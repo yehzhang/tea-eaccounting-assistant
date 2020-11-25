@@ -1,6 +1,7 @@
 import { Client, Message, MessageReaction, PartialUser, User } from 'discord.js';
 import * as _ from 'lodash';
 import { setupTesseract } from './data/itemDetection';
+import discordToken from './discordToken.json';
 import { Event } from './event';
 import { executeEvent } from './update/executeEvent';
 import { parseEventFromMessage } from './view/parseEventFromMessage';
@@ -93,6 +94,6 @@ client.on('messageReactionAdd', async (messageReaction: MessageReaction, partial
   await runEvents(events, messageReaction.message, client.user.id, partialUser.id);
 });
 
-client.login('Nzc2MjMzMjE2NzkzMTE2Njgz.X6x5hA.6mc6QhFiO-GM-ndGVadgCzrrFk8');
+client.login(discordToken.value);
 
 setupTesseract();

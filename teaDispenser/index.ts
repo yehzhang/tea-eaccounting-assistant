@@ -1,7 +1,6 @@
 import { Client, Message, MessageReaction, PartialUser, User } from 'discord.js';
 import * as _ from 'lodash';
 import { setupTesseract } from './data/itemDetection';
-import discordToken from './discordToken.json';
 import { Event } from './event';
 import { executeEvent } from './update/executeEvent';
 import { parseEventFromMessage } from './view/parseEventFromMessage';
@@ -94,6 +93,9 @@ client.on('messageReactionAdd', async (messageReaction: MessageReaction, partial
   await runEvents(events, messageReaction.message, client.user.id, partialUser.id);
 });
 
-client.login(discordToken.value);
+if (!process.env.DISCORD_BOT_TOKEN) {
+  throw new TypeError('Please set `DISCORD_BOT_TOKEN` environment variable');
+}
+client.login(process.env.DISCORD_BOT_TOKEN);
 
 setupTesseract();

@@ -1,11 +1,18 @@
 import { MessageOptions } from 'discord.js';
 import * as _ from 'lodash';
+import Command from '../data/Command';
+import { InvalidUsageReason } from '../data/InvalidCommand';
 import { ItemChecklist } from '../data/ItemChecklist';
 import { ItemChecklistEntry } from '../data/itemChecklistEntry';
 import { translateToChinese } from '../data/translateToChinese';
+import solarSystemNames from '../data/universeNames.json';
 import { User } from '../data/User';
 import { getTotalPrice } from '../state/getTotalPrice';
-import { ItemTransition, State } from '../state/state';
+import { AggregatedMarketPrice, ItemTransition, MarketQueryResult, State } from '../state/state';
+import { commandPrefix, queryPriceCommandView } from './commandViews';
+import renderPrice from './renderPrice';
+import renderRelativeDate from './renderRelativeDate';
+import renderTable from './renderTable';
 
 export function render(state: State): readonly Rendering[] {
   switch (state.type) {
@@ -215,6 +222,83 @@ export function render(state: State): readonly Rendering[] {
         },
       ];
     }
+    case 'SingleMarketQueryResult': {
+      const { query: { fetchedAt, orders } } = state;
+      return renderSingleMessage(
+          renderTable(
+              ['星系', '数量', '价格'],
+              orders.map(({ price, remainingVolume, solarSystemId }) => [
+                (solarSystemNames as { [solarSystemId: string]: string })[solarSystemId.toString()],
+                remainingVolume.toString(),
+                renderPrice(price),
+              ]),
+          ),
+          `_价格爬取自${renderRelativeDate(fetchedAt)}_`,
+      );
+    }
+    case 'UnknownItemName': {
+      return renderSingleMessage('未知物品名。请使用全称。');
+    }
+    case 'MarketPriceNotAvailable': {
+      return renderSingleMessage('尚未录入这件物品的价格。' +
+          '由于网易限制市场查询频率，目前仅支持绝地常见的产出，包括蓝图、装备、结构、矿、菜等。');
+    }
+    case 'MultipleMarketQueryResult': {
+      const { results } = state;
+      const minFetchedAt = _.minBy(results.filter((result): result is AggregatedMarketPrice =>
+          result.type === 'AggregatedMarketPrice')
+          .map(({ fetchedAt }) => fetchedAt), (fetchedAt) => fetchedAt.getTime());
+      return renderSingleMessage(
+          renderTable(
+              ['物品', '价格（吉他）', '价格（加权平均）'],
+              results.map((result) => {
+                return [result.itemName, ...renderPriceFromMarketQueryResult(result)];
+              }),
+          ),
+          minFetchedAt && `_价格最早爬取自${renderRelativeDate(minFetchedAt)}_`,
+      );
+    }
+    case 'UnknownCommand':
+      return renderSingleMessage('未知指令');
+    case 'InvalidUsage': {
+      const { commandType, reason } = state;
+      return renderSingleMessage(
+          renderInvalidCommandReason(reason),
+          '例如:',
+          ...renderCommandExamples(commandType),
+      );
+    }
+  }
+}
+
+function renderPriceFromMarketQueryResult(result: MarketQueryResult): string[] {
+  switch (result.type) {
+    case 'UnknownItemName':
+      return ['未知物品名', ''];
+    case 'MarketPriceNotAvailable':
+      return ['未录入价格', ''];
+    case 'AggregatedMarketPrice':
+      return [
+        result.jitaPrice === null ? '无' : renderPrice(result.jitaPrice),
+        renderPrice(result.weightedAveragePrice),
+      ];
+  }
+}
+
+function renderInvalidCommandReason(reason: InvalidUsageReason): string {
+  switch (reason) {
+    case 'ArgsRequired':
+      return '请输入至少一个参数';
+  }
+}
+
+function renderCommandExamples(commandType: Command['type']): string[] {
+  switch (commandType) {
+    case 'QueryPrice':
+      return [
+        `${commandPrefix}${queryPriceCommandView} 半导体记忆电池蓝图 III`,
+        `${commandPrefix}${queryPriceCommandView} 光泽合金，杂色复合物，重金属`,
+      ];
   }
 }
 
@@ -360,9 +444,9 @@ export interface RenderedReaction {
 }
 
 /** Convenience method that constructs a single message to return. */
-function renderSingleMessage(...lines: string[]): readonly RenderedMessage[] {
+function renderSingleMessage(...lines: (string | null | undefined)[]): readonly RenderedMessage[] {
   return [{
     type: 'RenderedMessage',
-    content: lines.join('\n'),
+    content: lines.filter(line => line != null).join('\n'),
   }];
 }

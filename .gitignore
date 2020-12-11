@@ -107,3 +107,9 @@ dist
 build/
 *.traineddata
 .DS_Store
+googleApisCredentials.json
+
+priceFetcher/mitm_module.py
+priceFetcher/fetcher.py
+priceFetcher/transport.py
+

@@ -2,11 +2,14 @@ import * as _ from 'lodash';
 import { fetchTempFile } from '../data/fetchTempFile';
 import { ItemChecklist } from '../data/ItemChecklist';
 import { recognizeItems } from '../data/itemDetection';
+import getJitaPrice from '../data/market/getJitaPrice';
+import getWeightedAverageMarketPrice from '../data/market/getWeightedAverageMarketPrice';
 import { User } from '../data/User';
 import { Event } from '../event';
 import { getTotalPrice } from '../state/getTotalPrice';
 import { ItemsPrices, State } from '../state/state';
 import { normalizeItemName } from './normalizeItemName';
+import queryMarketPriceByName from './queryMarketPriceByName';
 import { settleUpParticipants } from './settleUpParticipants';
 
 export async function executeEvent(event: Event): Promise<State> {
@@ -89,6 +92,44 @@ export async function executeEvent(event: Event): Promise<State> {
         itemsGrandTotal: getTotalPrice(selectedChecklists.flatMap(({ entries }) => entries)),
         participants: getParticipants(selectedChecklists),
       };
+    }
+    case 'CommandIssued': {
+      const { command } = event;
+      switch (command.type) {
+        case 'QueryPrice': {
+          const { itemNames } = command;
+          const dedupedItemNames = Array.from(new Set(itemNames));
+          const results = await Promise.all(dedupedItemNames.map(queryMarketPriceByName));
+
+          if (results.length === 1) {
+            return results[0];
+          }
+
+          return {
+            type: 'MultipleMarketQueryResult',
+            results: results.map((result) => {
+              switch (result.type) {
+                case 'MarketPriceNotAvailable':
+                case 'UnknownItemName':
+                  return result;
+                case 'SingleMarketQueryResult': {
+                  const { query: { orders, fetchedAt }, itemName } = result;
+                  return {
+                    type: 'AggregatedMarketPrice',
+                    itemName,
+                    jitaPrice: getJitaPrice(orders),
+                    weightedAveragePrice: getWeightedAverageMarketPrice(orders),
+                    fetchedAt,
+                  }
+                }
+              }
+            }),
+          };
+        }
+        case 'InvalidUsage':
+        case 'UnknownCommand':
+          return command;
+      }
     }
   }
 }

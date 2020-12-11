@@ -1,5 +1,7 @@
+import InvalidCommand from '../data/InvalidCommand';
 import { ItemChecklist } from '../data/ItemChecklist';
 import { ItemChecklistEntry } from '../data/itemChecklistEntry';
+import MarketQuery from '../data/market/MarketQuery';
 import { ParsedItemChecklistContent } from '../data/ParsedItemChecklistContent';
 import { ParsedValue } from '../data/parsedValue';
 import { User } from '../data/User';
@@ -12,6 +14,11 @@ export type State =
     | SettledUpParticipants
     | ChecklistNotSelected
     | LedgerEntry
+    | InvalidCommand
+    | SingleMarketQueryResult
+    | UnknownItemName
+    | MarketPriceNotAvailable
+    | MultipleMarketQueryResult
     ;
 
 interface Pong {
@@ -66,4 +73,38 @@ interface LedgerEntry {
   readonly checklistIndices: readonly number[];
   readonly itemsGrandTotal: number;
   readonly participants: readonly User[];
+}
+
+export interface SingleMarketQueryResult {
+  readonly type: 'SingleMarketQueryResult';
+  readonly itemName: string;
+  readonly query: MarketQuery;
+}
+
+export interface UnknownItemName {
+  readonly type: 'UnknownItemName';
+  readonly itemName: string;
+}
+
+export interface MarketPriceNotAvailable {
+  readonly type: 'MarketPriceNotAvailable';
+  readonly itemName: string;
+}
+
+interface MultipleMarketQueryResult {
+  readonly type: 'MultipleMarketQueryResult';
+  readonly results: readonly MarketQueryResult[];
+}
+
+export type MarketQueryResult =
+    | AggregatedMarketPrice
+    | UnknownItemName
+    | MarketPriceNotAvailable;
+
+export interface AggregatedMarketPrice {
+  readonly type: 'AggregatedMarketPrice';
+  readonly itemName: string;
+  readonly jitaPrice: number | null;
+  readonly weightedAveragePrice: number;
+  readonly fetchedAt: Date;
 }

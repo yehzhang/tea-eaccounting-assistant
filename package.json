@@ -10,6 +10,8 @@
     "emoji-regex": "^9.2.0",
     "lodash": "^4.17.20",
     "opencv4nodejs": "^5.6.0",
+    "sqlite": "^4.0.18",
+    "sqlite3": "^5.0.0",
     "tesseract.js": "^2.1.4"
   },
   "devDependencies": {
@@ -17,6 +19,7 @@
     "@types/jasmine": "^3.6.1",
     "@types/lodash": "^4.14.165",
     "@types/node": "^14.14.7",
+    "@types/sqlite3": "^3.1.6",
     "jasmine": "^3.6.3",
     "ts-node": "^9.0.0",
     "ts-node-dev": "^1.0.0",
@@ -25,6 +28,7 @@
   "scripts": {
     "generateDigitTemplates": "yarn ts-node-dev templateMatching/generateDigitTemplates.ts",
     "generateTextPacks": "yarn ts-node-dev data/generateTextPacks.ts",
+    "generateItemsData": "yarn ts-node-dev data/generateItemsData.ts",
     "writeTextsForTraining": "yarn ts-node-dev training/writeTextsForTraining.ts",
     "train:chinese": "cd ./training && tesstrain.sh --fontlist 'Source Han Sans CN Semi-Light' --fonts_dir ./font --output_dir ./outputTessdata --tessdata_dir ./inputTessdata --langdata_dir ./langdata --overwrite --lang chi_sim",
     "train:english": "cd ./training && tesstrain.sh --fontlist 'Source Han Sans CN Semi-Light' --fonts_dir ./font --output_dir ./outputTessdata --tessdata_dir ./inputTessdata --langdata_dir ./langdata --overwrite --lang eng",

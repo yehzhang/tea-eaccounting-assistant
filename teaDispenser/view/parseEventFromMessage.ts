@@ -1,5 +1,6 @@
 import { Message, Snowflake } from "discord.js";
 import { Event } from '../event';
+import { parseCommand } from './parseCommand';
 import { parseItemChecklistContent } from './parseItemChecklistContent';
 
 export function parseEventFromMessage(message: Message, clientUserId: Snowflake): readonly Event[] {
@@ -37,6 +38,14 @@ export function parseEventFromMessage(message: Message, clientUserId: Snowflake)
     events.push({
       type: 'ItemChecklistPosted',
       parsedItemChecklistContent,
+    });
+  }
+
+  const command = parseCommand(content);
+  if (command) {
+    events.push({
+      type: 'CommandIssued',
+      command,
     });
   }
 

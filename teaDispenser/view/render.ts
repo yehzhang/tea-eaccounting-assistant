@@ -1,8 +1,8 @@
 import { MessageOptions } from 'discord.js';
 import * as _ from 'lodash';
-import texts from '../../build/texts.json';
 import { ItemChecklist } from '../data/ItemChecklist';
 import { ItemChecklistEntry } from '../data/itemChecklistEntry';
+import { translateToChinese } from '../data/translateToChinese';
 import { User } from '../data/User';
 import { getTotalPrice } from '../state/getTotalPrice';
 import { ItemTransition, State } from '../state/state';
@@ -317,8 +317,7 @@ function renderChecklistSummary({ entries, author, createdAt }: ItemChecklist, i
 
 function renderCompactItemChecklistEntries(entries: readonly ItemChecklistEntry[]): string {
   return entries.map(({ name, amount }) => {
-    const textPack = texts.find(({ en }) => en === name);
-    return renderItemStack(textPack ? textPack.zh : name, Math.round(amount).toString());
+    return renderItemStack(translateToChinese(name), Math.round(amount).toString());
   }).join('、');
 }
 

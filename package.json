@@ -24,7 +24,8 @@
   },
   "scripts": {
     "generateDigitTemplates": "yarn ts-node-dev templateMatching/generateDigitTemplates.ts",
-    "extractNamesFromNetEaseJson": "yarn ts-node-dev training/extractNamesFromNetEaseJson.ts",
+    "generateTextPacks": "yarn ts-node-dev data/generateTextPacks.ts",
+    "writeTextsForTraining": "yarn ts-node-dev training/writeTextsForTraining.ts",
     "train:chinese": "cd ./training && tesstrain.sh --fontlist 'Source Han Sans CN Semi-Light' --fonts_dir ./font --output_dir ./outputTessdata --tessdata_dir ./inputTessdata --langdata_dir ./langdata --overwrite --lang chi_sim",
     "train:english": "cd ./training && tesstrain.sh --fontlist 'Source Han Sans CN Semi-Light' --fonts_dir ./font --output_dir ./outputTessdata --tessdata_dir ./inputTessdata --langdata_dir ./langdata --overwrite --lang eng",
     "test": "run(){ ts-node node_modules/jasmine/bin/jasmine ${@:-./**/*.spec.ts}; }; run",

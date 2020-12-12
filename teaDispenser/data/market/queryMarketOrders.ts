@@ -55,6 +55,7 @@ function getDatabase(): Promise<sqlite.Database> {
     databasePromise = open({
       filename: resolve(__dirname, '../../../priceFetcher/eve_echoes.db'),
       driver: sqlite3.Database,
+      mode: sqlite3.OPEN_READONLY,
     });
   }
   return databasePromise;

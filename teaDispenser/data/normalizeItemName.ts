@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
-import { itemNames } from '../data/itemNames';
-import { powerSet } from './powerSet';
+import { powerSet } from '../update/powerSet';
+import { itemNames } from './itemNames';
 
 export function normalizeItemName(text: string): NormalizationResult {
   const fuzzyText = text.replace(/’/g, `'`).replace(/ 一 /g, ' - ');

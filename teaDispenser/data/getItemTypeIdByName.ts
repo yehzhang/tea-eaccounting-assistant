@@ -1,5 +1,5 @@
-import { normalizeItemName } from '../update/normalizeItemName';
 import items from './items.json';
+import { normalizeItemName } from './normalizeItemName';
 import { translateToChinese } from './translateToChinese';
 
 function getItemTypeIdByName(itemName: string): number | null {

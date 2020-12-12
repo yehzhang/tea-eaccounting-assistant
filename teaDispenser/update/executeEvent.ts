@@ -4,11 +4,11 @@ import { ItemChecklist } from '../data/ItemChecklist';
 import { recognizeItems } from '../data/itemDetection';
 import getJitaPrice from '../data/market/getJitaPrice';
 import getWeightedAverageMarketPrice from '../data/market/getWeightedAverageMarketPrice';
+import { normalizeItemName } from '../data/normalizeItemName';
 import { User } from '../data/User';
 import { Event } from '../event';
 import { getTotalPrice } from '../state/getTotalPrice';
 import { ItemsPrices, State } from '../state/state';
-import { normalizeItemName } from './normalizeItemName';
 import queryMarketPriceByName from './queryMarketPriceByName';
 import { settleUpParticipants } from './settleUpParticipants';
 

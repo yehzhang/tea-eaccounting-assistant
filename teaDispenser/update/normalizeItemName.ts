@@ -3,11 +3,11 @@ import { itemNames } from '../data/itemNames';
 import { powerSet } from './powerSet';
 
 export function normalizeItemName(text: string): NormalizationResult {
-  const cleanText = text.replace(/’/g, `'`).replace(/ 一 /g, ' - ');
-  const ellipsisFreeText = trimEllipsis(cleanText);
+  const fuzzyText = text.replace(/’/g, `'`).replace(/ 一 /g, ' - ');
+  const ellipsisFreeText = trimEllipsis(fuzzyText);
   // If the text contains ellipsis, the name must not be a full name. Otherwise, the name may or may
   // not be a full name, because the ellipsis may or may not be recognized.
-  const hasEllipsis = cleanText !== ellipsisFreeText;
+  const hasEllipsis = fuzzyText !== ellipsisFreeText;
   const similarLookingTexts = listSimilarLookingTexts(ellipsisFreeText);
   const matchedSimilarLookingTexts = [];
   const allItemNameCandidates = [];
@@ -22,10 +22,11 @@ export function normalizeItemName(text: string): NormalizationResult {
         text: itemNameCandidates[0],
       };
     }
-    if (itemNameCandidates.includes(similarLookingText)) {
+    const matchingCandidate = itemNameCandidates.find(candidate => fuzzyEqual(candidate, similarLookingText));
+    if (matchingCandidate !== undefined) {
       return {
         type: 'ExactMatch',
-        text: similarLookingText,
+        text: matchingCandidate,
       };
     }
     matchedSimilarLookingTexts.push(similarLookingText);
@@ -34,7 +35,7 @@ export function normalizeItemName(text: string): NormalizationResult {
 
   if (matchedSimilarLookingTexts.length === 1) {
     const matchedText = matchedSimilarLookingTexts[0];
-    const prefix = getLongestCommonPrefix(allItemNameCandidates);
+    const prefix = getLongestCommonPrefix(allItemNameCandidates).trimEnd();
     return {
       type: 'NormalizationOnly',
       normalizedText: matchedText.length < prefix.length ? prefix : matchedText,
@@ -119,11 +120,18 @@ function trimEllipsis(text: string): string {
 const ellipsisTemplates = ['…', '...'];
 
 function findItemNamesByPrefix(prefix: string, includeExactMatch: boolean): string[] {
-  const spaceFreePrefix = prefix.replace(/ /g, '');
   const candidates = itemNames.filter(
-      candidate => candidate.replace(/ /g, '').startsWith(spaceFreePrefix));
+      candidate => getFuzzyText(candidate).startsWith(getFuzzyText(prefix)));
   if (includeExactMatch) {
     return candidates;
   }
-  return candidates.filter(candidate => candidate.replace(/ /g, '') !== prefix);
+  return candidates.filter(candidate => candidate !== prefix);
+}
+
+function fuzzyEqual(text: string, other: string): boolean {
+  return getFuzzyText(text) === getFuzzyText(other);
+}
+
+function getFuzzyText(text: string): string {
+  return text.replace(/ /g, '').toLocaleLowerCase();
 }

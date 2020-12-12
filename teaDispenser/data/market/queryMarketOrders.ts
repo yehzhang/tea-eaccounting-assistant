@@ -1,10 +1,10 @@
 import { resolve } from 'path';
-import { open } from 'sqlite'
-import { Database } from 'sqlite3';
+import sqlite, { open } from 'sqlite'
+import sqlite3 from 'sqlite3';
 import MarketQuery from './MarketQuery';
 
 async function queryMarketOrders(itemTypeId: number): Promise<MarketQuery | null> {
-  const database = await databasePromise;
+  const database = await getDatabase();
   const fetchedAtRow = await database.get(`
       select fetched_at
       from market_order
@@ -48,9 +48,16 @@ async function queryMarketOrders(itemTypeId: number): Promise<MarketQuery | null
 
 // const jitaSolarSystemId = 30000142;
 
-const databasePromise = open({
-  filename: resolve(__dirname, '../../../priceFetcher/eve_echoes.db'),
-  driver: Database,
-});
+let databasePromise: Promise<sqlite.Database>;
+
+function getDatabase(): Promise<sqlite.Database> {
+  if (!databasePromise) {
+    databasePromise = open({
+      filename: resolve(__dirname, '../../../priceFetcher/eve_echoes.db'),
+      driver: sqlite3.Database,
+    });
+  }
+  return databasePromise;
+}
 
 export default queryMarketOrders;

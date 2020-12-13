@@ -1,6 +1,7 @@
 import sqlite3
 from aiohttp import web
 import json
+from time import gmtime, strftime
 
 
 async def handle(request):
@@ -37,12 +38,15 @@ def fetch_orders(c, item_type_id):
       select price
            , remaining_volume
            , solar_system_id
+           , station_id
            , bid
       from market_order
       where item_type_id = :item_type_id
         and fetched_at = :fetched_at
       order by price
     ''', (item_type_id, fetched_at)).fetchall()
+
+    fetched_at += strftime("%z", gmtime())
 
     return result, fetched_at
 

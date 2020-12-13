@@ -1,4 +1,4 @@
-import items from './items.json';
+import items from '../../generated/items.json';
 import { normalizeItemName } from './normalizeItemName';
 import { translateToChinese } from './translateToChinese';
 

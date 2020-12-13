@@ -1,11 +1,11 @@
 import { MessageOptions } from 'discord.js';
 import * as _ from 'lodash';
+import solarSystemNames from '../../generated/universeNames.json';
 import Command from '../data/Command';
 import { InvalidUsageReason } from '../data/InvalidCommand';
 import { ItemChecklist } from '../data/ItemChecklist';
 import { ItemChecklistEntry } from '../data/itemChecklistEntry';
 import { translateToChinese } from '../data/translateToChinese';
-import solarSystemNames from '../data/universeNames.json';
 import { User } from '../data/User';
 import { getTotalPrice } from '../state/getTotalPrice';
 import { AggregatedMarketPrice, ItemTransition, MarketQueryResult, State } from '../state/state';

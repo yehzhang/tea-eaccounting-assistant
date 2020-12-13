@@ -1,5 +1,5 @@
 import getItemTypeIdByName from '../data/getItemTypeIdByName';
-import queryMarketOrders from '../data/market/queryMarketOrders';
+import queryMarketBuyOrders from '../data/market/queryMarketBuyOrders';
 import { MarketPriceNotAvailable, SingleMarketQueryResult, UnknownItemName } from '../state/state';
 
 async function queryMarketPriceByName(itemName: string): Promise<SingleMarketQueryResult | UnknownItemName | MarketPriceNotAvailable> {
@@ -11,7 +11,7 @@ async function queryMarketPriceByName(itemName: string): Promise<SingleMarketQue
     }
   }
 
-  const query = await queryMarketOrders(itemTypeId);
+  const query = await queryMarketBuyOrders(itemTypeId);
   if (!query || !query.orders.length) {
     return {
       type: 'MarketPriceNotAvailable',

@@ -1,6 +1,5 @@
 import { MessageOptions } from 'discord.js';
 import * as _ from 'lodash';
-import solarSystemNames from '../../generated/universeNames.json';
 import Command from '../data/Command';
 import { InvalidUsageReason } from '../data/InvalidCommand';
 import { ItemChecklist } from '../data/ItemChecklist';
@@ -227,8 +226,8 @@ export function render(state: State): readonly Rendering[] {
       return renderSingleMessage(
           renderTable(
               ['星系', '数量', '价格'],
-              orders.map(({ price, remainingVolume, solarSystemId }) => [
-                (solarSystemNames as { [solarSystemId: string]: string })[solarSystemId.toString()],
+              orders.map(({ price, remainingVolume, solarSystemName }) => [
+                solarSystemName,
                 remainingVolume.toString(),
                 renderPrice(price),
               ]),

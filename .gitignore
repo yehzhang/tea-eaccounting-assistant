@@ -112,3 +112,4 @@ googleApisCredentials.json
 priceFetcher/mitm_module.py
 priceFetcher/fetcher.py
 priceFetcher/transport.py
+priceFetcher/eve_echoes.db

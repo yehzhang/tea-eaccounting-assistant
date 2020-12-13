@@ -135,7 +135,7 @@ class ColumnDescriptor(object):
         return self.__repr__()
 
     def __eq__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             return self.name == other
         elif isinstance(other, ColumnDescriptor):
             return self.name == other.name and self.column_type == other.column_type and \
@@ -342,7 +342,7 @@ class DBRow(object):
         return self.__header__._columns
 
     def __getitem__(self, index):
-        if isinstance(index, basestring):
+        if isinstance(index, str):
             return getattr(self, index)
         if index >= self.size():
             raise IndexError('index(%s) beyond size(%s) in dbrow' % (index, self.size()))
@@ -372,7 +372,7 @@ class DBRow(object):
         return self.__repr__()
 
     def __setitem__(self, index, value):
-        if isinstance(index, basestring):
+        if isinstance(index, str):
             return setattr(self, index, value)
         if index >= self.size():
             raise IndexError('index(%d) beyond size(%d) in dbrow' % (index, self.size()))

@@ -9,6 +9,7 @@ async function queryMarketOrders(itemTypeId: number): Promise<MarketQuery | null
       select fetched_at
       from market_order
       where item_type_id = :item_type_id
+        and bid = 0
       order by fetched_at desc
       limit 1
   `, {
@@ -32,6 +33,8 @@ async function queryMarketOrders(itemTypeId: number): Promise<MarketQuery | null
       from market_order
       where item_type_id = :item_type_id
         and fetched_at = :fetched_at
+        and bid = 0
+      order by price
   `, {
     ':item_type_id': itemTypeId,
     ':fetched_at': fetchedAtRow.fetched_at,

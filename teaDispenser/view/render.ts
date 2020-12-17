@@ -19,14 +19,6 @@ export function render(state: State): readonly Rendering[] {
       return renderSingleMessage('Pong!');
     case 'DetectedItems': {
       const { items } = state;
-      if (!items.length) {
-        return renderSingleMessage(
-            '抱歉，没能从图中看出物品😔',
-            '请确认这是一张完整的物品栏截图',
-            `如果还是不行可以复制以前的${itemChecklist}，手动填写并回复`,
-        );
-      }
-
       const allValid = items.every(
           ({ name, amount }) => name.parsedValue !== null && amount.parsedValue !== null);
       return [
@@ -57,6 +49,26 @@ export function render(state: State): readonly Rendering[] {
               }),
               [],
           ),
+        },
+      ];
+    }
+    case 'NoItemsDetected':
+      return renderSingleMessage(
+          '抱歉，没能从图中看出物品😔',
+          '请确认这是一张完整的物品栏截图',
+          `如果还是不行可以复制以前的${itemChecklist}，手动填写并回复`,
+      );
+    case 'SpreadsheetCreationFailure':
+      return renderSingleMessage(
+          '抱歉，创建 Google Sheets 时出了问题😔',
+          mention(yzDiscordUserId),
+      );
+    case 'SpreadsheetCreated': {
+      const { url } = state;
+      return [
+        {
+          type: 'RenderedMessage',
+          content: url,
         },
       ];
     }
@@ -240,7 +252,7 @@ export function render(state: State): readonly Rendering[] {
     }
     case 'MarketPriceNotAvailable': {
       return renderSingleMessage('尚未录入这件物品的价格。' +
-          '由于网易限制市场查询频率，目前仅支持绝地常见的产出，包括蓝图、装备、结构、矿、菜等。');
+          '由于网易限制市场查询频率，目前仅支持绝地常见的产出，包括改装件蓝图、装备、结构、矿、菜等。');
     }
     case 'MultipleMarketQueryResult': {
       const { results } = state;
@@ -306,7 +318,7 @@ function renderActivitySummary(participants: readonly User[], checklistIndices: 
     type: 'RenderedMessage',
     content: [
       '此次活动：',
-      `• 参与者：${participants.map(({ id }) => `<@!${id}>`).join('，')}`,
+      `• 参与者：${participants.map(({ id }) => mention(id)).join('，')}`,
       `• 物品清单：${checklistIndices.map(index => indexIcons[index]).join('，')}`,
       `• 物品总价：${itemsGrandTotal}`,
       `• 每人应得：${Math.floor(itemsGrandTotal / participants.length)}`,
@@ -375,6 +387,10 @@ function groupAdjacentDuplicates<T>(items: readonly T[]): readonly DuplicateGrou
   return groups;
 }
 
+function mention(userId: string): string {
+  return `<@!${userId}>`;
+}
+
 interface DuplicateGroup<T> {
   readonly value: T;
   count: number;
@@ -428,6 +444,8 @@ export const ledgerIcon = '📒';
 const excelCellSeparator = '｜';
 
 export type Rendering = RenderedMessage | RenderedReaction;
+
+const yzDiscordUserId = '202649496381816832';
 
 export interface RenderedMessage {
   readonly type: 'RenderedMessage';

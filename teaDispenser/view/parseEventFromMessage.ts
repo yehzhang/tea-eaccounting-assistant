@@ -11,7 +11,7 @@ export function parseEventFromMessage(message: Message, clientUserId: Snowflake)
     return events;
   }
 
-  console.debug('parseEventFromMessage', message);
+  console.debug(`${author.username}: ${content}`);
 
   if (content.toLocaleLowerCase() === 'ping') {
     events.push({
@@ -30,6 +30,7 @@ export function parseEventFromMessage(message: Message, clientUserId: Snowflake)
     events.push({
       type: 'ImagePosted',
       url: attachment.url,
+      userName: author.username,
     });
   }
 

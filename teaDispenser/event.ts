@@ -20,6 +20,7 @@ interface Pinged {
 interface ImagePosted {
   readonly type: 'ImagePosted';
   readonly url: string;
+  readonly userName: string;
 }
 
 interface ItemChecklistPosted {

@@ -8,9 +8,19 @@ import { normalizeItemName } from '../data/normalizeItemName';
 import { User } from '../data/User';
 import { Event } from '../event';
 import { getTotalPrice } from '../state/getTotalPrice';
-import { ItemsPrices, State } from '../state/state';
+import {
+  ItemsPrices,
+  MarketPriceNotAvailable,
+  SingleMarketQueryResult,
+  State,
+  UnknownItemName,
+} from '../state/state';
 import queryMarketPriceByName from './queryMarketPriceByName';
 import { settleUpParticipants } from './settleUpParticipants';
+import createSpreadsheet from './sheets/createSpreadsheet';
+import grantPermission from './sheets/grantPermission';
+import setDataValidations from './sheets/setDataValidations';
+import updateSpreadsheetValues from './sheets/updateSpreadsheetValues';
 
 export async function executeEvent(event: Event): Promise<State> {
   switch (event.type) {
@@ -19,25 +29,50 @@ export async function executeEvent(event: Event): Promise<State> {
         type: 'Pong',
       };
     case 'ImagePosted': {
-      const { url } = event;
+      // TODO asks for how many people.
+      const { url, userName } = event;
       const imagePath = await fetchTempFile(url);
       const recognizedItems = await recognizeItems(imagePath);
-      return {
-        type: 'DetectedItems',
-        items: recognizedItems.map(({ name, amount }) => {
+      if (!recognizedItems.length) {
+        return {
+          type: 'NoItemsDetected',
+        };
+      }
+
+      const [spreadsheet, itemRows] = await Promise.all([
+        createSpreadsheet(userName),
+        Promise.all(recognizedItems.map(async ({ name, amount }) => {
           const normalizationResult = normalizeItemName(name);
-          const normalizedAmount = Number(amount);
+          const exactName = normalizationResult.type === 'ExactMatch' ? normalizationResult.text : null;
+          const query = exactName && await queryMarketPriceByName(exactName);
           return {
-            name: {
-              text: normalizationResult.type === 'NormalizationOnly' ? normalizationResult.normalizedText : name,
-              parsedValue: normalizationResult.type === 'ExactMatch' ? normalizationResult.text : null,
-            },
-            amount: {
-              text: amount,
-              parsedValue: isNaN(normalizedAmount) ? null : normalizedAmount,
-            },
+            name: exactName ? exactName :
+                normalizationResult.type === 'NormalizationOnly' ? normalizationResult.normalizedText : name,
+            amount,
+            price: query ? getJitaPrice(query.orders) : null,
           };
-        }),
+        })),
+      ]);
+      if (!spreadsheet) {
+        return {
+          type: 'SpreadsheetCreationFailure',
+        }
+      }
+
+      const results: readonly boolean[] = await Promise.all([
+        grantPermission(spreadsheet.id),
+        updateSpreadsheetValues(spreadsheet.id, itemRows),
+        setDataValidations(spreadsheet.id),
+      ]);
+      if (!_.every(results)) {
+        return {
+          type: 'SpreadsheetCreationFailure',
+        };
+      }
+
+      return {
+        type: 'SpreadsheetCreated',
+        url: spreadsheet.url,
       };
     }
     case 'ItemChecklistPosted': {
@@ -99,7 +134,27 @@ export async function executeEvent(event: Event): Promise<State> {
         case 'QueryPrice': {
           const { itemNames } = command;
           const dedupedItemNames = Array.from(new Set(itemNames));
-          const results = await Promise.all(dedupedItemNames.map(queryMarketPriceByName));
+          const results = await Promise.all(dedupedItemNames.map(async (itemName): Promise<MarketPriceNotAvailable | SingleMarketQueryResult | UnknownItemName> => {
+            const normalizationResult = normalizeItemName(itemName);
+            if (normalizationResult.type !== 'ExactMatch') {
+              return {
+                type: 'UnknownItemName',
+                itemName,
+              };
+            }
+            const query = await queryMarketPriceByName(normalizationResult.text);
+            if (!query || !query.orders.length) {
+              return {
+                type: 'MarketPriceNotAvailable',
+                itemName,
+              };
+            }
+            return {
+              type: 'SingleMarketQueryResult',
+              itemName,
+              query,
+            };
+          }));
 
           if (results.length === 1) {
             return results[0];

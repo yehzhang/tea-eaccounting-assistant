@@ -1,4 +1,5 @@
 import axios from 'axios';
+import MarketOrder from './MarketOrder';
 import MarketQuery from './MarketQuery';
 
 async function queryMarketBuyOrders(itemTypeId: number): Promise<MarketQuery | null> {
@@ -6,8 +7,14 @@ async function queryMarketBuyOrders(itemTypeId: number): Promise<MarketQuery | n
     url: `http://138.68.255.93:8000/${itemTypeId}`,
   });
   const { data } = response;
-  if (typeof data !== 'object' || data === null || 'error' in data) {
-    console.error('Unexpected error in database fetch', data);
+  if (typeof data !== 'object' || data === null) {
+    console.error('Expected valid response in database fetch', data);
+    return null;
+  }
+  if ('error' in data) {
+    if (data.error !== 'Unknown item_type_id') {
+      console.error('Unexpected error in database fetch', data);
+    }
     return null;
   }
 
@@ -25,18 +32,21 @@ async function queryMarketBuyOrders(itemTypeId: number): Promise<MarketQuery | n
             price,
             remaining_volume: remainingVolume,
             solar_system_name: solarSystemName,
+            station_id: stationId,
             bid,
           } = order || {};
-          if (typeof price !== 'number' || typeof remainingVolume !== 'number' || typeof solarSystemName !== 'string') {
+          if (typeof price !== 'number' || typeof remainingVolume !== 'number' || typeof solarSystemName !== 'string' || typeof stationId !== 'number' || typeof bid !== 'number') {
             console.error('Expected valid order, got', order);
             return null;
           }
-          return {
+          const marketOrder: MarketOrder = {
             price,
             remainingVolume,
             solarSystemName,
+            stationId,
             sell: !bid,
           };
+          return marketOrder;
         })
         .filter((order: any) => order?.sell),
     fetchedAt,

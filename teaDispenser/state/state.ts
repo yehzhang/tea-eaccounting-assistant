@@ -9,6 +9,9 @@ import { User } from '../data/User';
 export type State =
     | Pong
     | DetectedItems
+    | NoItemsDetected
+    | SpreadsheetCreationFailure
+    | SpreadsheetCreated
     | ItemChecklistSubmittedConfirmation
     | FetchedItemChecklistsOfToday
     | SettledUpParticipants
@@ -28,6 +31,19 @@ interface Pong {
 interface DetectedItems {
   readonly type: 'DetectedItems',
   readonly items: readonly DetectedItem[];
+}
+
+interface NoItemsDetected {
+  readonly type: 'NoItemsDetected',
+}
+
+interface SpreadsheetCreationFailure {
+  readonly type: 'SpreadsheetCreationFailure',
+}
+
+interface SpreadsheetCreated {
+  readonly type: 'SpreadsheetCreated',
+  readonly url: string;
 }
 
 interface DetectedItem {

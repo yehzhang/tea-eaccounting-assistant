@@ -1,6 +1,6 @@
 import axios from 'axios';
-import MarketOrder from './MarketOrder';
-import MarketQuery from './MarketQuery';
+import MarketOrder from '../../data/MarketOrder';
+import MarketQuery from '../../data/MarketQuery';
 
 async function queryMarketBuyOrders(itemTypeId: number): Promise<MarketQuery | null> {
   const response = await axios({

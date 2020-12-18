@@ -2,8 +2,6 @@ import * as _ from 'lodash';
 import { fetchTempFile } from '../data/fetchTempFile';
 import { ItemChecklist } from '../data/ItemChecklist';
 import { recognizeItems } from '../data/itemDetection';
-import getJitaPrice from '../data/market/getJitaPrice';
-import getWeightedAverageMarketPrice from '../data/market/getWeightedAverageMarketPrice';
 import { normalizeItemName } from '../data/normalizeItemName';
 import { User } from '../data/User';
 import { Event } from '../event';
@@ -15,6 +13,8 @@ import {
   State,
   UnknownItemName,
 } from '../state/state';
+import getJitaPrice from './market/getJitaPrice';
+import getWeightedAverageMarketPrice from './market/getWeightedAverageMarketPrice';
 import queryMarketPriceByName from './queryMarketPriceByName';
 import { settleUpParticipants } from './settleUpParticipants';
 import createSpreadsheet from './sheets/createSpreadsheet';

@@ -1,7 +1,7 @@
 import InvalidCommand from '../data/InvalidCommand';
 import { ItemChecklist } from '../data/ItemChecklist';
 import { ItemChecklistEntry } from '../data/itemChecklistEntry';
-import MarketQuery from '../data/market/MarketQuery';
+import MarketQuery from '../data/MarketQuery';
 import { ParsedItemChecklistContent } from '../data/ParsedItemChecklistContent';
 import { ParsedValue } from '../data/parsedValue';
 import { User } from '../data/User';

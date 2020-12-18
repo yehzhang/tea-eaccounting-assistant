@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import MarketOrder from './MarketOrder';
+import MarketOrder from '../../data/MarketOrder';
 
 function getWeightedAverageMarketPrice(orders: readonly MarketOrder[]): number {
   const itcOrders = orders.filter(({ solarSystemName }) => highSecItcSolarSystems.has(solarSystemName));

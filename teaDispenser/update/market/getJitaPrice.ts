@@ -1,4 +1,4 @@
-import MarketOrder from './MarketOrder';
+import MarketOrder from '../../data/MarketOrder';
 
 function getJitaPrice(orders: readonly MarketOrder[]): number | null {
   const jitaOrders = orders.filter(({ stationId }) => stationId === jitaItcStationId);

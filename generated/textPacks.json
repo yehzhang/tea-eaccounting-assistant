@@ -1116,10 +1116,6 @@
     "en": "MK3 Hornet"
   },
   {
-    "zh": "MK3 小型导弹扫射设备",
-    "en": "MK3 Small Missile Barrage Device"
-  },
-  {
     "zh": "MK3 小型护盾回充增量器",
     "en": "MK3 Small Shield Booster"
   },
@@ -1244,10 +1240,6 @@
     "en": "MK5 800mm Reinforced Steel Plate"
   },
   {
-    "zh": "MK5 中型导弹扫射设备",
-    "en": "MK5 Medium Missile Barrage Device"
-  },
-  {
     "zh": "MK5 中型护盾力场模块",
     "en": "MK5 Medium Shield Field Module"
   },
@@ -1358,10 +1350,6 @@
   {
     "zh": "MK5 导弹制导计算机",
     "en": "MK5 Missile Guidance Computer"
-  },
-  {
-    "zh": "MK5 小型导弹扫射设备",
-    "en": "MK5 Small Missile Barrage Device"
   },
   {
     "zh": "MK5 小型护盾力场模块",
@@ -1596,10 +1584,6 @@
     "en": "MK7 800mm Reinforced Steel Plate"
   },
   {
-    "zh": "MK7 中型导弹扫射设备",
-    "en": "MK7 Medium Missile Barrage Device"
-  },
-  {
     "zh": "MK7 中型护盾力场模块",
     "en": "MK7 Medium Shield Field Module"
   },
@@ -1736,10 +1720,6 @@
     "en": "MK7 Hobgoblin"
   },
   {
-    "zh": "MK7 大型导弹扫射设备",
-    "en": "MK7 Large Missile Barrage Device"
-  },
-  {
     "zh": "MK7 大型护盾力场模块",
     "en": "MK7 Large Shield Field Module"
   },
@@ -1802,10 +1782,6 @@
   {
     "zh": "MK7 导弹制导计算机",
     "en": "MK7 Missile Guidance Computer"
-  },
-  {
-    "zh": "MK7 小型导弹扫射设备",
-    "en": "MK7 Small Missile Barrage Device"
   },
   {
     "zh": "MK7 小型护盾力场模块",
@@ -2100,10 +2076,6 @@
     "en": "MK9 800mm Reinforced Steel Plate"
   },
   {
-    "zh": "MK9 中型导弹扫射设备",
-    "en": "MK9 Medium Missile Barrage Device"
-  },
-  {
     "zh": "MK9 中型护盾力场模块",
     "en": "MK9 Medium Shield Field Module"
   },
@@ -2240,10 +2212,6 @@
     "en": "MK9 Hobgoblin"
   },
   {
-    "zh": "MK9 大型导弹扫射设备",
-    "en": "MK9 Large Missile Barrage Device"
-  },
-  {
     "zh": "MK9 大型护盾力场模块",
     "en": "MK9 Large Shield Field Module"
   },
@@ -2306,10 +2274,6 @@
   {
     "zh": "MK9 导弹制导计算机",
     "en": "MK9 Missile Guidance Computer"
-  },
-  {
-    "zh": "MK9 小型导弹扫射设备",
-    "en": "MK9 Small Missile Barrage Device"
   },
   {
     "zh": "MK9 小型护盾力场模块",
@@ -2696,10 +2660,6 @@
     "en": "QA 800mm Reinforced Steel Plate"
   },
   {
-    "zh": "QA 中型导弹扫射设备",
-    "en": "QA Medium Missile Barrage Device"
-  },
-  {
     "zh": "QA 中型护盾回充增量器",
     "en": "QA Medium Shield Booster"
   },
@@ -2812,10 +2772,6 @@
     "en": "QA Hobgoblin"
   },
   {
-    "zh": "QA 大型导弹扫射设备",
-    "en": "QA Large Missile Barrage Device"
-  },
-  {
     "zh": "QA 大型护盾回充增量器",
     "en": "QA Large Shield Booster"
   },
@@ -2870,10 +2826,6 @@
   {
     "zh": "QA 导弹制导计算机",
     "en": "QA Missile Guidance Computer"
-  },
-  {
-    "zh": "QA 小型导弹扫射设备",
-    "en": "QA Small Missile Barrage Device"
   },
   {
     "zh": "QA 小型护盾回充增量器",
@@ -11372,10 +11324,6 @@
     "en": "Moon Tech 800mm Reinforced Steel Plate"
   },
   {
-    "zh": "卫星科技 中型导弹扫射设备",
-    "en": "Moon Tech Medium Missile Barrage Device"
-  },
-  {
     "zh": "卫星科技 中型护盾力场模块",
     "en": "Moon Medium Shield Field Module"
   },
@@ -11512,10 +11460,6 @@
     "en": "Moon Tech Hobgoblin"
   },
   {
-    "zh": "卫星科技 大型导弹扫射设备",
-    "en": "Moon Tech Large Missile Barrage Device"
-  },
-  {
     "zh": "卫星科技 大型护盾力场模块",
     "en": "Moon Large Shield Field Module"
   },
@@ -11578,10 +11522,6 @@
   {
     "zh": "卫星科技 导弹制导计算机",
     "en": "Moon Missile Guidance Computer"
-  },
-  {
-    "zh": "卫星科技 小型导弹扫射设备",
-    "en": "Moon Tech Small Missile Barrage Device"
   },
   {
     "zh": "卫星科技 小型护盾力场模块",
@@ -12113,19 +12053,19 @@
   },
   {
     "zh": "反动能聚合器蓝图 I",
-    "en": "Small Anti-Kinetic Pump I Blueprint"
+    "en": "Anti-Kinetic Pump I Blueprint"
   },
   {
     "zh": "反动能聚合器蓝图 II",
-    "en": "Small Anti-Kinetic Pump II Blueprint"
+    "en": "Anti-Kinetic Pump II Blueprint"
   },
   {
     "zh": "反动能聚合器蓝图 III",
-    "en": "Small Anti-Kinetic Pump III Blueprint"
+    "en": "Anti-Kinetic Pump III Blueprint"
   },
   {
     "zh": "反动能聚合器蓝图 IV",
-    "en": "Small Anti-Kinetic Pump IV Blueprint"
+    "en": "Anti-Kinetic Pump IV Blueprint"
   },
   {
     "zh": "反应式护盾增强器",
@@ -12209,19 +12149,19 @@
   },
   {
     "zh": "反热能聚合器蓝图 I",
-    "en": "Small Anti-Thermal Pump I Blueprint"
+    "en": "Anti-Thermal Pump I Blueprint"
   },
   {
     "zh": "反热能聚合器蓝图 II",
-    "en": "Small Anti-Thermal Pump II Blueprint"
+    "en": "Anti-Thermal Pump II Blueprint"
   },
   {
     "zh": "反热能聚合器蓝图 III",
-    "en": "Small Anti-Thermal Pump III Blueprint"
+    "en": "Anti-Thermal Pump III Blueprint"
   },
   {
     "zh": "反热能聚合器蓝图 IV",
-    "en": "Small Anti-Thermal Pump IV Blueprint"
+    "en": "Anti-Thermal Pump IV Blueprint"
   },
   {
     "zh": "反爆破横贯舱壁 I",
@@ -12273,19 +12213,19 @@
   },
   {
     "zh": "反爆破聚合器蓝图 I",
-    "en": "Small Anti-Explosive Pump I Blueprint"
+    "en": "Anti-Explosive Pump I Blueprint"
   },
   {
     "zh": "反爆破聚合器蓝图 II",
-    "en": "Small Anti-Explosive Pump II Blueprint"
+    "en": "Anti-Explosive Pump II Blueprint"
   },
   {
     "zh": "反爆破聚合器蓝图 III",
-    "en": "Small Anti-Explosive Pump III Blueprint"
+    "en": "Anti-Explosive Pump III Blueprint"
   },
   {
     "zh": "反爆破聚合器蓝图 IV",
-    "en": "Small Anti-Explosive Pump IV Blueprint"
+    "en": "Anti-Explosive Pump IV Blueprint"
   },
   {
     "zh": "反电磁横贯舱壁 I",
@@ -12337,19 +12277,19 @@
   },
   {
     "zh": "反电磁聚合器蓝图 I",
-    "en": "Small Anti-EM Pump I Blueprint"
+    "en": "Anti-EM Pump I Blueprint"
   },
   {
     "zh": "反电磁聚合器蓝图 II",
-    "en": "Small Anti-EM Pump II Blueprint"
+    "en": "Anti-EM Pump II Blueprint"
   },
   {
     "zh": "反电磁聚合器蓝图 III",
-    "en": "Small Anti-EM Pump III Blueprint"
+    "en": "Anti-EM Pump III Blueprint"
   },
   {
     "zh": "反电磁聚合器蓝图 IV",
-    "en": "Small Anti-EM Pump IV Blueprint"
+    "en": "Anti-EM Pump IV Blueprint"
   },
   {
     "zh": "发 射",
@@ -19548,10 +19488,6 @@
     "en": "Fullerene 800mm Reinforced Steel Plate"
   },
   {
-    "zh": "富勒烯 中型导弹扫射设备",
-    "en": "Fullerenes Medium Missile Barrage Device"
-  },
-  {
     "zh": "富勒烯 中型护盾力场模块",
     "en": "Fullerene Medium Shield Field Module"
   },
@@ -19688,10 +19624,6 @@
     "en": "Fullerene Hobgoblin"
   },
   {
-    "zh": "富勒烯 大型导弹扫射设备",
-    "en": "Fullerenes Large Missile Barrage Device"
-  },
-  {
     "zh": "富勒烯 大型护盾力场模块",
     "en": "Fullerene Large Shield Field Module"
   },
@@ -19754,10 +19686,6 @@
   {
     "zh": "富勒烯 导弹制导计算机",
     "en": "Fullerene Missile Guidance Computer"
-  },
-  {
-    "zh": "富勒烯 小型导弹扫射设备",
-    "en": "Fullerenes Small Missile Barrage Device"
   },
   {
     "zh": "富勒烯 小型护盾力场模块",
@@ -26189,19 +26117,19 @@
   },
   {
     "zh": "抗爆破屏障强化器蓝图 I",
-    "en": "Small Anti-Explosive Screen Reinforcer I Blueprint"
+    "en": "Anti-Explosive Screen Reinforcer I Blueprint"
   },
   {
     "zh": "抗爆破屏障强化器蓝图 II",
-    "en": "Small Anti-Explosive Screen Reinforcer II Blueprint"
+    "en": "Anti-Explosive Screen Reinforcer II Blueprint"
   },
   {
     "zh": "抗爆破屏障强化器蓝图 III",
-    "en": "Small Anti-Explosive Screen Reinforcer III Blueprint"
+    "en": "Anti-Explosive Screen Reinforcer III Blueprint"
   },
   {
     "zh": "抗爆破屏障强化器蓝图 IV",
-    "en": "Small Anti-Explosive Screen Reinforcer IV Blueprint"
+    "en": "Anti-Explosive Screen Reinforcer IV Blueprint"
   },
   {
     "zh": "抗电磁屏障强化器 I",
@@ -31348,24 +31276,12 @@
     "en": "Yan-Jung"
   },
   {
-    "zh": "殷郡 中型导弹扫射设备",
-    "en": "Yan-Jung Medium Missile Barrage Device"
-  },
-  {
     "zh": "殷郡 中型炮台扫射设备",
     "en": "Yan-Jung Medium Turret Barrage Device"
   },
   {
-    "zh": "殷郡 大型导弹扫射设备",
-    "en": "Yan-Jung Large Missile Barrage Device"
-  },
-  {
     "zh": "殷郡 大型炮台扫射设备",
     "en": "Yan-Jung Large Turret Barrage Device"
-  },
-  {
-    "zh": "殷郡 小型导弹扫射设备",
-    "en": "Yan-Jung Small Missile Barrage Device"
   },
   {
     "zh": "殷郡 小型炮台扫射设备",
@@ -42302,18 +42218,6 @@
   {
     "zh": "莫德团",
     "en": "Mordu's Legion"
-  },
-  {
-    "zh": "莫德团 中型导弹扫射设备",
-    "en": "Mordu's Legion Medium Missile Barrage Device"
-  },
-  {
-    "zh": "莫德团 大型导弹扫射设备",
-    "en": "Mordu's Legion Large Missile Barrage Device"
-  },
-  {
-    "zh": "莫德团 小型导弹扫射设备",
-    "en": "Mordu's Legion Small Missile Barrage Device"
   },
   {
     "zh": "莫德团发明原理",
@@ -65776,10 +65680,6 @@
     "en": "Corp. Name too long"
   },
   {
-    "zh": "双生 大型导弹扫射设备",
-    "en": "'Gemini' Large Missile Barrage Device "
-  },
-  {
     "zh": "军团邮件太长",
     "en": "Corporation Messages too long"
   },
@@ -66036,10 +65936,6 @@
     "en": "F-435454 Ogre Blueprint"
   },
   {
-    "zh": "双生 中型导弹扫射设备",
-    "en": "'Gemini' Medium Missile Barrage Device "
-  },
-  {
     "zh": "卫星科技 战锤蓝图",
     "en": "Moon Tech Hammerhead Blueprint"
   },
@@ -66110,10 +66006,6 @@
   {
     "zh": "富勒烯 大型群体装甲维修器蓝图",
     "en": "Fullerene Large Group Armor Repairer  Blueprint"
-  },
-  {
-    "zh": "双生 小型导弹扫射设备",
-    "en": "'Gemini' Small Missile Barrage Device "
   },
   {
     "zh": "W-634 蛮妖蓝图",

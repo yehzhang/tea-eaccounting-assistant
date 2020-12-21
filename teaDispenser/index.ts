@@ -1,8 +1,8 @@
 import { Client, Message, MessageReaction, PartialUser, User } from 'discord.js';
 import * as _ from 'lodash';
-import { setupTesseract } from './data/itemDetection';
 import { Event } from './event';
 import { executeEvent } from './update/executeEvent';
+import { setupTesseract } from './update/itemDetection/recognizeItems';
 import { parseEventFromMessage } from './view/parseEventFromMessage';
 import { parseEventFromMessageReaction } from './view/parseEventFromMessageReaction';
 import { render, RenderedMessage, RenderedReaction } from './view/render';

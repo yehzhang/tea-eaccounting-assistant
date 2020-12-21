@@ -1,33 +1,62 @@
 import * as _ from 'lodash';
 import { powerSet } from '../update/powerSet';
+import getSemanticIdentifier from './getSemanticIdentifier';
+import ItemIcon from './ItemIcon';
 import { itemNames } from './itemNames';
+import ItemType from './ItemType';
+import { findTextsByPrefix, makeTrie } from './trie';
 
-export function normalizeItemName(text: string): NormalizationResult {
-  const fuzzyText = text.replace(/’/g, `'`).replace(/ 一 /g, ' - ');
-  const ellipsisFreeText = trimEllipsis(fuzzyText);
+export async function normalizeItemName(text: string, getItemIcon: (itemType: ItemType) => Promise<ItemIcon | null>): Promise<NormalizationResult> {
+  const ellipsisFreeText = trimEllipsis(text);
   // If the text contains ellipsis, the name must not be a full name. Otherwise, the name may or may
   // not be a full name, because the ellipsis may or may not be recognized.
-  const hasEllipsis = fuzzyText !== ellipsisFreeText;
-  const similarLookingTexts = listSimilarLookingTexts(ellipsisFreeText);
+  const ellipsis = text !== ellipsisFreeText;
+  const cleanText = ellipsisFreeText
+      .replace(/’/g, `'`)
+      .replace(/ 一 /g, ' - ')
+      // Below should be handle by `listSimilarLookingTexts`, but it is too hard.
+      // Hopefully, their frequencies are scarce.
+      .replace(/([宅茎])冈/g, '钢')
+      .replace(/士兽/g, '增')
+      .replace(/力口/g, '加')
+      .replace(/弓虽/g, '强')
+      .replace(/木几/g, '机')
+      .replace(/木反/g, '板')
+      .replace(/\\\\/g, 'l');
+  const similarLookingTexts = listSimilarLookingTexts(cleanText);
   const matchedSimilarLookingTexts = [];
   const allItemNameCandidates = [];
   for (const similarLookingText of similarLookingTexts) {
-    const itemNameCandidates = findItemNamesByPrefix(similarLookingText, !hasEllipsis);
-    if (!itemNameCandidates.length) {
+    const itemNameCandidates = findItemNamesByPrefix(similarLookingText, !ellipsis);
+    const itemNameFilter = itemNameCandidates.length <= 1
+        // This is an optimization to skip filtering when unnecessary.
+        ? null
+        : await getItemNameFilter(getItemIcon, similarLookingText);
+    let filteredItemNameCandidates;
+    if (itemNameFilter) {
+      filteredItemNameCandidates = itemNameCandidates.filter(candidate => candidate.search(itemNameFilter) !== -1);
+    } else {
+      if (!ellipsis) {
+        const exactMatchCandidate = itemNameCandidates.find(candidate =>
+            getSemanticIdentifier(candidate) === getSemanticIdentifier(similarLookingText));
+        if (exactMatchCandidate) {
+          return {
+            type: 'ExactMatch',
+            text: exactMatchCandidate,
+          };
+        }
+      }
+      filteredItemNameCandidates = itemNameCandidates;
+    }
+    if (filteredItemNameCandidates.length === 1) {
+      return {
+        type: 'ExactMatch',
+        text: filteredItemNameCandidates[0],
+      };
+    }
+
+    if (!filteredItemNameCandidates.length) {
       continue;
-    }
-    if (itemNameCandidates.length === 1) {
-      return {
-        type: 'ExactMatch',
-        text: itemNameCandidates[0],
-      };
-    }
-    const matchingCandidate = itemNameCandidates.find(candidate => fuzzyEqual(candidate, similarLookingText));
-    if (matchingCandidate !== undefined) {
-      return {
-        type: 'ExactMatch',
-        text: matchingCandidate,
-      };
     }
     matchedSimilarLookingTexts.push(similarLookingText);
     allItemNameCandidates.push(...itemNameCandidates);
@@ -41,10 +70,57 @@ export function normalizeItemName(text: string): NormalizationResult {
       normalizedText: matchedText.length < prefix.length ? prefix : matchedText,
     };
   }
+  if (matchedSimilarLookingTexts.length) {
+    console.warn('Unexpected to match more than one similar looking texts', matchedSimilarLookingTexts);
+  }
 
   return {
     type: 'NoMatch',
   };
+}
+
+async function getItemNameFilter(getItemIcon: (itemType: ItemType) => Promise<ItemIcon | null>, itemNamePrefix: string): Promise<RegExp | null> {
+  const itemType = inferItemType(itemNamePrefix);
+  if (!itemType) {
+    return null;
+  }
+  const itemIcon = await getItemIcon(itemType);
+  if (!itemIcon) {
+    return null;
+  }
+  return getItemNameFilterBy(itemIcon);
+}
+
+/** Supports Chinese and a subset of items with ambiguous names. */
+function inferItemType(text: string): ItemType | null {
+  if (text.search(/^(激光炮|冷凝能量管理单元)/) !== -1) {
+    return 'LaserRigBlueprint'
+  }
+  if (text.startsWith('无人机')) {
+    return 'DroneRigBlueprint';
+  }
+  if (text.search(/^(纳米机器人|辅助纳米聚合|维修增效|三角装甲|反(爆破|电磁|动能|热能)聚合)/) !== -1) {
+    return 'ArmorRigBlueprint';
+  }
+  if (text.search(/^(半导体记忆电池|电容器控制电路|辅助能量路由器|锁定系统辅助)/) !== -1) {
+    return 'EngineeringRigBlueprint';
+  }
+  if (text.search(/^(引力电容器升级|放射范围约束|)/) !== -1) {
+    return 'ScanRigBlueprint';
+  }
+  if (text.startsWith('采矿器')) {
+    return 'MiningRigBlueprint';
+  }
+  return null;
+}
+
+function getItemNameFilterBy(itemIcon: ItemIcon): RegExp {
+  switch (itemIcon.type) {
+    case 'BlueprintIcon': {
+      const { techLevel } = itemIcon;
+      return new RegExp(`蓝图 ${'I'.repeat(techLevel)}$`);
+    }
+  }
 }
 
 function getLongestCommonPrefix(texts: readonly string[]): string {
@@ -57,7 +133,7 @@ function getLongestCommonPrefix(texts: readonly string[]): string {
   return shortestText;
 }
 
-type NormalizationResult = {
+export type NormalizationResult = {
   // An exactly matching item name is found.
   readonly type: 'ExactMatch';
   readonly text: string;
@@ -70,68 +146,78 @@ type NormalizationResult = {
   readonly type: 'NoMatch';
 }
 
-function listSimilarLookingTexts(text: string): readonly string[] {
+function listSimilarLookingTexts(text: string): ReadonlySet<string> {
   const characters = [...text];
-  const similarLookingIndices = characters
-      .map((character, index) => similarLookingCharacterMapping.has(character) ? index : null)
-      .filter((index): index is number => index !== null);
-  const texts = [];
-  for (const indices of powerSet(similarLookingIndices)) {
-    for (const index of indices) {
-      characters[index] = similarLookingCharacterMapping.get(characters[index])!;
+  const substitutions = characters
+      .flatMap((character, index) => similarLookingCharacterMapping
+          .filter(([fromCharacter]) => fromCharacter === character)
+          .map(([, toCharacter]): readonly [number, string] => [index, toCharacter]));
+  const texts = new Set<string>();
+  for (const substitutionSubset of powerSet(substitutions)) {
+    for (const [index, toCharacter] of substitutionSubset) {
+      characters[index] = toCharacter;
     }
-    texts.push(characters.join(''));
-    for (const index of indices) {
+    texts.add(characters.join(''));
+    for (const [index] of substitutionSubset) {
       characters[index] = text.charAt(index);
     }
   }
   return texts;
 }
 
-const similarLookingCharacterMapping: ReadonlyMap<string, string> = new Map([
+/** It is an error to add the same letter in different cases. */
+const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
+  ['\\', 'l'],
   ['I', 'l'],
+  ['l', 'I'],
+  ['l', 'i'],
   ['B', '8'],
   ['O', 'D'],
+  ['O', '0'],
   ['o', 'c'],
+  ['S', '5'],
+  ['f', '人'],
+  ['几', '机'],
+  ['爻', '反'],
   ['逮', '速'],
   ['哥', '图'],
   ['呈', '量'],
+  ['皇', '量'],
   ['蠹', '量'],
+  ['重', '量'],
+  ['童', '量'],
   ['虹', '血'],
   ['抖', '科'],
-]);
+  ['囊', '复'],
+  ['藁', '复'],
+  ['薹', '复'],
+  ['簪', '管'],
+  ['譬', '管'],
+  ['B', '管'],
+  ['桃', '挑'],
+  ['姚', '挑'],
+  ['肮', '航'],
+  ['固', '国'],
+  ['兽', '鲁'],
+  ['立', '位'],
+  ['胃', '胄'],
+];
 
 function trimEllipsis(text: string): string {
-  while (true) {
-    let trimmedText = text;
-    for (const ellipsisTemplate of ellipsisTemplates) {
-      if (text.endsWith(ellipsisTemplate)) {
-        trimmedText = text.slice(0, -ellipsisTemplate.length);
-        break;
-      }
-    }
-    if (trimmedText === text) {
-      return trimmedText;
-    }
-    text = trimmedText;
+  const ellipsisTemplate = '...';
+  if (text.endsWith('...')) {
+    return text.slice(0, -ellipsisTemplate.length);
   }
+  return text;
 }
 
-const ellipsisTemplates = ['…', '...'];
-
-function findItemNamesByPrefix(prefix: string, includeExactMatch: boolean): string[] {
-  const candidates = itemNames.filter(
-      candidate => getFuzzyText(candidate).startsWith(getFuzzyText(prefix)));
+function findItemNamesByPrefix(prefix: string, includeExactMatch: boolean): readonly string[] {
+  const candidates = findTextsByPrefix(getSemanticIdentifier(prefix), itemNameTrie);
   if (includeExactMatch) {
     return candidates;
   }
   return candidates.filter(candidate => candidate !== prefix);
 }
 
-function fuzzyEqual(text: string, other: string): boolean {
-  return getFuzzyText(text) === getFuzzyText(other);
-}
-
-function getFuzzyText(text: string): string {
-  return text.replace(/ /g, '').toLocaleLowerCase();
-}
+// It is perceivably slow to search the database of in-game texts, so optimized with a trie.
+const itemNameTrie = makeTrie(itemNames, getSemanticIdentifier);

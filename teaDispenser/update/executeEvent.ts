@@ -1,18 +1,18 @@
 import * as _ from 'lodash';
-import { fetchTempFile } from '../data/fetchTempFile';
+import { getTotalPrice } from '../data/getTotalPrice';
 import { ItemChecklist } from '../data/ItemChecklist';
-import { recognizeItems } from '../data/itemDetection';
 import { normalizeItemName } from '../data/normalizeItemName';
 import { User } from '../data/User';
 import { Event } from '../event';
-import { getTotalPrice } from '../state/getTotalPrice';
 import {
   ItemsPrices,
   MarketPriceNotAvailable,
   SingleMarketQueryResult,
   State,
   UnknownItemName,
-} from '../state/state';
+} from '../state';
+import { fetchTempFile } from './fetchTempFile';
+import { recognizeItems } from './itemDetection/recognizeItems';
 import getJitaPrice from './market/getJitaPrice';
 import getWeightedAverageMarketPrice from './market/getWeightedAverageMarketPrice';
 import queryMarketPriceByName from './queryMarketPriceByName';
@@ -29,30 +29,32 @@ export async function executeEvent(event: Event): Promise<State> {
         type: 'Pong',
       };
     case 'ImagePosted': {
-      // TODO asks for how many people.
       const { url, userName } = event;
-      const imagePath = await fetchTempFile(url);
-      const recognizedItems = await recognizeItems(imagePath);
-      if (!recognizedItems.length) {
+      const [spreadsheet, itemRows] = await Promise.all([
+        createSpreadsheet(userName),
+        fetchTempFile(url)
+            .then(recognizeItems)
+            .then(recognizedItems => Promise.all(recognizedItems.map(async ({
+                                                                              name,
+                                                                              amount,
+                                                                              findIcon,
+                                                                            }) => {
+              const normalizationResult = await normalizeItemName(name, findIcon);
+              const exactName = normalizationResult.type === 'ExactMatch' ? normalizationResult.text : null;
+              const query = exactName && await queryMarketPriceByName(exactName);
+              return {
+                name: exactName ? exactName :
+                    normalizationResult.type === 'NormalizationOnly' ? normalizationResult.normalizedText : name,
+                amount,
+                price: query ? getJitaPrice(query.orders) : null,
+              };
+            }))),
+      ]);
+      if (!itemRows.length) {
         return {
           type: 'NoItemsDetected',
         };
       }
-
-      const [spreadsheet, itemRows] = await Promise.all([
-        createSpreadsheet(userName),
-        Promise.all(recognizedItems.map(async ({ name, amount }) => {
-          const normalizationResult = normalizeItemName(name);
-          const exactName = normalizationResult.type === 'ExactMatch' ? normalizationResult.text : null;
-          const query = exactName && await queryMarketPriceByName(exactName);
-          return {
-            name: exactName ? exactName :
-                normalizationResult.type === 'NormalizationOnly' ? normalizationResult.normalizedText : name,
-            amount,
-            price: query ? getJitaPrice(query.orders) : null,
-          };
-        })),
-      ]);
       if (!spreadsheet) {
         return {
           type: 'SpreadsheetCreationFailure',
@@ -102,7 +104,10 @@ export async function executeEvent(event: Event): Promise<State> {
       const validChecklistIndices = selectedChecklistIndices.filter(index => checklists[index]);
       const selectedChecklists = validChecklistIndices.map(index => checklists[index]);
       const participants = getParticipants(selectedChecklists);
-      const checklistsByAuthor = new Map(selectedChecklists.map(({ entries, author: { id } }) => [id, entries]));
+      const checklistsByAuthor = new Map(selectedChecklists.map(({
+                                                                   entries,
+                                                                   author: { id },
+                                                                 }) => [id, entries]));
       return {
         type: 'SettledUpParticipants',
         checklistIndices: validChecklistIndices,
@@ -135,7 +140,7 @@ export async function executeEvent(event: Event): Promise<State> {
           const { itemNames } = command;
           const dedupedItemNames = Array.from(new Set(itemNames));
           const results = await Promise.all(dedupedItemNames.map(async (itemName): Promise<MarketPriceNotAvailable | SingleMarketQueryResult | UnknownItemName> => {
-            const normalizationResult = normalizeItemName(itemName);
+            const normalizationResult = await normalizeItemName(itemName, () => Promise.resolve(null));
             if (normalizationResult.type !== 'ExactMatch') {
               return {
                 type: 'UnknownItemName',
@@ -190,7 +195,10 @@ export async function executeEvent(event: Event): Promise<State> {
 }
 
 function getParticipants(checklists: readonly ItemChecklist[]): readonly User[] {
-  return _.uniqBy(checklists.flatMap(({ author, participants }) => participants.concat(author)), ({ id }) => id);
+  return _.uniqBy(checklists.flatMap(({
+                                        author,
+                                        participants,
+                                      }) => participants.concat(author)), ({ id }) => id);
 }
 
 function updateItemChecklistsWithLatestPrices(checklists: readonly ItemChecklist[]): { checklists: readonly ItemChecklist[]; itemsPrices: ItemsPrices } {

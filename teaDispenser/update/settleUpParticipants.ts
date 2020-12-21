@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
+import { getTotalPrice } from '../data/getTotalPrice';
 import { ItemChecklistEntry } from '../data/itemChecklistEntry';
-import { getTotalPrice } from '../state/getTotalPrice';
-import { ItemTransition } from '../state/state';
+import { ItemTransition } from '../state';
 import { splitItemsAmongParticipants } from './splitItemsAmongParticipants';
 
 export function settleUpParticipants(participantsItems: readonly (readonly ItemChecklistEntry[])[]): readonly ItemTransition[] {

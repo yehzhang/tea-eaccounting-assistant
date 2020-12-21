@@ -1,13 +1,13 @@
 import { MessageOptions } from 'discord.js';
 import * as _ from 'lodash';
 import Command from '../data/Command';
+import { getTotalPrice } from '../data/getTotalPrice';
 import { InvalidUsageReason } from '../data/InvalidCommand';
 import { ItemChecklist } from '../data/ItemChecklist';
 import { ItemChecklistEntry } from '../data/itemChecklistEntry';
 import { translateToChinese } from '../data/translateToChinese';
 import { User } from '../data/User';
-import { getTotalPrice } from '../state/getTotalPrice';
-import { AggregatedMarketPrice, ItemTransition, MarketQueryResult, State } from '../state/state';
+import { AggregatedMarketPrice, ItemTransition, MarketQueryResult, State } from '../state';
 import { commandPrefix, queryPriceCommandView } from './commandViews';
 import renderPrice from './renderPrice';
 import renderRelativeDate from './renderRelativeDate';
@@ -53,11 +53,7 @@ export function render(state: State): readonly Rendering[] {
       ];
     }
     case 'NoItemsDetected':
-      return renderSingleMessage(
-          '抱歉，没能从图中看出物品😔',
-          '请确认这是一张完整的物品栏截图',
-          `如果还是不行可以复制以前的${itemChecklist}，手动填写并回复`,
-      );
+      return renderSingleMessage('抱歉，没能从图中看出物品😔 请在游戏内选中所有需要分赃的物品');
     case 'SpreadsheetCreationFailure':
       return renderSingleMessage(
           '抱歉，创建 Google Sheets 时出了问题😔',
@@ -405,7 +401,11 @@ function renderItemStack(name: string, amount: string): string {
   return `${name} ${itemChecklistAmountPrefix}${amount}`;
 }
 
-function renderChecklistSummary({ entries, author, createdAt }: ItemChecklist, icon: string): string {
+function renderChecklistSummary({
+                                  entries,
+                                  author,
+                                  createdAt,
+                                }: ItemChecklist, icon: string): string {
   return [
     `${icon} ${author.name}｜${createdAt.toLocaleString('zh')} 上传`,
     `物品：${renderCompactItemChecklistEntries(entries)}`,

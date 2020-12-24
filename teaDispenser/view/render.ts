@@ -240,7 +240,7 @@ export function render(state: State): readonly Rendering[] {
                 renderPrice(price),
               ]),
           ),
-          `_价格爬取自${renderRelativeDate(fetchedAt)}_`,
+          renderPriceTimestamp(fetchedAt),
       );
     }
     case 'UnknownItemName': {
@@ -262,7 +262,7 @@ export function render(state: State): readonly Rendering[] {
                 return [result.itemName, ...renderPriceFromMarketQueryResult(result)];
               }),
           ),
-          minFetchedAt && `_价格最早爬取自${renderRelativeDate(minFetchedAt)}_`,
+          minFetchedAt && renderPriceTimestamp(minFetchedAt),
       );
     }
     case 'UnknownCommand':
@@ -276,6 +276,10 @@ export function render(state: State): readonly Rendering[] {
       );
     }
   }
+}
+
+function renderPriceTimestamp(date: Date): string {
+  return `_这是${renderRelativeDate(date)}的价格_`
 }
 
 function renderPriceFromMarketQueryResult(result: MarketQueryResult): string[] {

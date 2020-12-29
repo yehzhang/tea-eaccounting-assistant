@@ -1,12 +1,11 @@
 import { Message, Snowflake } from "discord.js";
 import { Event } from '../event';
 import { parseCommand } from './parseCommand';
-import { parseItemChecklistContent } from './parseItemChecklistContent';
 
 export function parseEventFromMessage(message: Message, clientUserId: Snowflake): readonly Event[] {
   const events: Event[] = [];
 
-  const { id, author, content, attachments, mentions } = message;
+  const { id, author, content, attachments } = message;
   if (author.id === clientUserId) {
     return events;
   }
@@ -31,14 +30,6 @@ export function parseEventFromMessage(message: Message, clientUserId: Snowflake)
       type: 'ImagePosted',
       url: attachment.url,
       userName: author.username,
-    });
-  }
-
-  const parsedItemChecklistContent = parseItemChecklistContent(content, mentions);
-  if (parsedItemChecklistContent) {
-    events.push({
-      type: 'ItemChecklistPosted',
-      parsedItemChecklistContent,
     });
   }
 

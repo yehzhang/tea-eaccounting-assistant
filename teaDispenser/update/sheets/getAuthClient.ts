@@ -13,6 +13,8 @@ function getAuthClient(): JWT {
   authClient = auth.fromJSON(JSON.parse(credentials)) as JWT;
   authClient.scopes = [
     'https://www.googleapis.com/auth/drive.file',
+    // Necessary to access human created sheets.
+    'https://www.googleapis.com/auth/spreadsheets.readonly',
   ];
 
   return authClient;

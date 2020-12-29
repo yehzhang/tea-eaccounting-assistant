@@ -1,11 +1,7 @@
-import * as _ from 'lodash';
-import { getTotalPrice } from '../data/getTotalPrice';
-import { ItemChecklist } from '../data/ItemChecklist';
+import _ from 'lodash';
 import { normalizeItemName } from '../data/normalizeItemName';
-import { User } from '../data/User';
 import { Event } from '../event';
 import {
-  ItemsPrices,
   MarketPriceNotAvailable,
   SingleMarketQueryResult,
   State,
@@ -15,11 +11,15 @@ import { fetchTempFile } from './fetchTempFile';
 import { recognizeItems } from './itemDetection/recognizeItems';
 import getJitaPrice from './market/getJitaPrice';
 import getWeightedAverageMarketPrice from './market/getWeightedAverageMarketPrice';
+import populateItemStack from './populateItemStack';
 import queryMarketPriceByName from './queryMarketPriceByName';
-import { settleUpParticipants } from './settleUpParticipants';
+import settleUpParticipants from './settleUpParticipants';
 import createSpreadsheet from './sheets/createSpreadsheet';
 import grantPermission from './sheets/grantPermission';
-import setDataValidations from './sheets/setDataValidations';
+import readSpreadsheetValues from './sheets/readSpreadsheetValues';
+import setAutoResize from './sheets/setAutoResize';
+import setDataFormats from './sheets/setDataFormats';
+import setSpreadsheetValues from './sheets/setSpreadsheetValues';
 import updateSpreadsheetValues from './sheets/updateSpreadsheetValues';
 
 export async function executeEvent(event: Event): Promise<State> {
@@ -30,107 +30,78 @@ export async function executeEvent(event: Event): Promise<State> {
       };
     case 'ImagePosted': {
       const { url, userName } = event;
-      const [spreadsheet, itemRows] = await Promise.all([
-        createSpreadsheet(userName),
-        fetchTempFile(url)
-            .then(recognizeItems)
-            .then(recognizedItems => Promise.all(recognizedItems.map(async ({
-                                                                              name,
-                                                                              amount,
-                                                                              findIcon,
-                                                                            }) => {
-              const normalizationResult = await normalizeItemName(name, findIcon);
-              const exactName = normalizationResult.type === 'ExactMatch' ? normalizationResult.text : null;
-              const query = exactName && await queryMarketPriceByName(exactName);
-              return {
-                name: exactName ? exactName :
-                    normalizationResult.type === 'NormalizationOnly' ? normalizationResult.normalizedText : name,
-                amount,
-                price: query ? getJitaPrice(query.orders) : null,
-              };
-            }))),
+      const createSpreadsheetPromise = createSpreadsheet(userName);
+      const configureSpreadsheetPromise = createSpreadsheetPromise
+          .then(spreadsheet => spreadsheet && Promise.all([
+            grantPermission(spreadsheet.id),
+            setDataFormats(spreadsheet.id),
+          ]));
+      const [spreadsheet, itemStacks] = await Promise.all([
+        createSpreadsheetPromise,
+        fetchTempFile(url).then(recognizeItems)
+            .then((recognizedItems) => Promise.all(recognizedItems.map(populateItemStack))),
       ]);
-      if (!itemRows.length) {
+      if (!itemStacks.length) {
         return {
           type: 'NoItemsDetected',
         };
       }
       if (!spreadsheet) {
         return {
-          type: 'SpreadsheetCreationFailure',
+          type: 'SpreadsheetOperationFailure',
         }
       }
 
-      const results: readonly boolean[] = await Promise.all([
-        grantPermission(spreadsheet.id),
-        updateSpreadsheetValues(spreadsheet.id, itemRows),
-        setDataValidations(spreadsheet.id),
-      ]);
-      if (!_.every(results)) {
+      const postCreationSuccess = await configureSpreadsheetPromise && await setSpreadsheetValues(spreadsheet.id, itemStacks);
+      if (!postCreationSuccess) {
         return {
-          type: 'SpreadsheetCreationFailure',
+          type: 'SpreadsheetOperationFailure',
         };
       }
+
+      await setAutoResize(spreadsheet.id);
 
       return {
         type: 'SpreadsheetCreated',
         url: spreadsheet.url,
+        linkTitle: spreadsheet.linkTitle,
       };
-    }
-    case 'ItemChecklistPosted': {
-      const { parsedItemChecklistContent } = event;
-      return {
-        type: 'ItemChecklistSubmittedConfirmation',
-        parsedItemChecklistContent,
-      };
-    }
-    case 'SummaryButtonPressed': {
-      const { fetchSubmittedItemChecklistsOfToday } = event;
-      const checklists = await fetchSubmittedItemChecklistsOfToday();
-      return {
-        type: 'FetchedItemChecklistsOfToday',
-        ...updateItemChecklistsWithLatestPrices(checklists),
-      }
     }
     case 'HandsUpButtonPressed': {
-      const { selectedChecklistIndices, fetchSubmittedItemChecklistsOfToday } = event;
-      if (!selectedChecklistIndices.length) {
+      const { spreadsheetId } = event;
+      const itemSplit = await readSpreadsheetValues(spreadsheetId);
+      if (!itemSplit) {
         return {
-          type: 'ChecklistNotSelected',
+          type: 'SpreadsheetOperationFailure',
+        };
+      }
+      if (!itemSplit.participants.length) {
+        return {
+          type: 'NoParticipantsToSettleUp',
         };
       }
 
-      const { checklists } = updateItemChecklistsWithLatestPrices(await fetchSubmittedItemChecklistsOfToday());
-      const validChecklistIndices = selectedChecklistIndices.filter(index => checklists[index]);
-      const selectedChecklists = validChecklistIndices.map(index => checklists[index]);
-      const participants = getParticipants(selectedChecklists);
-      const checklistsByAuthor = new Map(selectedChecklists.map(({
-                                                                   entries,
-                                                                   author: { id },
-                                                                 }) => [id, entries]));
-      return {
-        type: 'SettledUpParticipants',
-        checklistIndices: validChecklistIndices,
-        itemTransitions: settleUpParticipants(participants.map(({ id }) => checklistsByAuthor.get(id) || [])),
-        participants,
-      }
-    }
-    case 'LedgerButtonPressed': {
-      const { selectedChecklistIndices, fetchSubmittedItemChecklistsOfToday } = event;
-      if (!selectedChecklistIndices.length) {
+      const participants = settleUpParticipants(itemSplit);
+      const gainedParticipants = participants
+          .filter(({ items }, index) => !_.isEqual(items, itemSplit.participants[index].items));
+      if (!gainedParticipants.length) {
         return {
-          type: 'ChecklistNotSelected',
+          type: 'NoOpParticipantsSettledUp',
         };
       }
 
-      const { checklists } = updateItemChecklistsWithLatestPrices(await fetchSubmittedItemChecklistsOfToday());
-      const validChecklistIndices = selectedChecklistIndices.filter(index => checklists[index]);
-      const selectedChecklists = validChecklistIndices.map(index => checklists[index]);
+      const success = await updateSpreadsheetValues(spreadsheetId, gainedParticipants);
+      if (!success) {
+        return {
+          type: 'SpreadsheetOperationFailure',
+        };
+      }
+
+      const gainedParticipantNames = gainedParticipants.map(({ participantName }) => participantName);
       return {
-        type: 'LedgerEntry',
-        checklistIndices: validChecklistIndices,
-        itemsGrandTotal: getTotalPrice(selectedChecklists.flatMap(({ entries }) => entries)),
-        participants: getParticipants(selectedChecklists),
+        type: 'ParticipantsSettledUp',
+        gainedParticipants: gainedParticipantNames,
+        noOpParticipants: _.difference(participants.map(({ participantName }) => participantName), gainedParticipantNames),
       };
     }
     case 'CommandIssued': {
@@ -192,33 +163,4 @@ export async function executeEvent(event: Event): Promise<State> {
       }
     }
   }
-}
-
-function getParticipants(checklists: readonly ItemChecklist[]): readonly User[] {
-  return _.uniqBy(checklists.flatMap(({
-                                        author,
-                                        participants,
-                                      }) => participants.concat(author)), ({ id }) => id);
-}
-
-function updateItemChecklistsWithLatestPrices(checklists: readonly ItemChecklist[]): { checklists: readonly ItemChecklist[]; itemsPrices: ItemsPrices } {
-  const itemsPrices = getItemsPrices(checklists);
-  return {
-    checklists: checklists.map(checklist => ({
-      ...checklist,
-      entries: checklist.entries.map((entry) => ({
-        ...entry,
-        price: itemsPrices[entry.name][0],
-      })),
-    })),
-    itemsPrices,
-  };
-}
-
-function getItemsPrices(checklists: readonly ItemChecklist[]): ItemsPrices {
-  return _.mapValues(
-      _.groupBy(checklists
-          .flatMap(({ entries }) => entries), ({ name }) => name),
-      (entries) => entries.map(({ price }) => price),
-  );
 }

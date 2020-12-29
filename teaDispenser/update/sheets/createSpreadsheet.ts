@@ -2,13 +2,14 @@ import getAuthClient from './getAuthClient';
 
 async function createSpreadsheet(username: string): Promise<Spreadsheet | null> {
   const todayLocaleString = new Date().toLocaleString('zh', { month: 'short', day: 'numeric' });
+  const title = `${todayLocaleString} @${username} 分赃记录 - 由分赃小助手提供`;
   try {
     const response = await getAuthClient().request({
       url: 'https://sheets.googleapis.com/v4/spreadsheets',
       method: 'POST',
       data: {
         properties: {
-          title: `${todayLocaleString} ${username} 分赃记录 - 由分赃小助手提供`,
+          title,
         },
         sheets: [
           {
@@ -126,6 +127,7 @@ async function createSpreadsheet(username: string): Promise<Spreadsheet | null> 
     return {
       id: spreadsheetId,
       url: spreadsheetUrl,
+      linkTitle: `${title} - Google Sheets`,
     };
   } catch (e) {
     console.error('Unexpected error when creating a Spreadsheet', e);
@@ -226,6 +228,7 @@ interface Color {
 interface Spreadsheet {
   readonly id: string;
   readonly url: string;
+  readonly linkTitle: string;
 }
 
 export default createSpreadsheet;

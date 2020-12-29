@@ -1,22 +1,15 @@
 import InvalidCommand from './data/InvalidCommand';
-import { ItemChecklist } from './data/ItemChecklist';
 import { ItemChecklistEntry } from './data/itemChecklistEntry';
 import MarketQuery from './data/MarketQuery';
-import { ParsedItemChecklistContent } from './data/ParsedItemChecklistContent';
-import { ParsedValue } from './data/parsedValue';
-import { User } from './data/User';
 
 export type State =
     | Pong
-    | DetectedItems
     | NoItemsDetected
-    | SpreadsheetCreationFailure
+    | SpreadsheetOperationFailure
     | SpreadsheetCreated
-    | ItemChecklistSubmittedConfirmation
-    | FetchedItemChecklistsOfToday
-    | SettledUpParticipants
-    | ChecklistNotSelected
-    | LedgerEntry
+    | NoParticipantsToSettleUp
+    | ParticipantsSettledUp
+    | NoOpParticipantsSettledUp
     | InvalidCommand
     | SingleMarketQueryResult
     | UnknownItemName
@@ -25,70 +18,45 @@ export type State =
     ;
 
 interface Pong {
-  readonly type: 'Pong',
-}
-
-interface DetectedItems {
-  readonly type: 'DetectedItems',
-  readonly items: readonly DetectedItem[];
+  readonly type: 'Pong';
 }
 
 interface NoItemsDetected {
-  readonly type: 'NoItemsDetected',
+  readonly type: 'NoItemsDetected';
 }
 
-interface SpreadsheetCreationFailure {
-  readonly type: 'SpreadsheetCreationFailure',
+interface SpreadsheetOperationFailure {
+  readonly type: 'SpreadsheetOperationFailure';
 }
 
 interface SpreadsheetCreated {
-  readonly type: 'SpreadsheetCreated',
+  readonly type: 'SpreadsheetCreated';
   readonly url: string;
+  readonly linkTitle: string;
 }
 
-interface DetectedItem {
-  readonly name: ParsedValue<string>;
-  readonly amount: ParsedValue<number>;
+interface NoParticipantsToSettleUp {
+  readonly type: 'NoParticipantsToSettleUp';
 }
 
-interface ItemChecklistSubmittedConfirmation {
-  readonly type: 'ItemChecklistSubmittedConfirmation';
-  readonly parsedItemChecklistContent: ParsedItemChecklistContent;
+interface ParticipantsSettledUp {
+  readonly type: 'ParticipantsSettledUp';
+  readonly gainedParticipants: readonly string[];
+  readonly noOpParticipants: readonly string[];
 }
 
-interface FetchedItemChecklistsOfToday {
-  readonly type: 'FetchedItemChecklistsOfToday';
-  // The most recent ones first.
-  readonly checklists: readonly ItemChecklist[];
-  readonly itemsPrices: ItemsPrices;
+interface NoOpParticipantsSettledUp {
+  readonly type: 'NoOpParticipantsSettledUp';
 }
 
 export interface ItemsPrices {
   readonly [itemName: string]: readonly number[];
 }
 
-interface SettledUpParticipants {
-  readonly type: 'SettledUpParticipants';
-  readonly checklistIndices: readonly number[];
-  readonly itemTransitions: readonly ItemTransition[];
-  readonly participants: readonly User[];
-}
-
 export interface ItemTransition {
   readonly sourceParticipantIndex: number;
   readonly targetParticipantIndex: number;
   readonly entry: ItemChecklistEntry;
-}
-
-interface ChecklistNotSelected {
-  readonly type: 'ChecklistNotSelected';
-}
-
-interface LedgerEntry {
-  readonly type: 'LedgerEntry';
-  readonly checklistIndices: readonly number[];
-  readonly itemsGrandTotal: number;
-  readonly participants: readonly User[];
 }
 
 export interface SingleMarketQueryResult {

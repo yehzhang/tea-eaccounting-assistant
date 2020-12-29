@@ -13,7 +13,8 @@
     "opencv4nodejs": "^5.6.0",
     "sqlite": "^4.0.18",
     "sqlite3": "^5.0.0",
-    "tesseract.js": "^2.1.4"
+    "tesseract.js": "^2.1.4",
+    "tinyqueue": "^2.0.3"
   },
   "devDependencies": {
     "@types/emoji-regex": "^8.0.0",

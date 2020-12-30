@@ -9,27 +9,30 @@ function renderTable(header: readonly string[], table: readonly (readonly string
       maxLength = Math.max(fullTable[rowIndex][columnIndex].length, maxLength);
     }
 
-    const numericColumn = header[columnIndex].startsWith('价格') || header[columnIndex].startsWith('数量');
+    const numericColumn =
+      header[columnIndex].startsWith('价格') || header[columnIndex].startsWith('数量');
     for (let rowIndex = 0; rowIndex < fullTable.length; rowIndex++) {
       const cell = fullTable[rowIndex][columnIndex];
       const monospacedCell = numericColumn ? cell : toDoubleByteCharacterText(cell);
-      const justifiedCell = columnIndex === header.length - 1
-          ? monospacedCell : monospacedCell.padEnd(maxLength, numericColumn ? ' ' : '　');
+      const justifiedCell =
+        columnIndex === header.length - 1
+          ? monospacedCell
+          : monospacedCell.padEnd(maxLength, numericColumn ? ' ' : '　');
       outputTable[rowIndex].push(justifiedCell);
     }
   }
 
-  const headerSeparator = '一'.repeat(_.sumBy(outputTable[0], (cell) => cell.length + 1) - 1)
+  const headerSeparator = '一'.repeat(_.sumBy(outputTable[0], (cell) => cell.length + 1) - 1);
   outputTable.splice(1, 0, [headerSeparator]);
 
-  const renderedTable = outputTable.map(row => row.join('　')).join('\n');
+  const renderedTable = outputTable.map((row) => row.join('　')).join('\n');
   return '```' + renderedTable + '```';
 }
 
 function toDoubleByteCharacterText(text: string): string {
   return [...text]
-      .map(character => String.fromCharCode(toDoubleByteCharacterCode(character.charCodeAt(0))))
-      .join('');
+    .map((character) => String.fromCharCode(toDoubleByteCharacterCode(character.charCodeAt(0))))
+    .join('');
 }
 
 function toDoubleByteCharacterCode(charCode: number): number {

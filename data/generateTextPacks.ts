@@ -1,4 +1,4 @@
-import { join } from "path";
+import { join } from 'path';
 import readNeoxJson from './readNeoxJson';
 import { writeText } from './writeText';
 
@@ -8,7 +8,7 @@ function main() {
   const zhTexts: { [id: string]: string } = readNeoxJson(join(getTextDataDirectory, 'zh'));
   const enTexts: { [id: string]: string } = readNeoxJson(join(getTextDataDirectory, 'en'));
   const textIds = Array.from(new Set(Object.keys(zhTexts).concat(Object.keys(enTexts))));
-  const textPacks = textIds.map(textId => ({
+  const textPacks = textIds.map((textId) => ({
     zh: zhTexts[textId],
     en: enTexts[textId],
   }));

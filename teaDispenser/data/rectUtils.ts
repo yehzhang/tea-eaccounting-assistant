@@ -13,5 +13,10 @@ function getMaxY({ y, height }: Rect): number {
 }
 
 export function containRect(rect: Rect, container: Rect): boolean {
-  return container.x <= rect.x && container.y <= rect.y && getMaxX(rect) <= getMaxX(container) && getMaxY(rect) <= getMaxY(container);
+  return (
+    container.x <= rect.x &&
+    container.y <= rect.y &&
+    getMaxX(rect) <= getMaxX(container) &&
+    getMaxY(rect) <= getMaxY(container)
+  );
 }

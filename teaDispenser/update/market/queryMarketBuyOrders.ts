@@ -27,28 +27,34 @@ async function queryMarketBuyOrders(itemTypeId: number): Promise<MarketQuery | n
 
   return {
     orders: (data as any).orders
-        .map((order: any) => {
-          const {
-            price,
-            remaining_volume: remainingVolume,
-            solar_system_name: solarSystemName,
-            station_id: stationId,
-            bid,
-          } = order || {};
-          if (typeof price !== 'number' || typeof remainingVolume !== 'number' || typeof solarSystemName !== 'string' || typeof stationId !== 'number' || typeof bid !== 'number') {
-            console.error('Expected valid order, got', order);
-            return null;
-          }
-          const marketOrder: MarketOrder = {
-            price,
-            remainingVolume,
-            solarSystemName,
-            stationId,
-            sell: !bid,
-          };
-          return marketOrder;
-        })
-        .filter((order: any) => order?.sell),
+      .map((order: any) => {
+        const {
+          price,
+          remaining_volume: remainingVolume,
+          solar_system_name: solarSystemName,
+          station_id: stationId,
+          bid,
+        } = order || {};
+        if (
+          typeof price !== 'number' ||
+          typeof remainingVolume !== 'number' ||
+          typeof solarSystemName !== 'string' ||
+          typeof stationId !== 'number' ||
+          typeof bid !== 'number'
+        ) {
+          console.error('Expected valid order, got', order);
+          return null;
+        }
+        const marketOrder: MarketOrder = {
+          price,
+          remainingVolume,
+          solarSystemName,
+          stationId,
+          sell: !bid,
+        };
+        return marketOrder;
+      })
+      .filter((order: any) => order?.sell),
     fetchedAt,
   };
 }

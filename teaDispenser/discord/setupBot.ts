@@ -4,7 +4,9 @@ import Event from '../Event';
 import parseEventFromMessage from './parseEventFromMessage';
 import parseEventFromMessageReaction from './parseEventFromMessageReaction';
 
-async function setupBot(dispatchEvent: (event: Event, context: DiscordEventContext) => Promise<void>) {
+async function setupBot(
+  dispatchEvent: (event: Event, context: DiscordEventContext) => Promise<void>
+) {
   const client = new Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'] });
 
   client.on('ready', () => {
@@ -17,32 +19,47 @@ async function setupBot(dispatchEvent: (event: Event, context: DiscordEventConte
 
     client.on('message', async (message) => {
       const events = parseEventFromMessage(message, clientUser.id);
-      await Promise.all(events.map(event => dispatchEvent(event, {
-        message,
-        clientUser,
-        triggeringUser: message.author,
-        messageContexts: [],
-      })));
+      await Promise.all(
+        events.map((event) =>
+          dispatchEvent(event, {
+            message,
+            clientUser,
+            triggeringUser: message.author,
+            messageContexts: [],
+          })
+        )
+      );
     });
 
-    client.on('messageReactionAdd', async (messageReaction: MessageReaction, partialUser: User | PartialUser) => {
-      if (messageReaction.message.partial) {
-        await messageReaction.message.fetch();
-      }
+    client.on(
+      'messageReactionAdd',
+      async (messageReaction: MessageReaction, partialUser: User | PartialUser) => {
+        if (messageReaction.message.partial) {
+          await messageReaction.message.fetch();
+        }
 
-      // TODO Remove this once state parsing is supported.
-      if (partialUser.id === clientUser.id) {
-        return;
-      }
+        // TODO Remove this once state parsing is supported.
+        if (partialUser.id === clientUser.id) {
+          return;
+        }
 
-      const events = parseEventFromMessageReaction(messageReaction, partialUser.id, clientUser.id);
-      await Promise.all(events.map(event => dispatchEvent(event, {
-        message: messageReaction.message,
-        clientUser,
-        triggeringUser: partialUser as User,
-        messageContexts: [],
-      })));
-    });
+        const events = parseEventFromMessageReaction(
+          messageReaction,
+          partialUser.id,
+          clientUser.id
+        );
+        await Promise.all(
+          events.map((event) =>
+            dispatchEvent(event, {
+              message: messageReaction.message,
+              clientUser,
+              triggeringUser: partialUser as User,
+              messageContexts: [],
+            })
+          )
+        );
+      }
+    );
   });
 
   if (!process.env.DISCORD_BOT_TOKEN) {

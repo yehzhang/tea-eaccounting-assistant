@@ -7,7 +7,9 @@ function getAuthClient(): JWT {
 
   const credentials = process.env.GOOGLE_APIS_CREDS;
   if (!credentials) {
-    throw new TypeError('Expected environment variable `GOOGLE_APIS_CREDS`. Cannot interact with sheets without it.');
+    throw new TypeError(
+      'Expected environment variable `GOOGLE_APIS_CREDS`. Cannot interact with sheets without it.'
+    );
   }
 
   authClient = auth.fromJSON(JSON.parse(credentials)) as JWT;

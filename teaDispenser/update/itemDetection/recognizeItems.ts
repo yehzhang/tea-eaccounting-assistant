@@ -10,7 +10,10 @@ import recognizeItemIcon from './recognizeItemIcon';
 import recognizeText from './recognizeText';
 import removeFactionSuperscript from './removeFactionSuperscript';
 
-async function recognizeItems(imagePath: string, schedulers: TesseractSchedulers): Promise<readonly RecognizedItem[]> {
+async function recognizeItems(
+  imagePath: string,
+  schedulers: TesseractSchedulers
+): Promise<readonly RecognizedItem[]> {
   console.debug('Recognizing image:', imagePath);
 
   const [locatedItemStacks, languageRecognizer] = await Promise.all([
@@ -18,18 +21,26 @@ async function recognizeItems(imagePath: string, schedulers: TesseractSchedulers
     detectLanguage(imagePath, schedulers),
   ]);
 
-  const recognizedItemStacks = await Promise.all(locatedItemStacks
-      .map((locatedItemStack => recognizeItemStack(locatedItemStack, languageRecognizer))));
+  const recognizedItemStacks = await Promise.all(
+    locatedItemStacks.map((locatedItemStack) =>
+      recognizeItemStack(locatedItemStack, languageRecognizer)
+    )
+  );
   return recognizedItemStacks.filter(({ name, amount }) => name || amount);
 }
 
-async function recognizeItemStack(locatedItemStack: LocatedObject, languageRecognizer: Scheduler): Promise<RecognizedItem> {
+async function recognizeItemStack(
+  locatedItemStack: LocatedObject,
+  languageRecognizer: Scheduler
+): Promise<RecognizedItem> {
   const { image, boundingRects } = locatedItemStack;
   const [name, amount] = await Promise.all([
-    removeFactionSuperscript(getItemNameImage(image))
-        .then(itemNameImage => recognizeText(languageRecognizer, itemNameImage)),
-    Promise.all(getItemAmountDigitImages(image, boundingRects).map(recognizeDigit))
-        .then(amountDigits => amountDigits.join('')),
+    removeFactionSuperscript(getItemNameImage(image)).then((itemNameImage) =>
+      recognizeText(languageRecognizer, itemNameImage)
+    ),
+    Promise.all(
+      getItemAmountDigitImages(image, boundingRects).map(recognizeDigit)
+    ).then((amountDigits) => amountDigits.join('')),
   ]);
   return {
     name,
@@ -42,11 +53,13 @@ function getItemAmountDigitImages(image: Mat, boundingRects: readonly Rect[]): r
   const amountBoundingRect = getItemAmountBoundingRect(image);
   const amountCenterY = getCenterY(amountBoundingRect);
   return removeContainingSiblingBoundingRects(
-      boundingRects
-          .filter(boundingRect => containRect(boundingRect, amountBoundingRect) &&
-              // Choose only rects close to the horizontal center.
-              Math.abs(getCenterY(boundingRect) - amountCenterY) <= amountBoundingRect.height * 0.2))
-      .map(boundingRect => image.getRegion(boundingRect));
+    boundingRects.filter(
+      (boundingRect) =>
+        containRect(boundingRect, amountBoundingRect) &&
+        // Choose only rects close to the horizontal center.
+        Math.abs(getCenterY(boundingRect) - amountCenterY) <= amountBoundingRect.height * 0.2
+    )
+  ).map((boundingRect) => image.getRegion(boundingRect));
 }
 
 /** Guarantees the returned `boundingRects` to be sorted by `x`. */
@@ -70,12 +83,11 @@ function removeContainingSiblingBoundingRects(boundingRects: readonly Rect[]): r
   return sortedBoundingRects;
 }
 
-async function detectLanguage(imagePath: string, schedulers: TesseractSchedulers): Promise<Scheduler> {
-  const {
-    languageDetector,
-    chineseRecognizer,
-    englishRecognizer,
-  } = schedulers;
+async function detectLanguage(
+  imagePath: string,
+  schedulers: TesseractSchedulers
+): Promise<Scheduler> {
+  const { languageDetector, chineseRecognizer, englishRecognizer } = schedulers;
   const { data } = await languageDetector.addJob('detect', imagePath);
   switch (data.script) {
     case 'Latin':
@@ -93,7 +105,12 @@ async function detectLanguage(imagePath: string, schedulers: TesseractSchedulers
 function getItemNameImage(itemStackImage: Mat): Mat {
   const padding = 2;
   const height = Math.round(itemStackImage.rows * 0.211);
-  const itemNameRect = new Rect(padding, padding, itemStackImage.cols - padding * 2, height - padding * 2);
+  const itemNameRect = new Rect(
+    padding,
+    padding,
+    itemStackImage.cols - padding * 2,
+    height - padding * 2
+  );
   return itemStackImage.getRegion(itemNameRect);
 }
 

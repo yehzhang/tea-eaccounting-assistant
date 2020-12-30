@@ -11,7 +11,7 @@ async function setAutoResize(spreadsheetId: string): Promise<boolean> {
             // Resize the item name column.
             autoResizeDimensions: {
               dimensions: {
-                dimension: "COLUMNS",
+                dimension: 'COLUMNS',
                 startIndex: 0,
                 endIndex: 1,
               },

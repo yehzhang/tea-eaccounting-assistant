@@ -47,9 +47,7 @@ async function createSpreadsheet(username: string): Promise<Spreadsheet | null> 
               },
               {
                 // Mark not yet split amount as yellow.
-                ranges: [
-                  splitAmountGridRange,
-                ],
+                ranges: [splitAmountGridRange],
                 booleanRule: {
                   condition: {
                     type: 'NUMBER_GREATER',
@@ -66,9 +64,7 @@ async function createSpreadsheet(username: string): Promise<Spreadsheet | null> 
               },
               {
                 // Mark over split amount as red.
-                ranges: [
-                  splitAmountGridRange,
-                ],
+                ranges: [splitAmountGridRange],
                 booleanRule: {
                   condition: {
                     type: 'NUMBER_LESS',
@@ -100,16 +96,26 @@ async function createSpreadsheet(username: string): Promise<Spreadsheet | null> 
                 rowData: [
                   {
                     values: [
-                      buildBoldTextFormatCell(), {},
-                      buildBoldTextFormatCell(), {},
-                      buildBoldTextFormatCell(), {},
-                      buildBoldTextFormatCell(), {},
-                      buildBoldTextFormatCell(), {},
-                      buildBoldTextFormatCell(), {},
-                      buildBoldTextFormatCell(), {},
-                      buildBoldTextFormatCell(), {},
-                      buildBoldTextFormatCell(), {},
-                      buildBoldTextFormatCell(), {},
+                      buildBoldTextFormatCell(),
+                      {},
+                      buildBoldTextFormatCell(),
+                      {},
+                      buildBoldTextFormatCell(),
+                      {},
+                      buildBoldTextFormatCell(),
+                      {},
+                      buildBoldTextFormatCell(),
+                      {},
+                      buildBoldTextFormatCell(),
+                      {},
+                      buildBoldTextFormatCell(),
+                      {},
+                      buildBoldTextFormatCell(),
+                      {},
+                      buildBoldTextFormatCell(),
+                      {},
+                      buildBoldTextFormatCell(),
+                      {},
                     ],
                   },
                 ],
@@ -150,16 +156,18 @@ function buildSplitValueConditionalFormatRules(gridRange: GridRange, cellReferen
   return [
     buildConditionalFormatRule(gridRange, `=${expression}>10%`, green),
     buildConditionalFormatRule(gridRange, `=AND(${cellReference}<>0, ${expression}<-10%)`, red),
-  ]
+  ];
 }
 
 const averageSplitValueCellReference = 'E2';
 
-function buildConditionalFormatRule(gridRange: GridRange, userEnteredValue: string, backgroundColor: Color) {
+function buildConditionalFormatRule(
+  gridRange: GridRange,
+  userEnteredValue: string,
+  backgroundColor: Color
+) {
   return {
-    ranges: [
-      gridRange,
-    ],
+    ranges: [gridRange],
     booleanRule: {
       condition: {
         type: 'CUSTOM_FORMULA',

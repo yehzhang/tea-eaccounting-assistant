@@ -2,21 +2,20 @@ import InvalidCommand from './data/InvalidCommand';
 import MarketQuery from './data/MarketQuery';
 
 type State =
-    | Pong
-    | DetectingItems
-    | NoItemsDetected
-    | PopulatingSpreadsheet
-    | SpreadsheetOperationFailure
-    | SpreadsheetCreated
-    | NoParticipantsToSettleUp
-    | ParticipantsSettledUp
-    | NoOpParticipantsSettledUp
-    | InvalidCommand
-    | SingleMarketQueryResult
-    | UnknownItemName
-    | MarketPriceNotAvailable
-    | MultipleMarketQueryResult
-    ;
+  | Pong
+  | DetectingItems
+  | NoItemsDetected
+  | PopulatingSpreadsheet
+  | SpreadsheetOperationFailure
+  | SpreadsheetCreated
+  | NoParticipantsToSettleUp
+  | ParticipantsSettledUp
+  | NoOpParticipantsSettledUp
+  | InvalidCommand
+  | SingleMarketQueryResult
+  | UnknownItemName
+  | MarketPriceNotAvailable
+  | MultipleMarketQueryResult;
 
 interface Pong {
   readonly type: 'Pong';
@@ -84,10 +83,7 @@ interface MultipleMarketQueryResult {
   readonly results: readonly MarketQueryResult[];
 }
 
-export type MarketQueryResult =
-    | AggregatedMarketPrice
-    | UnknownItemName
-    | MarketPriceNotAvailable;
+export type MarketQueryResult = AggregatedMarketPrice | UnknownItemName | MarketPriceNotAvailable;
 
 export interface AggregatedMarketPrice {
   readonly type: 'AggregatedMarketPrice';

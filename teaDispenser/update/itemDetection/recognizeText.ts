@@ -12,34 +12,43 @@ async function recognizeText(languageRecognizer: Scheduler, image: Mat): Promise
   const imagePath = await getTempPath(`tmp_${Math.random().toString().slice(2)}.png`);
   await imwriteAsync(imagePath, normalizedImage);
 
-  const { data }: RecognizeResult = await languageRecognizer.addJob('recognize', imagePath) as any;
+  const { data }: RecognizeResult = (await languageRecognizer.addJob(
+    'recognize',
+    imagePath
+  )) as any;
 
-  const confidentText = _.compact(data.words
-      .map(word => word.symbols
-          .filter(symbol => minRecognizingConfidence <= symbol.confidence)
-          .map(symbol => symbol.text)
-          .join('')))
-      .join(' ');
+  const confidentText = _.compact(
+    data.words.map((word) =>
+      word.symbols
+        .filter((symbol) => minRecognizingConfidence <= symbol.confidence)
+        .map((symbol) => symbol.text)
+        .join('')
+    )
+  ).join(' ');
   const ellipsis = confidentText.replace(/[·',"]/g, '.').search(/(\.\.\.|…)$/) !== -1;
-  const cleanText = _.trimEnd(confidentText, ` ‘\n\t'",/#!$%^&*;:{}=-_\`~()[]{}\\·….«`)
+  const cleanText =
+    _.trimEnd(confidentText, ` ‘\n\t'",/#!$%^&*;:{}=-_\`~()[]{}\\·….«`)
       .replace(/[丨|]/g, 'I')
       .replace(/‖/g, 'II') + (ellipsis ? '...' : '');
 
-  console.dir({
-    rawText: data.text,
-    confidentText,
-    cleanText,
-    confidence: data.confidence,
-    normalizedImagePath: imagePath,
-    wordsChoices: data.words.map(word => word.choices),
-    // symbolsChoices: data.symbols.map(symbol => symbol.choices),
-  }, {
-    depth: null,
-  });
+  console.dir(
+    {
+      rawText: data.text,
+      confidentText,
+      cleanText,
+      confidence: data.confidence,
+      normalizedImagePath: imagePath,
+      wordsChoices: data.words.map((word) => word.choices),
+      // symbolsChoices: data.symbols.map(symbol => symbol.choices),
+    },
+    {
+      depth: null,
+    }
+  );
 
   return cleanText
-      .replace('激光炮苜Z调节装置', '激光炮发散调节装置')
-      .replace('无\\木几射五亘力口弓虽装置', '无人机射速加强装置');
+    .replace('激光炮苜Z调节装置', '激光炮发散调节装置')
+    .replace('无\\木几射五亘力口弓虽装置', '无人机射速加强装置');
 }
 
 const minRecognizingConfidence = 60;

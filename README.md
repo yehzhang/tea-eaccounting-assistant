@@ -1,6 +1,6 @@
 # TEA E-accounting Assistant
 
-A prototype system to make loot accounting easier for Eve Echoes corps. Made by TEA. 
+A prototype system to make loot accounting easier for Eve Echoes corps. Made by TEA.
 
 Not production ready.
 

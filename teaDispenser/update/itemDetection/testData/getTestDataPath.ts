@@ -1,4 +1,4 @@
-import { join } from "path";
+import { join } from 'path';
 
 function getTestDataPath(filename: string): string {
   return join(__dirname, filename);

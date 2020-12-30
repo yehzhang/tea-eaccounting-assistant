@@ -2,7 +2,11 @@ import { MessageReaction } from 'discord.js';
 import Event from '../Event';
 import { handsUpIcon } from '../view/render';
 
-function parseEventFromMessageReaction(messageReaction: MessageReaction, userId: string, clientUserId: string): readonly Event[] {
+function parseEventFromMessageReaction(
+  messageReaction: MessageReaction,
+  userId: string,
+  clientUserId: string
+): readonly Event[] {
   const events: Event[] = [];
 
   if (messageReaction.message.author.id !== clientUserId) {
@@ -10,7 +14,9 @@ function parseEventFromMessageReaction(messageReaction: MessageReaction, userId:
   }
 
   if (messageReaction.emoji.name === handsUpIcon) {
-    const spreadsheetIdMatch = messageReaction.message.embeds[0]?.url?.match(/.*docs\.google\.com\/spreadsheets\/d\/([\w\d-]+)\/edit.*/);
+    const spreadsheetIdMatch = messageReaction.message.embeds[0]?.url?.match(
+      /.*docs\.google\.com\/spreadsheets\/d\/([\w\d-]+)\/edit.*/
+    );
     if (spreadsheetIdMatch) {
       events.push({
         type: 'HandsUpButtonPressed',

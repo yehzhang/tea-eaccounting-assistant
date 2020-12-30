@@ -7,13 +7,13 @@ describe('trie', () => {
     expect(trie).toEqual({
       texts: [],
       children: {
-        '秃': {
+        秃: {
           texts: [],
           children: {
-            '鹫': {
+            鹫: {
               texts: [],
               children: {
-                '级': {
+                级: {
                   texts: ['秃鹫级'],
                   children: {
                     ' ': {
@@ -29,9 +29,9 @@ describe('trie', () => {
                 },
               },
             },
-            '鹰': {
+            鹰: {
               texts: [],
-              children: { '级': { texts: ['秃鹰级'], children: {} } },
+              children: { 级: { texts: ['秃鹰级'], children: {} } },
             },
           },
         },

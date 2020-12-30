@@ -2,7 +2,9 @@ import _ from 'lodash';
 import MarketOrder from '../../data/MarketOrder';
 
 function getWeightedAverageMarketPrice(orders: readonly MarketOrder[]): number {
-  const itcOrders = orders.filter(({ solarSystemName }) => highSecItcSolarSystems.has(solarSystemName));
+  const itcOrders = orders.filter(({ solarSystemName }) =>
+    highSecItcSolarSystems.has(solarSystemName)
+  );
   if (itcOrders.length) {
     return getWeightedAveragePrice(itcOrders);
   }
@@ -34,8 +36,10 @@ const highSecItcSolarSystems = new Set([
 ]);
 
 function getWeightedAveragePrice(orders: readonly MarketOrder[]): number {
-  return _.sumBy(orders, ({ price, remainingVolume }) => price * remainingVolume) /
-      _.sumBy(orders, ({ remainingVolume }) => remainingVolume);
+  return (
+    _.sumBy(orders, ({ price, remainingVolume }) => price * remainingVolume) /
+    _.sumBy(orders, ({ remainingVolume }) => remainingVolume)
+  );
 }
 
 export default getWeightedAverageMarketPrice;

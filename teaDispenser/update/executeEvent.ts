@@ -2,11 +2,7 @@ import _ from 'lodash';
 import normalizeItemName from '../data/normalizeItemName';
 import Event from '../Event';
 import ExternalDependency from '../ExternalDependency';
-import State, {
-  MarketPriceNotAvailable,
-  SingleMarketQueryResult,
-  UnknownItemName,
-} from '../State';
+import State, { MarketPriceNotAvailable, SingleMarketQueryResult, UnknownItemName } from '../State';
 import fetchTempFile from './fetchTempFile';
 import recognizeItems from './itemDetection/recognizeItems';
 import getJitaPrice from './market/getJitaPrice';
@@ -22,7 +18,11 @@ import setDataFormats from './sheets/setDataFormats';
 import setSpreadsheetValues from './sheets/setSpreadsheetValues';
 import updateSpreadsheetValues from './sheets/updateSpreadsheetValues';
 
-async function executeEvent(event: Event, setState: (state: State) => void, { schedulers }: ExternalDependency): Promise<void> {
+async function executeEvent(
+  event: Event,
+  setState: (state: State) => void,
+  { schedulers }: ExternalDependency
+): Promise<void> {
   switch (event.type) {
     case 'Pinged':
       setState({
@@ -47,16 +47,16 @@ async function executeEvent(event: Event, setState: (state: State) => void, { sc
 
       const { url, userName } = event;
       const createSpreadsheetPromise = createSpreadsheet(userName);
-      const configureSpreadsheetPromise = createSpreadsheetPromise
-          .then(spreadsheet => spreadsheet && Promise.all([
-            grantPermission(spreadsheet.id),
-            setDataFormats(spreadsheet.id),
-          ]));
+      const configureSpreadsheetPromise = createSpreadsheetPromise.then(
+        (spreadsheet) =>
+          spreadsheet &&
+          Promise.all([grantPermission(spreadsheet.id), setDataFormats(spreadsheet.id)])
+      );
       const [spreadsheet, itemStacks] = await Promise.all([
         createSpreadsheetPromise,
         fetchTempFile(url)
-            .then(path => recognizeItems(path, schedulers))
-            .then((recognizedItems) => Promise.all(recognizedItems.map(populateItemStack))),
+          .then((path) => recognizeItems(path, schedulers))
+          .then((recognizedItems) => Promise.all(recognizedItems.map(populateItemStack))),
       ]);
       if (!itemStacks.length) {
         setState({
@@ -67,7 +67,7 @@ async function executeEvent(event: Event, setState: (state: State) => void, { sc
       if (!spreadsheet) {
         setState({
           type: 'SpreadsheetOperationFailure',
-        })
+        });
         return;
       }
 
@@ -76,7 +76,9 @@ async function executeEvent(event: Event, setState: (state: State) => void, { sc
         type: 'PopulatingSpreadsheet',
       });
 
-      const postCreationSuccess = await configureSpreadsheetPromise && await setSpreadsheetValues(spreadsheet.id, itemStacks);
+      const postCreationSuccess =
+        (await configureSpreadsheetPromise) &&
+        (await setSpreadsheetValues(spreadsheet.id, itemStacks));
       if (!postCreationSuccess) {
         setState({
           type: 'SpreadsheetOperationFailure',
@@ -114,8 +116,9 @@ async function executeEvent(event: Event, setState: (state: State) => void, { sc
       }
 
       const participants = settleUpParticipants(itemSplit);
-      const gainedParticipants = participants
-          .filter(({ items }, index) => !_.isEqual(items, itemSplit.participants[index].items));
+      const gainedParticipants = participants.filter(
+        ({ items }, index) => !_.isEqual(items, itemSplit.participants[index].items)
+      );
 
       if (!gainedParticipants.length) {
         setState({
@@ -132,11 +135,16 @@ async function executeEvent(event: Event, setState: (state: State) => void, { sc
         return;
       }
 
-      const gainedParticipantNames = gainedParticipants.map(({ participantName }) => participantName);
+      const gainedParticipantNames = gainedParticipants.map(
+        ({ participantName }) => participantName
+      );
       setState({
         type: 'ParticipantsSettledUp',
         gainedParticipants: gainedParticipantNames,
-        noOpParticipants: _.difference(participants.map(({ participantName }) => participantName), gainedParticipantNames),
+        noOpParticipants: _.difference(
+          participants.map(({ participantName }) => participantName),
+          gainedParticipantNames
+        ),
       });
       return;
     }
@@ -146,27 +154,35 @@ async function executeEvent(event: Event, setState: (state: State) => void, { sc
         case 'QueryPrice': {
           const { itemNames } = command;
           const dedupedItemNames = Array.from(new Set(itemNames));
-          const results = await Promise.all(dedupedItemNames.map(async (itemName): Promise<MarketPriceNotAvailable | SingleMarketQueryResult | UnknownItemName> => {
-            const normalizationResult = await normalizeItemName(itemName, () => Promise.resolve(null));
-            if (normalizationResult.type !== 'ExactMatch') {
-              return {
-                type: 'UnknownItemName',
-                itemName,
-              };
-            }
-            const query = await queryMarketPriceByName(normalizationResult.text);
-            if (!query || !query.orders.length) {
-              return {
-                type: 'MarketPriceNotAvailable',
-                itemName,
-              };
-            }
-            return {
-              type: 'SingleMarketQueryResult',
-              itemName,
-              query,
-            };
-          }));
+          const results = await Promise.all(
+            dedupedItemNames.map(
+              async (
+                itemName
+              ): Promise<MarketPriceNotAvailable | SingleMarketQueryResult | UnknownItemName> => {
+                const normalizationResult = await normalizeItemName(itemName, () =>
+                  Promise.resolve(null)
+                );
+                if (normalizationResult.type !== 'ExactMatch') {
+                  return {
+                    type: 'UnknownItemName',
+                    itemName,
+                  };
+                }
+                const query = await queryMarketPriceByName(normalizationResult.text);
+                if (!query || !query.orders.length) {
+                  return {
+                    type: 'MarketPriceNotAvailable',
+                    itemName,
+                  };
+                }
+                return {
+                  type: 'SingleMarketQueryResult',
+                  itemName,
+                  query,
+                };
+              }
+            )
+          );
 
           if (results.length === 1) {
             setState(results[0]);
@@ -181,14 +197,17 @@ async function executeEvent(event: Event, setState: (state: State) => void, { sc
                 case 'UnknownItemName':
                   return result;
                 case 'SingleMarketQueryResult': {
-                  const { query: { orders, fetchedAt }, itemName } = result;
+                  const {
+                    query: { orders, fetchedAt },
+                    itemName,
+                  } = result;
                   return {
                     type: 'AggregatedMarketPrice',
                     itemName,
                     jitaPrice: getJitaPrice(orders),
                     weightedAveragePrice: getWeightedAverageMarketPrice(orders),
                     fetchedAt,
-                  }
+                  };
                 }
               }
             }),

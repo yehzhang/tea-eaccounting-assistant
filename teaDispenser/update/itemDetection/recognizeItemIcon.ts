@@ -5,19 +5,24 @@ import ItemType from '../../data/ItemType';
 import matchBestTemplate from './matchBestTemplate';
 import resizeHeightTo from './resizeHeightTo';
 
-async function recognizeItemIcon(itemStackImage: Mat, itemType: ItemType): Promise<ItemIcon | null> {
+async function recognizeItemIcon(
+  itemStackImage: Mat,
+  itemType: ItemType
+): Promise<ItemIcon | null> {
   const normalizedImage = await normalizeImage(itemStackImage);
 
   const blueprintsIconTemplates = await blueprintsIconTemplatesPromise;
-  const matchedTemplateIndex = await matchBestTemplate(normalizedImage,
-      blueprintsIconTemplates[itemType].map(
-          (template, index) => [index, template] as const), minTemplateMatchingConfidence);
+  const matchedTemplateIndex = await matchBestTemplate(
+    normalizedImage,
+    blueprintsIconTemplates[itemType].map((template, index) => [index, template] as const),
+    minTemplateMatchingConfidence
+  );
   if (matchedTemplateIndex === null) {
     return null;
   }
   return {
     type: 'BlueprintIcon',
-    techLevel: matchedTemplateIndex + 1 as 1 | 2 | 3 | 4,
+    techLevel: (matchedTemplateIndex + 1) as 1 | 2 | 3 | 4,
   };
 }
 

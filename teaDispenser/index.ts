@@ -8,7 +8,9 @@ import executeEvent from './update/executeEvent';
 import setupTesseract from './update/itemDetection/setupTesseract';
 import render from './view/render';
 
-async function setup(dispatchEvent: (event: Event, context: DiscordEventContext) => Promise<void>): Promise<ExternalDependency> {
+async function setup(
+  dispatchEvent: (event: Event, context: DiscordEventContext) => Promise<void>
+): Promise<ExternalDependency> {
   const schedulers = await setupTesseract();
   await setupBot(dispatchEvent);
   return {

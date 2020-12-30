@@ -1,4 +1,4 @@
-import { Message, Snowflake } from "discord.js";
+import { Message, Snowflake } from 'discord.js';
 import Event from '../Event';
 import parseCommand from '../view/parseCommand';
 

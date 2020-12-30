@@ -4,7 +4,11 @@ import { createScheduler, createWorker, PSM, Scheduler } from 'tesseract.js';
 import { TesseractSchedulers } from '../../ExternalDependency';
 
 async function setupTesseract(): Promise<TesseractSchedulers> {
-  async function createMonolingualScheduler(language: string, pageSegMode: PSM, tessedit_char_whitelist?: string): Promise<Scheduler> {
+  async function createMonolingualScheduler(
+    language: string,
+    pageSegMode: PSM,
+    tessedit_char_whitelist?: string
+  ): Promise<Scheduler> {
     const worker = createWorker({
       langPath: join(__dirname, '../../../training/outputTessdata'),
       gzip: false,
@@ -23,19 +27,18 @@ async function setupTesseract(): Promise<TesseractSchedulers> {
     return scheduler;
   }
 
-  const trainedDataFilenames = [
-    'chi_sim.traineddata',
-    'eng.traineddata',
-  ];
-  await Promise.all(trainedDataFilenames.map(async (filename) => {
-    const path = join(__dirname, '../../../', filename);
-    try {
-      await stat(path);
-    } catch {
-      return;
-    }
-    await unlink(path);
-  }));
+  const trainedDataFilenames = ['chi_sim.traineddata', 'eng.traineddata'];
+  await Promise.all(
+    trainedDataFilenames.map(async (filename) => {
+      const path = join(__dirname, '../../../', filename);
+      try {
+        await stat(path);
+      } catch {
+        return;
+      }
+      await unlink(path);
+    })
+  );
 
   const [languageDetector, chineseRecognizer, englishRecognizer] = await Promise.all([
     createMonolingualScheduler('chi_sim', PSM.SPARSE_TEXT_OSD),

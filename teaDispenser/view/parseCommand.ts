@@ -34,7 +34,10 @@ function parseCommand(text: string): Command | InvalidCommand | null {
 }
 
 function parseCommaSeparatedList(text: string): string[] {
-  return text.split(/[,，]/).map(segment => segment.trim()).filter(Boolean);
+  return text
+    .split(/[,，]/)
+    .map((segment) => segment.trim())
+    .filter(Boolean);
 }
 
 export default parseCommand;

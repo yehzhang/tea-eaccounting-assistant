@@ -8,14 +8,25 @@ import resizeHeightTo from './resizeHeightTo';
 /** Assumes the image is larger than the template. */
 async function recognizeDigit(image: Mat): Promise<string> {
   const normalizedImage = await normalizeImage(image);
-  return await matchBestTemplate(
-      normalizedImage, Object.entries(characterTemplates), minTemplateMatchingConfidence) || '';
+  return (
+    (await matchBestTemplate(
+      normalizedImage,
+      Object.entries(characterTemplates),
+      minTemplateMatchingConfidence
+    )) || ''
+  );
 }
 
 async function normalizeImage(image: Mat): Promise<Mat> {
   const greyscaleImage = await image.cvtColorAsync(COLOR_RGB2GRAY);
   const resizedImage = await resizeHeightTo(templateContourHeight, greyscaleImage);
-  return resizedImage.copyMakeBorderAsync(imagePadding, imagePadding, imagePadding, imagePadding, BORDER_REPLICATE);
+  return resizedImage.copyMakeBorderAsync(
+    imagePadding,
+    imagePadding,
+    imagePadding,
+    imagePadding,
+    BORDER_REPLICATE
+  );
 }
 
 const imagePadding = 10;

@@ -10,10 +10,7 @@ describe('recognizeText', () => {
   let englishRecognizer: Scheduler;
 
   beforeAll(async () => {
-    ({
-      chineseRecognizer,
-      englishRecognizer,
-    } = await setupTesseract());
+    ({ chineseRecognizer, englishRecognizer } = await setupTesseract());
   });
 
   async function run(imageFilename: string): Promise<string> {
@@ -45,24 +42,20 @@ describe('recognizeText', () => {
     expect(actual).toBe('激光炮发散调节装置.');
   });
 
-
   it('recognizes chn_debris_1', async () => {
     const actual = await run('chn_debris_1.png');
     expect(actual).toBe('艾玛7级受损结构');
   });
-
 
   it('recognizes chn_debris_2', async () => {
     const actual = await run('chn_debris_2.png');
     expect(actual).toBe('艾玛7级受损结构');
   });
 
-
   it('recognizes chn_debris_3', async () => {
     const actual = await run('chn_debris_3.png');
     expect(actual).toBe('艾玛4级受损结构');
   });
-
 
   it('recognizes chn_drone_2', async () => {
     const actual = await run('chn_drone_2.png');

@@ -45,27 +45,37 @@ function parseSpareItems(values: SheetValues): readonly ItemRow[] {
   });
 }
 
-function mapItemRows(values: SheetValues, callbackFn: (row: SheetRow, rowIndex: number) => ItemRow | null): readonly ItemRow[] {
+function mapItemRows(
+  values: SheetValues,
+  callbackFn: (row: SheetRow, rowIndex: number) => ItemRow | null
+): readonly ItemRow[] {
   const itemRowsStartIndex = 2;
-  return _.compact(values.slice(itemRowsStartIndex)
-      .map((row, index) => callbackFn(row, index + itemRowsStartIndex)));
+  return _.compact(
+    values
+      .slice(itemRowsStartIndex)
+      .map((row, index) => callbackFn(row, index + itemRowsStartIndex))
+  );
 }
 
 function parseParticipantColumns(values: SheetValues): readonly ParticipantColumn[] {
-  return _.compact([6, 8, 10, 12, 14, 16, 18, 20, 22, 24].map(columnIndex => {
-    const rawParticipantName = values[0][columnIndex];
-    const participantName = typeof rawParticipantName === 'string'
-        ? rawParticipantName
-        : rawParticipantName.toString();
-    if (participantName.startsWith('参与者') && values.slice(2).every(row => !row[columnIndex])) {
-      return null;
-    }
-    return {
-      columnIndex,
-      participantName,
-      items: parseParticipantItemRows(values, columnIndex),
-    }
-  }));
+  return _.compact(
+    [6, 8, 10, 12, 14, 16, 18, 20, 22, 24].map((columnIndex) => {
+      const rawParticipantName = values[0][columnIndex];
+      const participantName =
+        typeof rawParticipantName === 'string' ? rawParticipantName : rawParticipantName.toString();
+      if (
+        participantName.startsWith('参与者') &&
+        values.slice(2).every((row) => !row[columnIndex])
+      ) {
+        return null;
+      }
+      return {
+        columnIndex,
+        participantName,
+        items: parseParticipantItemRows(values, columnIndex),
+      };
+    })
+  );
 }
 
 function parseParticipantItemRows(values: SheetValues, columnIndex: number): readonly ItemRow[] {

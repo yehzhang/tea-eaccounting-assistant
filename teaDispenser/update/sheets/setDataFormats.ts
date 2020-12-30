@@ -17,10 +17,10 @@ async function setDataFormats(spreadsheetId: string): Promise<boolean> {
               },
               rule: {
                 condition: {
-                  type: "NUMBER_GREATER",
+                  type: 'NUMBER_GREATER',
                   values: [
                     {
-                      'userEnteredValue': '0',
+                      userEnteredValue: '0',
                     },
                   ],
                 },
@@ -80,7 +80,7 @@ function buildPriceNumberFormat(columnIndex: number) {
           },
         },
       },
-      fields: "userEnteredFormat.numberFormat",
+      fields: 'userEnteredFormat.numberFormat',
     },
   };
 }

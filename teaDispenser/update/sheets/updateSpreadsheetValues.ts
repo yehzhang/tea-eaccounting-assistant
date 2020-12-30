@@ -1,7 +1,10 @@
 import ParticipantColumn from '../../data/ParticipantColumn';
 import getAuthClient from './getAuthClient';
 
-async function updateSpreadsheetValues(spreadsheetId: string, participants: readonly ParticipantColumn[]): Promise<boolean> {
+async function updateSpreadsheetValues(
+  spreadsheetId: string,
+  participants: readonly ParticipantColumn[]
+): Promise<boolean> {
   try {
     await getAuthClient().request({
       url: `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchUpdate`,

@@ -35,7 +35,7 @@ function render(state: State): readonly Rendering[] {
             },
           },
         },
-      ]
+      ];
     }
     case 'NoItemsDetected':
       return [
@@ -61,7 +61,7 @@ function render(state: State): readonly Rendering[] {
             },
           },
         },
-      ]
+      ];
     case 'SpreadsheetOperationFailure':
       return [
         {
@@ -125,7 +125,9 @@ function render(state: State): readonly Rendering[] {
               description: [
                 `• 有新分到赃物：${gainedParticipants.join('，')}`,
                 noOpParticipants.length && `• 无变动：${noOpParticipants.join('，')}`,
-              ].filter(Boolean).join('\n'),
+              ]
+                .filter(Boolean)
+                .join('\n'),
             },
           },
         },
@@ -145,39 +147,48 @@ function render(state: State): readonly Rendering[] {
         },
       ];
     case 'SingleMarketQueryResult': {
-      const { query: { fetchedAt, orders } } = state;
+      const {
+        query: { fetchedAt, orders },
+      } = state;
       return renderSingleMessage(
-          renderTable(
-              ['星系', '数量', '价格'],
-              orders.map(({ price, remainingVolume, solarSystemName }) => [
-                solarSystemName,
-                remainingVolume.toString(),
-                renderPrice(price),
-              ]),
-          ),
-          renderPriceTimestamp(fetchedAt),
+        renderTable(
+          ['星系', '数量', '价格'],
+          orders.map(({ price, remainingVolume, solarSystemName }) => [
+            solarSystemName,
+            remainingVolume.toString(),
+            renderPrice(price),
+          ])
+        ),
+        renderPriceTimestamp(fetchedAt)
       );
     }
     case 'UnknownItemName': {
       return renderSingleMessage('未知物品名。请使用全称。');
     }
     case 'MarketPriceNotAvailable': {
-      return renderSingleMessage('尚未录入这件物品的价格。' +
-          '由于网易限制市场查询频率，目前仅支持绝地常见的产出，包括改装件蓝图、装备、结构、矿、菜等。');
+      return renderSingleMessage(
+        '尚未录入这件物品的价格。' +
+          '由于网易限制市场查询频率，目前仅支持绝地常见的产出，包括改装件蓝图、装备、结构、矿、菜等。'
+      );
     }
     case 'MultipleMarketQueryResult': {
       const { results } = state;
-      const minFetchedAt = _.minBy(results.filter((result): result is AggregatedMarketPrice =>
-          result.type === 'AggregatedMarketPrice')
-          .map(({ fetchedAt }) => fetchedAt), (fetchedAt) => fetchedAt.getTime());
+      const minFetchedAt = _.minBy(
+        results
+          .filter(
+            (result): result is AggregatedMarketPrice => result.type === 'AggregatedMarketPrice'
+          )
+          .map(({ fetchedAt }) => fetchedAt),
+        (fetchedAt) => fetchedAt.getTime()
+      );
       return renderSingleMessage(
-          renderTable(
-              ['物品', '价格（吉他）', '价格（加权平均）'],
-              results.map((result) => {
-                return [result.itemName, ...renderPriceFromMarketQueryResult(result)];
-              }),
-          ),
-          minFetchedAt && renderPriceTimestamp(minFetchedAt),
+        renderTable(
+          ['物品', '价格（吉他）', '价格（加权平均）'],
+          results.map((result) => {
+            return [result.itemName, ...renderPriceFromMarketQueryResult(result)];
+          })
+        ),
+        minFetchedAt && renderPriceTimestamp(minFetchedAt)
       );
     }
     case 'UnknownCommand':
@@ -185,16 +196,16 @@ function render(state: State): readonly Rendering[] {
     case 'InvalidUsage': {
       const { commandType, reason } = state;
       return renderSingleMessage(
-          renderInvalidCommandReason(reason),
-          '例如:',
-          ...renderCommandExamples(commandType),
+        renderInvalidCommandReason(reason),
+        '例如:',
+        ...renderCommandExamples(commandType)
       );
     }
   }
 }
 
 function renderPriceTimestamp(date: Date): string {
-  return `_这是${renderRelativeDate(date)}的价格_`
+  return `_这是${renderRelativeDate(date)}的价格_`;
 }
 
 function renderPriceFromMarketQueryResult(result: MarketQueryResult): string[] {
@@ -238,13 +249,15 @@ const yzDiscordUserId = '202649496381816832';
 
 /** Convenience method that constructs a single message to return. */
 function renderSingleMessage(...lines: (string | null | undefined)[]): readonly RenderedMessage[] {
-  return [{
-    type: 'RenderedMessage',
-    content: lines.filter(line => line != null).join('\n'),
-    replyTo: 'user',
-  }];
+  return [
+    {
+      type: 'RenderedMessage',
+      content: lines.filter((line) => line != null).join('\n'),
+      replyTo: 'user',
+    },
+  ];
 }
 
-const dispenserSilver = 0xD3D3D3;
+const dispenserSilver = 0xd3d3d3;
 
 export default render;

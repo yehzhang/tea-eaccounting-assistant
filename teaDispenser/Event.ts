@@ -1,12 +1,7 @@
 import Command from './data/Command';
 import InvalidCommand from './data/InvalidCommand';
 
-type Event =
-    | Pinged
-    | ImagePosted
-    | HandsUpButtonPressed
-    | CommandIssued
-    ;
+type Event = Pinged | ImagePosted | HandsUpButtonPressed | CommandIssued;
 
 interface Pinged {
   readonly type: 'Pinged';
@@ -14,7 +9,7 @@ interface Pinged {
 
 interface ImagePosted {
   readonly type: 'ImagePosted';
-  readonly url: string;
+  readonly urls: readonly string[];
   readonly userName: string;
 }
 

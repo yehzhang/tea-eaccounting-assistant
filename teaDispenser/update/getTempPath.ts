@@ -1,6 +1,6 @@
-import { mkdtempSync } from "fs";
-import { tmpdir } from "os";
-import { join } from "path";
+import { mkdtempSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
 function getTempPath(filename: string): string {
   if (tempDirectory === null) {

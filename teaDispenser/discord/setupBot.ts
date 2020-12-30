@@ -1,6 +1,6 @@
 import { Client, MessageReaction, PartialUser, User } from 'discord.js';
 import DiscordEventContext from '../data/DiscordEventContext';
-import { Event } from '../event';
+import Event from '../Event';
 import parseEventFromMessage from './parseEventFromMessage';
 import parseEventFromMessageReaction from './parseEventFromMessageReaction';
 

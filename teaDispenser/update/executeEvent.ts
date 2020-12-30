@@ -1,14 +1,14 @@
 import _ from 'lodash';
-import { normalizeItemName } from '../data/normalizeItemName';
-import { Event } from '../event';
-import {
+import normalizeItemName from '../data/normalizeItemName';
+import Event from '../Event';
+import ExternalDependency from '../ExternalDependency';
+import State, {
   MarketPriceNotAvailable,
   SingleMarketQueryResult,
-  State,
   UnknownItemName,
-} from '../state';
-import { fetchTempFile } from './fetchTempFile';
-import { recognizeItems } from './itemDetection/recognizeItems';
+} from '../State';
+import fetchTempFile from './fetchTempFile';
+import recognizeItems from './itemDetection/recognizeItems';
 import getJitaPrice from './market/getJitaPrice';
 import getWeightedAverageMarketPrice from './market/getWeightedAverageMarketPrice';
 import populateItemStack from './populateItemStack';
@@ -22,7 +22,7 @@ import setDataFormats from './sheets/setDataFormats';
 import setSpreadsheetValues from './sheets/setSpreadsheetValues';
 import updateSpreadsheetValues from './sheets/updateSpreadsheetValues';
 
-async function executeEvent(event: Event, setState: (state: State) => void): Promise<void> {
+async function executeEvent(event: Event, setState: (state: State) => void, { schedulers }: ExternalDependency): Promise<void> {
   switch (event.type) {
     case 'Pinged':
       setState({
@@ -54,7 +54,8 @@ async function executeEvent(event: Event, setState: (state: State) => void): Pro
           ]));
       const [spreadsheet, itemStacks] = await Promise.all([
         createSpreadsheetPromise,
-        fetchTempFile(url).then(recognizeItems)
+        fetchTempFile(url)
+            .then(path => recognizeItems(path, schedulers))
             .then((recognizedItems) => Promise.all(recognizedItems.map(populateItemStack))),
       ]);
       if (!itemStacks.length) {

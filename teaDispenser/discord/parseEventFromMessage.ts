@@ -1,6 +1,6 @@
 import { Message, Snowflake } from "discord.js";
-import { Event } from '../event';
-import { parseCommand } from '../view/parseCommand';
+import Event from '../Event';
+import parseCommand from '../view/parseCommand';
 
 function parseEventFromMessage(message: Message, clientUserId: Snowflake): readonly Event[] {
   const events: Event[] = [];

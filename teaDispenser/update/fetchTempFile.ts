@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { createWriteStream } from 'fs';
 import { basename } from 'path';
-import { getTempPath } from './getTempPath';
+import getTempPath from './getTempPath';
 
-export async function fetchTempFile(url: string): Promise<string> {
+async function fetchTempFile(url: string): Promise<string> {
   const response = await axios({
     url,
     responseType: 'stream',
@@ -18,3 +18,5 @@ export async function fetchTempFile(url: string): Promise<string> {
 
   return filePath;
 }
+
+export default fetchTempFile;

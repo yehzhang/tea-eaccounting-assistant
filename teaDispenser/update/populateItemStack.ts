@@ -1,5 +1,5 @@
 import ItemStack from '../data/ItemStack';
-import { normalizeItemName } from '../data/normalizeItemName';
+import normalizeItemName from '../data/normalizeItemName';
 import RecognizedItem from '../data/RecognizedItem';
 import getJitaPrice from './market/getJitaPrice';
 import queryMarketPriceByName from './queryMarketPriceByName';

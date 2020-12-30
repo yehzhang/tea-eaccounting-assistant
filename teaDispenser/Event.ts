@@ -1,7 +1,7 @@
 import Command from './data/Command';
 import InvalidCommand from './data/InvalidCommand';
 
-export type Event =
+type Event =
     | Pinged
     | ImagePosted
     | HandsUpButtonPressed
@@ -27,3 +27,5 @@ interface CommandIssued {
   readonly type: 'CommandIssued';
   readonly command: Command | InvalidCommand;
 }
+
+export default Event;

@@ -1,5 +1,5 @@
 import { MessageReaction } from 'discord.js';
-import { Event } from '../event';
+import Event from '../Event';
 import { handsUpIcon } from '../view/render';
 
 function parseEventFromMessageReaction(messageReaction: MessageReaction, userId: string, clientUserId: string): readonly Event[] {

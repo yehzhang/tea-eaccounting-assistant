@@ -1,8 +1,7 @@
 import InvalidCommand from './data/InvalidCommand';
-import { ItemChecklistEntry } from './data/itemChecklistEntry';
 import MarketQuery from './data/MarketQuery';
 
-export type State =
+type State =
     | Pong
     | DetectingItems
     | NoItemsDetected
@@ -64,12 +63,6 @@ export interface ItemsPrices {
   readonly [itemName: string]: readonly number[];
 }
 
-export interface ItemTransition {
-  readonly sourceParticipantIndex: number;
-  readonly targetParticipantIndex: number;
-  readonly entry: ItemChecklistEntry;
-}
-
 export interface SingleMarketQueryResult {
   readonly type: 'SingleMarketQueryResult';
   readonly itemName: string;
@@ -103,3 +96,5 @@ export interface AggregatedMarketPrice {
   readonly weightedAveragePrice: number;
   readonly fetchedAt: Date;
 }
+
+export default State;

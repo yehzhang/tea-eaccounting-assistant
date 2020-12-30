@@ -1,5 +1,5 @@
 import items from '../../generated/items.json';
-import { translateToChinese } from './translateToChinese';
+import translateToChinese from './translateToChinese';
 
 function getItemTypeIdByName(itemName: string): number | null {
   const zhItemName = translateToChinese(itemName);

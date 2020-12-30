@@ -3,7 +3,7 @@ import Command from '../data/Command';
 import { InvalidUsageReason } from '../data/InvalidCommand';
 import RenderedMessage from '../data/RenderedMessage';
 import Rendering from '../data/Rendering';
-import { AggregatedMarketPrice, MarketQueryResult, State } from '../state';
+import State, { AggregatedMarketPrice, MarketQueryResult } from '../State';
 import { commandPrefix, queryPriceCommandView } from './commandViews';
 import renderPrice from './renderPrice';
 import renderRelativeDate from './renderRelativeDate';

@@ -1,22 +1,21 @@
-import { stat, unlink } from 'fs/promises';
 import * as _ from 'lodash';
 import { Mat, Rect } from 'opencv4nodejs';
-import { join } from 'path';
-import { createScheduler, createWorker, PSM, Scheduler } from 'tesseract.js';
+import { Scheduler } from 'tesseract.js';
 import RecognizedItem from '../../data/RecognizedItem';
 import { containRect, getCenterY } from '../../data/rectUtils';
+import { TesseractSchedulers } from '../../ExternalDependency';
 import locateItemStacks, { LocatedObject } from './locateItemStacks';
 import recognizeDigit from './recognizeDigit';
 import recognizeItemIcon from './recognizeItemIcon';
-import { recognizeText } from './recognizeText';
+import recognizeText from './recognizeText';
 import removeFactionSuperscript from './removeFactionSuperscript';
 
-export async function recognizeItems(imagePath: string): Promise<readonly RecognizedItem[]> {
+async function recognizeItems(imagePath: string, schedulers: TesseractSchedulers): Promise<readonly RecognizedItem[]> {
   console.debug('Recognizing image:', imagePath);
 
   const [locatedItemStacks, languageRecognizer] = await Promise.all([
     locateItemStacks(imagePath),
-    detectLanguage(imagePath),
+    detectLanguage(imagePath, schedulers),
   ]);
 
   const recognizedItemStacks = await Promise.all(locatedItemStacks
@@ -71,11 +70,7 @@ function removeContainingSiblingBoundingRects(boundingRects: readonly Rect[]): r
   return sortedBoundingRects;
 }
 
-async function detectLanguage(imagePath: string): Promise<Scheduler> {
-  if (!schedulers) {
-    throw new TypeError('Expected Tesseract to be setup');
-  }
-
+async function detectLanguage(imagePath: string, schedulers: TesseractSchedulers): Promise<Scheduler> {
   const {
     languageDetector,
     chineseRecognizer,
@@ -109,57 +104,4 @@ function getItemAmountBoundingRect(itemStackImage: Mat): Rect {
   return new Rect(padding, itemStackImage.rows - height - padding, width - padding, height);
 }
 
-let schedulers: {
-  languageDetector: Scheduler,
-  chineseRecognizer: Scheduler,
-  englishRecognizer: Scheduler,
-} | null = null;
-
-export async function setupTesseract() {
-  async function createMonolingualScheduler(language: string, pageSegMode: PSM, tessedit_char_whitelist?: string): Promise<Scheduler> {
-    const worker = createWorker({
-      langPath: join(__dirname, '../../../training/outputTessdata'),
-      gzip: false,
-    });
-    await worker.load();
-    await worker.loadLanguage(language);
-    await worker.initialize(language);
-    await worker.setParameters({
-      tessedit_pageseg_mode: pageSegMode,
-      tessedit_char_whitelist,
-    });
-
-    const scheduler = createScheduler();
-    scheduler.addWorker(worker);
-
-    return scheduler;
-  }
-
-  const trainedDataFilenames = [
-    'chi_sim.traineddata',
-    'eng.traineddata',
-  ];
-  await Promise.all(trainedDataFilenames.map(async (filename) => {
-    const path = join(__dirname, '../../../', filename);
-    try {
-      await stat(path);
-    } catch {
-      return;
-    }
-    await unlink(path);
-  }));
-
-  const [languageDetector, chineseRecognizer, englishRecognizer] = await Promise.all([
-    createMonolingualScheduler('chi_sim', PSM.SPARSE_TEXT_OSD),
-    createMonolingualScheduler('chi_sim', PSM.SINGLE_LINE),
-    createMonolingualScheduler('eng', PSM.SINGLE_LINE),
-  ]);
-
-  schedulers = {
-    languageDetector,
-    chineseRecognizer,
-    englishRecognizer,
-  };
-
-  return schedulers;
-}
+export default recognizeItems;

@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import ItemRow from '../data/ItemRow';
 import ItemSplit from '../data/ItemSplit';
 import ParticipantColumn from '../data/ParticipantColumn';
-import { splitItemsAmongParticipants } from './splitItemsAmongParticipants';
+import splitItemsAmongParticipants from './splitItemsAmongParticipants';
 
 function settleUpParticipants({
                                 participants,

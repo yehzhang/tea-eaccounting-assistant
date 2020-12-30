@@ -1,6 +1,6 @@
 import { Scheduler } from 'tesseract.js';
-import { setupTesseract } from './recognizeItems';
-import { recognizeText } from './recognizeText';
+import recognizeText from './recognizeText';
+import setupTesseract from './setupTesseract';
 import getTestImage from './testData/getTestImage';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;

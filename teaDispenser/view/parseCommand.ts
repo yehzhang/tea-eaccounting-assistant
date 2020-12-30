@@ -2,7 +2,7 @@ import Command from '../data/Command';
 import InvalidCommand from '../data/InvalidCommand';
 import { commandPrefix, queryPriceCommandView } from './commandViews';
 
-export function parseCommand(text: string): Command | InvalidCommand | null {
+function parseCommand(text: string): Command | InvalidCommand | null {
   const cleanText = text.trim();
   if (!cleanText.startsWith(commandPrefix) && !cleanText.startsWith('！')) {
     return null;
@@ -36,3 +36,5 @@ export function parseCommand(text: string): Command | InvalidCommand | null {
 function parseCommaSeparatedList(text: string): string[] {
   return text.split(/[,，]/).map(segment => segment.trim()).filter(Boolean);
 }
+
+export default parseCommand;

@@ -1,4 +1,4 @@
-import { splitItemsAmongParticipants } from './splitItemsAmongParticipants';
+import splitItemsAmongParticipants from './splitItemsAmongParticipants';
 
 describe('splitItemsAmongParticipants', () => {
   it('works', () => {

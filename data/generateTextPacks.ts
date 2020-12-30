@@ -1,5 +1,5 @@
 import { join } from "path";
-import { readNeoxJson } from './readNeoxJson';
+import readNeoxJson from './readNeoxJson';
 import { writeText } from './writeText';
 
 function main() {

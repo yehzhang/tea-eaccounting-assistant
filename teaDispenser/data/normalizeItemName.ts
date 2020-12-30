@@ -1,12 +1,12 @@
 import * as _ from 'lodash';
-import { powerSet } from '../update/powerSet';
+import texts from '../../generated/textPacks.json';
+import powerSet from '../update/powerSet';
 import getSemanticIdentifier from './getSemanticIdentifier';
 import ItemIcon from './ItemIcon';
-import { itemNames } from './itemNames';
 import ItemType from './ItemType';
 import { findTextsByPrefix, makeTrie } from './trie';
 
-export async function normalizeItemName(text: string, getItemIcon: (itemType: ItemType) => Promise<ItemIcon | null>): Promise<NormalizationResult> {
+async function normalizeItemName(text: string, getItemIcon: (itemType: ItemType) => Promise<ItemIcon | null>): Promise<NormalizationResult> {
   const ellipsisFreeText = trimEllipsis(text);
   // If the text contains ellipsis, the name must not be a full name. Otherwise, the name may or may
   // not be a full name, because the ellipsis may or may not be recognized.
@@ -220,4 +220,6 @@ function findItemNamesByPrefix(prefix: string, includeExactMatch: boolean): read
 }
 
 // It is perceivably slow to search the database of in-game texts, so optimized with a trie.
-const itemNameTrie = makeTrie(itemNames, getSemanticIdentifier);
+const itemNameTrie = makeTrie(texts.flatMap(({ zh, en }) => [zh, en]), getSemanticIdentifier);
+
+export default normalizeItemName;

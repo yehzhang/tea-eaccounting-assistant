@@ -1,5 +1,5 @@
 import ItemIcon from './ItemIcon';
-import { NormalizationResult, normalizeItemName } from './normalizeItemName';
+import normalizeItemName, { NormalizationResult } from './normalizeItemName';
 
 describe('normalizeItemName', () => {
   it('works', async () => {

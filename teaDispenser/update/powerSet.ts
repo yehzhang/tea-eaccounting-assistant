@@ -1,4 +1,4 @@
-export function* powerSet<T>(set: readonly T[], offset = 0): Generator<T[]> {
+function* powerSet<T>(set: readonly T[], offset = 0): Generator<T[]> {
   yield [];
   while (offset < set.length) {
     let first = set[offset++];
@@ -8,3 +8,5 @@ export function* powerSet<T>(set: readonly T[], offset = 0): Generator<T[]> {
     }
   }
 }
+
+export default powerSet;

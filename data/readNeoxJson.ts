@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
 
-export function readNeoxJson(dataDirectory: string): { [key: string]: any } {
+function readNeoxJson(dataDirectory: string): { [key: string]: any } {
   const filenames = readdirSync(dataDirectory);
   return filenames.filter(filename => filename.match(/\d+\.json/))
       .map(filename => {
@@ -10,3 +10,5 @@ export function readNeoxJson(dataDirectory: string): { [key: string]: any } {
       })
       .reduce((acc, data) => Object.assign(acc, data), {});
 }
+
+export default readNeoxJson;

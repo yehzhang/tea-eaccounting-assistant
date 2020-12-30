@@ -1,16 +1,15 @@
 import * as _ from 'lodash';
 import { imwriteAsync, Mat } from 'opencv4nodejs';
 import { RecognizeResult, Scheduler } from 'tesseract.js';
-import { getTempPath } from '../getTempPath';
+import getTempPath from '../getTempPath';
 import resizeHeightTo from './resizeHeightTo';
 
 /** Returns an empty string if failed to recognize anything. */
-export async function recognizeText(languageRecognizer: Scheduler, image: Mat): Promise<string> {
+async function recognizeText(languageRecognizer: Scheduler, image: Mat): Promise<string> {
   // The optimal character size is 30, which roughly translates to 54 in title height.
   const normalizedImage = await resizeHeightTo(54, image);
 
   const imagePath = await getTempPath(`tmp_${Math.random().toString().slice(2)}.png`);
-  // TODO set DPI.
   await imwriteAsync(imagePath, normalizedImage);
 
   const { data }: RecognizeResult = await languageRecognizer.addJob('recognize', imagePath) as any;
@@ -44,3 +43,5 @@ export async function recognizeText(languageRecognizer: Scheduler, image: Mat): 
 }
 
 const minRecognizingConfidence = 60;
+
+export default recognizeText;

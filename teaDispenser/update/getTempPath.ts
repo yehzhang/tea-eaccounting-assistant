@@ -2,7 +2,7 @@ import { mkdtempSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 
-export function getTempPath(filename: string): string {
+function getTempPath(filename: string): string {
   if (tempDirectory === null) {
     tempDirectory = mkdtempSync(join(tmpdir(), 'teaDispenser_'));
     console.debug('Using temp directory:', tempDirectory);
@@ -11,3 +11,5 @@ export function getTempPath(filename: string): string {
 }
 
 let tempDirectory: string | null = null;
+
+export default getTempPath;

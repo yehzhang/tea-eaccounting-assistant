@@ -1,10 +1,14 @@
-function startApp<E, S, R, C>(
-    initialize: (dispatchEvent: (event: E, context: C) => Promise<void>) => void,
-    update: (event: E, setState: (state: S) => void) => Promise<void>,
+async function startApp<E, S, R, C, D extends object>(
+    initialize: (dispatchEvent: (event: E, context: C) => Promise<void>) => Promise<D>,
+    update: (event: E, setState: (state: S) => void, externalDependency: D) => Promise<void>,
     render: (state: S) => R,
     dispatchRendering: (rendering: R, context: C) => Promise<void>,
-): void {
-  initialize(async (event, context) => {
+): Promise<void> {
+  const externalDependency = await initialize(async (event, context) => {
+    if (!externalDependency) {
+      throw new TypeError('Unexpected event dispatched during initialization');
+    }
+
     let renderingDispatchingPromise: Promise<void> | null = null;
     let nextState: S | null = null;
     const setState = async (state: S) => {
@@ -27,7 +31,7 @@ function startApp<E, S, R, C>(
       }
     };
 
-    await update(event, setState);
+    await update(event, setState, externalDependency);
     await renderingDispatchingPromise;
   });
 }

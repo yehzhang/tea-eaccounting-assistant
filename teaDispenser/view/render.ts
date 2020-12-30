@@ -1,14 +1,15 @@
-import { MessageOptions } from 'discord.js';
 import * as _ from 'lodash';
 import Command from '../data/Command';
 import { InvalidUsageReason } from '../data/InvalidCommand';
+import RenderedMessage from '../data/RenderedMessage';
+import Rendering from '../data/Rendering';
 import { AggregatedMarketPrice, MarketQueryResult, State } from '../state';
 import { commandPrefix, queryPriceCommandView } from './commandViews';
 import renderPrice from './renderPrice';
 import renderRelativeDate from './renderRelativeDate';
 import renderTable from './renderTable';
 
-export function render(state: State): readonly Rendering[] {
+function render(state: State): readonly Rendering[] {
   switch (state.type) {
     case 'Pong':
       return [
@@ -22,6 +23,20 @@ export function render(state: State): readonly Rendering[] {
           },
         },
       ];
+    case 'DetectingItems': {
+      const { magnifierDirection } = state;
+      return [
+        {
+          type: 'RenderedMessage',
+          content: {
+            embed: {
+              color: dispenserSilver,
+              title: `${magnifierDirection ? '🔍' : '🔎'}正在识别物品`,
+            },
+          },
+        },
+      ]
+    }
     case 'NoItemsDetected':
       return [
         {
@@ -35,6 +50,18 @@ export function render(state: State): readonly Rendering[] {
           },
         },
       ];
+    case 'PopulatingSpreadsheet':
+      return [
+        {
+          type: 'RenderedMessage',
+          content: {
+            embed: {
+              color: dispenserSilver,
+              title: '✍️正在填写表格',
+            },
+          },
+        },
+      ]
     case 'SpreadsheetOperationFailure':
       return [
         {
@@ -112,7 +139,7 @@ export function render(state: State): readonly Rendering[] {
             embed: {
               color: dispenserSilver,
               title: '分赃完毕，但没有变动',
-              description: '所有物品在自动分赃前已被分配完毕。若要重新分赃，可以使用 Google Sheets 的历史记录功能',
+              description: '若要重新分赃，可以恢复 Google Sheets 的历史',
             },
           },
         },
@@ -207,23 +234,7 @@ function mention(userId: string): string {
 
 export const handsUpIcon = '🙌';
 
-export type Rendering = RenderedMessage | RenderedReaction;
-
 const yzDiscordUserId = '202649496381816832';
-
-export interface RenderedMessage {
-  readonly type: 'RenderedMessage';
-  readonly content: RenderedMessageContent;
-  readonly reactionContents?: readonly string[];
-  readonly replyTo?: 'user' | 'message';
-}
-
-export type RenderedMessageContent = string | MessageOptions & { split?: false };
-
-export interface RenderedReaction {
-  readonly type: 'RenderedReaction';
-  readonly content: string;
-}
 
 /** Convenience method that constructs a single message to return. */
 function renderSingleMessage(...lines: (string | null | undefined)[]): readonly RenderedMessage[] {
@@ -235,3 +246,5 @@ function renderSingleMessage(...lines: (string | null | undefined)[]): readonly 
 }
 
 const dispenserSilver = 0xD3D3D3;
+
+export default render;

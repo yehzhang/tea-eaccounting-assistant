@@ -22,13 +22,29 @@ import setDataFormats from './sheets/setDataFormats';
 import setSpreadsheetValues from './sheets/setSpreadsheetValues';
 import updateSpreadsheetValues from './sheets/updateSpreadsheetValues';
 
-export async function executeEvent(event: Event): Promise<State> {
+async function executeEvent(event: Event, setState: (state: State) => void): Promise<void> {
   switch (event.type) {
     case 'Pinged':
-      return {
+      setState({
         type: 'Pong',
-      };
+      });
+      return;
     case 'ImagePosted': {
+      let detectingItems = true;
+      const ignored = (async () => {
+        let magnifierDirection = true;
+        while (detectingItems) {
+          setState({
+            type: 'DetectingItems',
+            magnifierDirection,
+          });
+          await new Promise((resolve) => {
+            setTimeout(resolve, 1260);
+          });
+          magnifierDirection = !magnifierDirection;
+        }
+      })();
+
       const { url, userName } = event;
       const createSpreadsheetPromise = createSpreadsheet(userName);
       const configureSpreadsheetPromise = createSpreadsheetPromise
@@ -42,67 +58,86 @@ export async function executeEvent(event: Event): Promise<State> {
             .then((recognizedItems) => Promise.all(recognizedItems.map(populateItemStack))),
       ]);
       if (!itemStacks.length) {
-        return {
+        setState({
           type: 'NoItemsDetected',
-        };
+        });
+        return;
       }
       if (!spreadsheet) {
-        return {
+        setState({
           type: 'SpreadsheetOperationFailure',
-        }
+        })
+        return;
       }
+
+      detectingItems = false;
+      setState({
+        type: 'PopulatingSpreadsheet',
+      });
 
       const postCreationSuccess = await configureSpreadsheetPromise && await setSpreadsheetValues(spreadsheet.id, itemStacks);
       if (!postCreationSuccess) {
-        return {
+        setState({
           type: 'SpreadsheetOperationFailure',
-        };
+        });
+        return;
       }
 
       await setAutoResize(spreadsheet.id);
 
-      return {
+      setState({
         type: 'SpreadsheetCreated',
         url: spreadsheet.url,
         linkTitle: spreadsheet.linkTitle,
-      };
+      });
+      return;
     }
     case 'HandsUpButtonPressed': {
+      setState({
+        type: 'PopulatingSpreadsheet',
+      });
+
       const { spreadsheetId } = event;
       const itemSplit = await readSpreadsheetValues(spreadsheetId);
       if (!itemSplit) {
-        return {
+        setState({
           type: 'SpreadsheetOperationFailure',
-        };
+        });
+        return;
       }
       if (!itemSplit.participants.length) {
-        return {
+        setState({
           type: 'NoParticipantsToSettleUp',
-        };
+        });
+        return;
       }
 
       const participants = settleUpParticipants(itemSplit);
       const gainedParticipants = participants
           .filter(({ items }, index) => !_.isEqual(items, itemSplit.participants[index].items));
+
       if (!gainedParticipants.length) {
-        return {
+        setState({
           type: 'NoOpParticipantsSettledUp',
-        };
+        });
+        return;
       }
 
       const success = await updateSpreadsheetValues(spreadsheetId, gainedParticipants);
       if (!success) {
-        return {
+        setState({
           type: 'SpreadsheetOperationFailure',
-        };
+        });
+        return;
       }
 
       const gainedParticipantNames = gainedParticipants.map(({ participantName }) => participantName);
-      return {
+      setState({
         type: 'ParticipantsSettledUp',
         gainedParticipants: gainedParticipantNames,
         noOpParticipants: _.difference(participants.map(({ participantName }) => participantName), gainedParticipantNames),
-      };
+      });
+      return;
     }
     case 'CommandIssued': {
       const { command } = event;
@@ -133,10 +168,11 @@ export async function executeEvent(event: Event): Promise<State> {
           }));
 
           if (results.length === 1) {
-            return results[0];
+            setState(results[0]);
+            return;
           }
 
-          return {
+          setState({
             type: 'MultipleMarketQueryResult',
             results: results.map((result) => {
               switch (result.type) {
@@ -155,12 +191,16 @@ export async function executeEvent(event: Event): Promise<State> {
                 }
               }
             }),
-          };
+          });
+          return;
         }
         case 'InvalidUsage':
         case 'UnknownCommand':
-          return command;
+          setState(command);
+          return;
       }
     }
   }
 }
+
+export default executeEvent;

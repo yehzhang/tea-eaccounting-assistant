@@ -54,7 +54,9 @@ function mapItemRows(values: SheetValues, callbackFn: (row: SheetRow, rowIndex: 
 function parseParticipantColumns(values: SheetValues): readonly ParticipantColumn[] {
   return _.compact([6, 8, 10, 12, 14, 16, 18, 20, 22, 24].map(columnIndex => {
     const rawParticipantName = values[0][columnIndex];
-    const participantName = typeof rawParticipantName === 'string' ? rawParticipantName : '';
+    const participantName = typeof rawParticipantName === 'string'
+        ? rawParticipantName
+        : rawParticipantName.toString();
     if (participantName.startsWith('参与者') && values.slice(2).every(row => !row[columnIndex])) {
       return null;
     }

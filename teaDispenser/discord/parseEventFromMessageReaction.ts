@@ -1,10 +1,8 @@
 import { MessageReaction } from 'discord.js';
 import { Event } from '../event';
-import { handsUpIcon } from './render';
+import { handsUpIcon } from '../view/render';
 
-export function parseEventFromMessageReaction(messageReaction: MessageReaction, userId: string, clientUserId: string): readonly Event[] {
-  console.debug('parseEventFromMessageReaction', messageReaction);
-
+function parseEventFromMessageReaction(messageReaction: MessageReaction, userId: string, clientUserId: string): readonly Event[] {
   const events: Event[] = [];
 
   if (messageReaction.message.author.id !== clientUserId) {
@@ -23,3 +21,5 @@ export function parseEventFromMessageReaction(messageReaction: MessageReaction, 
 
   return events;
 }
+
+export default parseEventFromMessageReaction;

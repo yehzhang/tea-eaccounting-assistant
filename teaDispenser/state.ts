@@ -4,7 +4,9 @@ import MarketQuery from './data/MarketQuery';
 
 export type State =
     | Pong
+    | DetectingItems
     | NoItemsDetected
+    | PopulatingSpreadsheet
     | SpreadsheetOperationFailure
     | SpreadsheetCreated
     | NoParticipantsToSettleUp
@@ -21,8 +23,17 @@ interface Pong {
   readonly type: 'Pong';
 }
 
+interface DetectingItems {
+  readonly type: 'DetectingItems';
+  readonly magnifierDirection: boolean;
+}
+
 interface NoItemsDetected {
   readonly type: 'NoItemsDetected';
+}
+
+interface PopulatingSpreadsheet {
+  readonly type: 'PopulatingSpreadsheet';
 }
 
 interface SpreadsheetOperationFailure {

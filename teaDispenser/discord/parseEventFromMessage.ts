@@ -1,8 +1,8 @@
 import { Message, Snowflake } from "discord.js";
 import { Event } from '../event';
-import { parseCommand } from './parseCommand';
+import { parseCommand } from '../view/parseCommand';
 
-export function parseEventFromMessage(message: Message, clientUserId: Snowflake): readonly Event[] {
+function parseEventFromMessage(message: Message, clientUserId: Snowflake): readonly Event[] {
   const events: Event[] = [];
 
   const { id, author, content, attachments } = message;
@@ -43,3 +43,5 @@ export function parseEventFromMessage(message: Message, clientUserId: Snowflake)
 
   return events;
 }
+
+export default parseEventFromMessage;

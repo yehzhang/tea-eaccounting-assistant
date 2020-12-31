@@ -461,6 +461,8 @@ describe('normalizeItemName', () => {
       '加达里4级受损结构',
       '加达里5级受损结构',
       '加达里6级受损结构',
+      '动态燃料控制阀蓝图 II',
+      { name: '动态燃料控制阀蓝图 II', icon: { type: 'BlueprintIcon', techLevel: 2 } },
     ];
     const actual = await Promise.all(itemNames.map(run));
 
@@ -766,6 +768,8 @@ describe('normalizeItemName', () => {
       { type: 'ExactMatch', text: '加达里4级受损结构' },
       { type: 'ExactMatch', text: '加达里5级受损结构' },
       { type: 'ExactMatch', text: '加达里6级受损结构' },
+      { type: 'ExactMatch', text: '动态燃料控制阀蓝图 II' },
+      { type: 'ExactMatch', text: '动态燃料控制阀蓝图 II' },
     ]);
   });
 });

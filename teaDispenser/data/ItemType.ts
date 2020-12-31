@@ -4,6 +4,8 @@ type ItemType =
   | 'ArmorRigBlueprint'
   | 'EngineeringRigBlueprint'
   | 'ScanRigBlueprint'
-  | 'MiningRigBlueprint';
+  | 'MiningRigBlueprint'
+  | 'RailgunRigBlueprint'
+  | 'NavigationRigBlueprint';
 
 export default ItemType;

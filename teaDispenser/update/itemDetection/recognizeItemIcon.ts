@@ -41,6 +41,8 @@ const blueprintsIconTemplatesPromise: Promise<BlueprintsIconTemplates> = (async 
     scanRigBlueprintTemplates,
     miningRigBlueprintTemplates,
     droneRigBlueprintTemplates,
+    railgunRigBlueprintTemplates,
+    navigationRigBlueprintTemplates,
   ] = await Promise.all([
     Promise.all([
       getTemplate('11702000000.png'),
@@ -78,6 +80,18 @@ const blueprintsIconTemplatesPromise: Promise<BlueprintsIconTemplates> = (async 
       getTemplate('11719000002.png'),
       getTemplate('11719000003.png'),
     ]),
+    Promise.all([
+      getTemplate('11700000000.png'),
+      getTemplate('11700000001.png'),
+      getTemplate('11700000002.png'),
+      getTemplate('11700000003.png'),
+    ]),
+    Promise.all([
+      getTemplate('11710000000.png'),
+      getTemplate('11710000001.png'),
+      getTemplate('11710000002.png'),
+      getTemplate('11710000003.png'),
+    ]),
   ]);
   return {
     LaserRigBlueprint: laserRigBlueprintTemplates,
@@ -86,6 +100,8 @@ const blueprintsIconTemplatesPromise: Promise<BlueprintsIconTemplates> = (async 
     EngineeringRigBlueprint: engineeringRigBlueprintTemplates,
     ScanRigBlueprint: scanRigBlueprintTemplates,
     MiningRigBlueprint: miningRigBlueprintTemplates,
+    RailgunRigBlueprint: railgunRigBlueprintTemplates,
+    NavigationRigBlueprint: navigationRigBlueprintTemplates,
   };
 })();
 

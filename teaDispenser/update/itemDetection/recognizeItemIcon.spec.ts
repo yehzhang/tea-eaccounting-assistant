@@ -147,6 +147,70 @@ describe('recognizeItemIcon', () => {
       techLevel: 1,
     });
   });
+
+  it('recognizes chn_navigation_bp_1', async () => {
+    const itemIcon = await run('chn_navigation_bp_1.png', 'NavigationRigBlueprint');
+    expect(itemIcon).toEqual({
+      type: 'BlueprintIcon',
+      techLevel: 3,
+    });
+  });
+
+  it('recognizes chn_navigation_bp_2', async () => {
+    const itemIcon = await run('chn_navigation_bp_2.png', 'NavigationRigBlueprint');
+    expect(itemIcon).toEqual({
+      type: 'BlueprintIcon',
+      techLevel: 2,
+    });
+  });
+
+  it('recognizes chn_navigation_bp_3', async () => {
+    const itemIcon = await run('chn_navigation_bp_3.png', 'NavigationRigBlueprint');
+    expect(itemIcon).toEqual({
+      type: 'BlueprintIcon',
+      techLevel: 1,
+    });
+  });
+
+  it('recognizes chn_navigation_bp_4', async () => {
+    const itemIcon = await run('chn_navigation_bp_4.png', 'NavigationRigBlueprint');
+    expect(itemIcon).toEqual({
+      type: 'BlueprintIcon',
+      techLevel: 1,
+    });
+  });
+
+  it('recognizes chn_armor_bp_8', async () => {
+    const itemIcon = await run('chn_armor_bp_8.png', 'ArmorRigBlueprint');
+    expect(itemIcon).toEqual({
+      type: 'BlueprintIcon',
+      techLevel: 3,
+    });
+  });
+
+  it('recognizes chn_engineering_bp_1', async () => {
+    const itemIcon = await run('chn_engineering_bp_1.png', 'EngineeringRigBlueprint');
+    expect(itemIcon).toEqual({
+      type: 'BlueprintIcon',
+      techLevel: 3,
+    });
+  });
+
+  it('recognizes chn_scan_bp_2', async () => {
+    const itemIcon = await run('chn_scan_bp_2.png', 'ScanRigBlueprint');
+    expect(itemIcon).toEqual({
+      type: 'BlueprintIcon',
+      techLevel: 1,
+    });
+  });
+
+  it('recognizes chn_scan_bp_3', async () => {
+    const itemIcon = await run('chn_scan_bp_3.png', 'ScanRigBlueprint');
+    expect(itemIcon).toEqual({
+      type: 'BlueprintIcon',
+      techLevel: 2,
+    });
+  });
 });
 
 async function run(imageFilename: string, itemType: ItemType): Promise<ItemIcon | null> {

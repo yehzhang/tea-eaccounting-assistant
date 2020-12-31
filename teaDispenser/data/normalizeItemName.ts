@@ -107,28 +107,24 @@ async function getItemNameFilter(
 
 /** Supports Chinese and a subset of items with ambiguous names. */
 function inferItemType(text: string): ItemType | null {
-  if (text.search(/^(激光炮|冷凝能量管理单元)/) !== -1) {
-    return 'LaserRigBlueprint';
-  }
-  if (text.startsWith('无人机')) {
-    return 'DroneRigBlueprint';
-  }
-  if (
-    text.search(/^(纳米机器人|辅助纳米聚合|维修增效|三角装甲|反(爆破|电磁|动能|热能)聚合)/) !== -1
-  ) {
-    return 'ArmorRigBlueprint';
-  }
-  if (text.search(/^(半导体记忆电池|电容器控制电路|辅助能量路由器|锁定系统辅助)/) !== -1) {
-    return 'EngineeringRigBlueprint';
-  }
-  if (text.search(/^(引力电容器升级|放射范围约束|)/) !== -1) {
-    return 'ScanRigBlueprint';
-  }
-  if (text.startsWith('采矿器')) {
-    return 'MiningRigBlueprint';
+  for (const [itemType, regExp] of Object.entries(itemTypeNameRegexps)) {
+    if (text.search(regExp) !== -1) {
+      return itemType as ItemType;
+    }
   }
   return null;
 }
+
+const itemTypeNameRegexps: { readonly [T in ItemType]: RegExp } = {
+  LaserRigBlueprint: /^(激光炮|冷凝能量管理单元)/,
+  DroneRigBlueprint: /^无人机/,
+  ArmorRigBlueprint: /^(纳米机器人|辅助纳米聚合|维修增效|三角装甲|反(爆破|电磁|动能|热能)(聚合|横贯舱壁)|横贯舱壁)/,
+  EngineeringRigBlueprint: /^(半导体记忆电池|电容器控制电路|辅助能量路由器|锁定系统辅助)/,
+  ScanRigBlueprint: /^(引力电容器升级|放射范围约束)/,
+  MiningRigBlueprint: /^采矿器/,
+  RailgunRigBlueprint: /^磁轨炮/,
+  NavigationRigBlueprint: /^(动态燃料控制阀|超空间速度|货柜舱优化|辅助推进器|复合碳素|希格斯粒子|跃迁核心优化)/,
+};
 
 function getItemNameFilterBy(itemIcon: ItemIcon): RegExp {
   switch (itemIcon.type) {
@@ -189,6 +185,7 @@ function listSimilarLookingTexts(text: string): ReadonlySet<string> {
 const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['\\', 'l'],
   ['I', 'l'],
+  ['L', 'I'],
   ['l', 'I'],
   ['l', 'i'],
   ['B', '8'],
@@ -221,6 +218,8 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['兽', '鲁'],
   ['立', '位'],
   ['胃', '胄'],
+  ['川', 'III'],
+  ['豇', '置'],
 ];
 
 function trimEllipsis(text: string): string {

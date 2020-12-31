@@ -514,6 +514,23 @@ describe('recognizeItems', () => {
       { name: '加达里6级受损结构', amount: '141' },
     ]);
   });
+
+  it('recognized items from tablet_chn_blueprints_1', async () => {
+    const actual = await recognizeItems(
+      getTestDataPath('inventory/tablet_chn_blueprints_1.jpg'),
+      schedulers
+    );
+    expectEqual(actual, [
+      { name: '反热能聚合器蓝图 川', amount: '1' },
+      { name: '动态燃料控制阀蓝图I', amount: '3' },
+      { name: '动态燃料控制阀蓝图 II', amount: '4' },
+      { name: '货柜舱优化改造蓝图 I...', amount: '1' },
+      { name: '超空间逮度调节器蓝...', amount: '1' },
+      { name: '锁定系统辅助控制器...', amount: '1' },
+      { name: '引力电容器升级蓝图I', amount: '3' },
+      { name: '引力电容器升级蓝图 II', amount: '2' },
+    ]);
+  });
 });
 
 function expectEqual(

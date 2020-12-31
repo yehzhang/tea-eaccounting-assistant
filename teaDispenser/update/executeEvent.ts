@@ -45,7 +45,7 @@ async function executeEvent(
         }
       })();
 
-      const { url, userName } = event;
+      const { urls, userName } = event;
       const createSpreadsheetPromise = createSpreadsheet(userName);
       const configureSpreadsheetPromise = createSpreadsheetPromise.then(
         (spreadsheet) =>
@@ -54,9 +54,13 @@ async function executeEvent(
       );
       const [spreadsheet, itemStacks] = await Promise.all([
         createSpreadsheetPromise,
-        fetchTempFile(url)
-          .then((path) => recognizeItems(path, schedulers))
-          .then((recognizedItems) => Promise.all(recognizedItems.map(populateItemStack))),
+        Promise.all(
+          urls.map(async (url) => {
+            const path = await fetchTempFile(url);
+            const recognizedItems = await recognizeItems(path, schedulers);
+            return Promise.all(recognizedItems.map(populateItemStack));
+          })
+        ).then((itemStacksList) => itemStacksList.flat()),
       ]);
       if (!itemStacks.length) {
         setState({

@@ -1,4 +1,5 @@
 import { Message, Snowflake } from 'discord.js';
+import _ from 'lodash';
 import Event from '../Event';
 import parseCommand from '../view/parseCommand';
 
@@ -18,17 +19,22 @@ function parseEventFromMessage(message: Message, clientUserId: Snowflake): reado
     });
   }
 
-  for (const attachment of attachments.values()) {
-    if (attachment.width === null) {
-      console.warn('Received an attachment that is not an image', {
-        messageId: id,
-        attachment,
-      });
-      continue;
-    }
+  const imageUrls = _.compact(
+    [...attachments.values()].map((attachment) => {
+      if (attachment.width === null) {
+        console.warn('Received an attachment that is not an image', {
+          messageId: id,
+          attachment,
+        });
+        return null;
+      }
+      return attachment.url;
+    })
+  );
+  if (imageUrls.length) {
     events.push({
       type: 'ImagePosted',
-      url: attachment.url,
+      urls: imageUrls,
       userName: author.username,
     });
   }

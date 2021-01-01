@@ -76,7 +76,7 @@ function buildPriceNumberFormat(columnIndex: number) {
         userEnteredFormat: {
           numberFormat: {
             type: 'NUMBER',
-            pattern: '[<1000]0;[<999500]0,"K";0,,"M"',
+            pattern: '#,#',
           },
         },
       },

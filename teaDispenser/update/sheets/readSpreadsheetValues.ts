@@ -60,12 +60,10 @@ function mapItemRows(
 function parseParticipantColumns(values: SheetValues): readonly ParticipantColumn[] {
   return _.compact(
     [6, 8, 10, 12, 14, 16, 18, 20, 22, 24].map((columnIndex) => {
-      const rawParticipantName = values[0][columnIndex];
-      const participantName =
-        typeof rawParticipantName === 'string' ? rawParticipantName : rawParticipantName.toString();
+      const participantName = parseParticipantName(values, columnIndex);
       if (
         participantName.startsWith('参与者') &&
-        values.slice(2).every((row) => !row[columnIndex])
+        values.slice(2).every((row) => !hasCellValue(row[columnIndex]))
       ) {
         return null;
       }
@@ -76,6 +74,18 @@ function parseParticipantColumns(values: SheetValues): readonly ParticipantColum
       };
     })
   );
+}
+
+function parseParticipantName(values: SheetValues, columnIndex: number): string {
+  const rawParticipantName = values[0][columnIndex];
+  if (rawParticipantName == null) {
+    return '';
+  }
+  return rawParticipantName.toString();
+}
+
+function hasCellValue(value: string | number | null | undefined): value is string | number {
+  return value != null && value !== '';
 }
 
 function parseParticipantItemRows(values: SheetValues, columnIndex: number): readonly ItemRow[] {
@@ -98,6 +108,6 @@ function parseParticipantItemRows(values: SheetValues, columnIndex: number): rea
 }
 
 type SheetValues = readonly SheetRow[];
-type SheetRow = readonly (string | number)[];
+type SheetRow = readonly (string | number | undefined)[];
 
 export default readSpreadsheetValues;

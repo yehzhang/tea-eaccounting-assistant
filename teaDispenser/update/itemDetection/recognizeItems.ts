@@ -12,8 +12,8 @@ import removeFactionSuperscript from './removeFactionSuperscript';
 
 async function recognizeItems(
   imagePath: string,
-  schedulers: TesseractSchedulers
-): Promise<readonly RecognizedItem[]> {
+  schedulers: TesseractSchedulers,
+): Promise<readonly Promise<RecognizedItem | null>[]> {
   console.debug('Recognizing image:', imagePath);
 
   const [locatedItemStacks, languageRecognizer] = await Promise.all([
@@ -21,27 +21,27 @@ async function recognizeItems(
     detectLanguage(imagePath, schedulers),
   ]);
 
-  const recognizedItemStacks = await Promise.all(
-    locatedItemStacks.map((locatedItemStack) =>
-      recognizeItemStack(locatedItemStack, languageRecognizer)
-    )
+  return locatedItemStacks.map((locatedItemStack) =>
+    recognizeItemStack(locatedItemStack, languageRecognizer)
   );
-  return recognizedItemStacks.filter(({ name, amount }) => name || amount);
 }
 
 async function recognizeItemStack(
   locatedItemStack: LocatedObject,
-  languageRecognizer: Scheduler
-): Promise<RecognizedItem> {
+  languageRecognizer: Scheduler,
+): Promise<RecognizedItem | null> {
   const { image, boundingRects } = locatedItemStack;
   const [name, amount] = await Promise.all([
     removeFactionSuperscript(getItemNameImage(image)).then((itemNameImage) =>
       recognizeText(languageRecognizer, itemNameImage)
     ),
     Promise.all(
-      getItemAmountDigitImages(image, boundingRects).map(recognizeDigit)
+      getItemAmountDigitImages(image, boundingRects).map(recognizeDigit),
     ).then((amountDigits) => amountDigits.join('')),
   ]);
+  if (!name && !amount) {
+    return null;
+  }
   return {
     name,
     amount,

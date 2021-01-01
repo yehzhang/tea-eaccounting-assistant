@@ -19,8 +19,14 @@ describe('recognizeItems', () => {
     jasmine.addCustomEqualityTester(semanticTester);
   });
 
+  async function run(filename: string): Promise<readonly RecognizedItem[]> {
+    const promises = await recognizeItems(getTestDataPath(filename), schedulers);
+    const recognizedItems = await Promise.all(promises);
+    return _.compact(recognizedItems);
+  }
+
   it('recognizes items from ipad_eng_1', async () => {
-    const actual = await recognizeItems(getTestDataPath('inventory/ipad_eng_1.png'), schedulers);
+    const actual = await run('inventory/ipad_eng_1.png');
     expectEqual(actual, [
       { name: 'MK7 Small Pulse Laser', amount: '3' },
       { name: 'Imperial Navy Small...', amount: '1' },
@@ -38,10 +44,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from simulator_chn_1', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/simulator_chn_1.png'),
-      schedulers
-    );
+    const actual = await run('inventory/simulator_chn_1.png');
     expectEqual(actual, [
       { name: '残月级原型', amount: '1' },
       { name: '火石 中型来薹磁轨炮', amount: '4' },
@@ -55,18 +58,12 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes nothing from unselected items', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/ipad_eng_unselected.png'),
-      schedulers
-    );
+    const actual = await run('inventory/ipad_eng_unselected.png');
     expectEqual(actual, []);
   });
 
   it('recognizes items from mobile_eng_filtered_blueprints_2', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/mobile_eng_filtered_blueprints_2.png'),
-      schedulers
-    );
+    const actual = await run('inventory/mobile_eng_filtered_blueprints_2.png');
     expectEqual(actual, [
       { name: 'Anti-Explosive Pump I...', amount: '5' },
       { name: 'Anti-Explosive Pump II', amount: '2' },
@@ -79,10 +76,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from mobile_eng_filtered_blueprints_1', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/mobile_eng_filtered_blueprints_1.png'),
-      schedulers
-    );
+    const actual = await run('inventory/mobile_eng_filtered_blueprints_1.png');
     expectEqual(actual, [
       { name: 'MK5 Small Group Shield', amount: '1' },
       { name: 'MK7 Small Group...', amount: '1' },
@@ -96,10 +90,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_armors_4', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_armors_4.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_armors_4.png');
     expectEqual(actual, [
       { name: 'MK7 反应式装甲 增强...', amount: '4' },
       { name: 'MK9 反应式装甲增强...', amount: '1' },
@@ -117,10 +108,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_armors_3', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_armors_3.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_armors_3.png');
     expectEqual(actual, [
       { name: 'MK7 400mm钢附 甲板', amount: '2' },
       { name: '堡垒 400mm钢附 甲板', amount: '86' },
@@ -138,10 +126,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_armors_2', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_armors_2.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_armors_2.png');
     expectEqual(actual, [
       { name: '铁网 100mm钢附甲木反', amount: '22' },
       { name: '帝国海军 100mm钢附...', amount: '3' },
@@ -159,10 +144,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_armors_1', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_armors_1.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_armors_1.png');
     expectEqual(actual, [
       { name: '偷窃 自适应装甲 增强...', amount: '19' },
       { name: '偷窃 自适应装甲增强...', amount: '1' },
@@ -180,10 +162,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_reps_2', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_reps_2.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_reps_2.png');
     expectEqual(actual, [
       { name: '科波斯C 大型装甲维...', amount: '9' },
       { name: '科尔C 大型装甲维修器', amount: '1' },
@@ -201,10 +180,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_reps_1', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_reps_1.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_reps_1.png');
     expectEqual(actual, [
       { name: '甲胃 小型装甲维修器', amount: '1' },
       { name: '帝国海军 小型装甲维...', amount: '3' },
@@ -222,10 +198,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_drones', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_drones.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_drones.png');
     expectEqual(actual, [
       { name: 'MK7 无人机导航电脑', amount: '6' },
       { name: 'MK7 无人机导航电脑', amount: '2' },
@@ -243,10 +216,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_remotes_2', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_remotes_2.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_remotes_2.png');
     expectEqual(actual, [
       { name: '帝国海军 小型远程装...', amount: '4' },
       { name: '宁静 小型远程装甲维...', amount: '1' },
@@ -264,10 +234,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_remotes_1', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_remotes_1.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_remotes_1.png');
     expectEqual(actual, [
       { name: 'MK7 中型远程电容传...', amount: '1' },
       { name: '随从 中型远程电容传...', amount: '1' },
@@ -285,10 +252,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_neuts', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_neuts.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_neuts.png');
     expectEqual(actual, [
       { name: '城壕 小型能呈中和器', amount: '1' },
       { name: 'MK5 中型能呈中和器', amount: '3' },
@@ -307,10 +271,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_nos', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_nos.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_nos.png');
     expectEqual(actual, [
       { name: 'MK5 小型掠能器', amount: '30' },
       { name: 'MK5 小型掠能器', amount: '6' },
@@ -328,10 +289,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_lasers_4', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_lasers_4.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_lasers_4.png');
     expectEqual(actual, [
       { name: '科波斯C 大型脉冲激...', amount: '57' },
       { name: 'MK5 小型自动加农炮', amount: '1' },
@@ -349,10 +307,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_lasers_3', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_lasers_3.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_lasers_3.png');
     expectEqual(actual, [
       { name: 'MK7 中型脉冲激光炮', amount: '15' },
       { name: 'MK7 中型脉冲激光炮', amount: '1' },
@@ -370,10 +325,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_lasers_2', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_lasers_2.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_lasers_2.png');
     expectEqual(actual, [
       { name: '帝国海军 中型集束激...', amount: '66' },
       { name: '仪式 中型集束激光炮', amount: '1' },
@@ -391,10 +343,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognizes items from iphone_chn_lasers_1', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_lasers_1.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_lasers_1.png');
     expectEqual(actual, [
       { name: 'MK7 大型短管磁轨炮', amount: '1' },
       { name: '骗子 大型短管磁轨炮', amount: '2' },
@@ -412,10 +361,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognized items from iphone_chn_blueprints_1', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_blueprints_1.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_blueprints_1.png');
     expectEqual(actual, [
       { name: 'MK7 隐秘行动装置蓝...', amount: '1' },
       { name: 'MK5 小型群体护盾回...', amount: '1' },
@@ -433,10 +379,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognized items from iphone_chn_blueprints_2', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_blueprints_2.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_blueprints_2.png');
     expectEqual(actual, [
       { name: '维修增效器蓝图 II', amount: '1' },
       { name: '反爆破聚合器蓝图I', amount: '5' },
@@ -454,10 +397,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognized items from iphone_chn_blueprints_3', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_blueprints_3.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_blueprints_3.png');
     expectEqual(actual, [
       { name: '无人机射程扩展装置...', amount: '3' },
       { name: '无人机射程扩展装置...', amount: '2' },
@@ -474,10 +414,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognized items from iphone_chn_datacores', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_datacores.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_datacores.png');
     expect(actual).toEqual([
       jasmine.objectContaining({ name: 'MK7瓦尔基里', amount: '2' }),
       jasmine.objectContaining({ name: 'MK7 狂战士', amount: '2' }),
@@ -495,10 +432,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognized items from iphone_chn_debris', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/iphone_chn_debris.png'),
-      schedulers
-    );
+    const actual = await run('inventory/iphone_chn_debris.png');
     expectEqual(actual, [
       { name: '等离子体团', amount: '800' },
       { name: '艾玛4级受损结构', amount: '91' },
@@ -516,10 +450,7 @@ describe('recognizeItems', () => {
   });
 
   it('recognized items from tablet_chn_blueprints_1', async () => {
-    const actual = await recognizeItems(
-      getTestDataPath('inventory/tablet_chn_blueprints_1.jpg'),
-      schedulers
-    );
+    const actual = await run('inventory/tablet_chn_blueprints_1.jpg');
     expectEqual(actual, [
       { name: '反热能聚合器蓝图 川', amount: '1' },
       { name: '动态燃料控制阀蓝图I', amount: '3' },

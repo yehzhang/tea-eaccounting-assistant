@@ -57,10 +57,16 @@ async function executeEvent(
         Promise.all(
           urls.map(async (url) => {
             const path = await fetchTempFile(url);
-            const recognizedItems = await recognizeItems(path, schedulers);
-            return Promise.all(recognizedItems.map(populateItemStack));
+            const recognizedItemPromises = await recognizeItems(path, schedulers);
+            return Promise.all(
+              recognizedItemPromises.map((recognizedItemPromise) =>
+                recognizedItemPromise.then(
+                  (recognizedItem) => recognizedItem && populateItemStack(recognizedItem),
+                )
+              )
+            );
           })
-        ).then((itemStacksList) => itemStacksList.flat()),
+        ).then((itemStacksList) => _.compact(itemStacksList.flat())),
       ]);
       if (!itemStacks.length) {
         setState({

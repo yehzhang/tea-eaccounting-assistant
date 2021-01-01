@@ -141,7 +141,9 @@ function render(state: State): readonly Rendering[] {
             embed: {
               color: dispenserSilver,
               title: '分赃完毕，但没有变动',
-              description: '若要重新分赃，可以恢复 Google Sheets 的历史',
+              description:
+                '已分的赃物不会参与分赃。若要重新自动分赃已分的赃物，' +
+                `请恢复 Google Sheets 历史至自动分赃前，再按${handsUpIcon}按钮`,
             },
           },
         },

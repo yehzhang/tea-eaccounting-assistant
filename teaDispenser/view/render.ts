@@ -92,6 +92,7 @@ function render(state: State): readonly Rendering[] {
                 '2. 填写物品的价格与数量，如果有缺的话',
                 '3. 邀请参与者填写需求',
                 `4. 按下方${handsUpIcon}按钮以自动分配未分配的物品`,
+                '5. 若分赃不均，可将赃物抵押奶茶当铺，然后分钱',
               ].join('\n'),
             },
           },

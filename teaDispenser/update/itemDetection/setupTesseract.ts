@@ -12,6 +12,7 @@ async function setupTesseract(): Promise<TesseractSchedulers> {
     const worker = createWorker({
       langPath: join(__dirname, '../../../training/outputTessdata'),
       gzip: false,
+      errorHandler: (error) => void console.warn('Tesseract worker error:', error),
     });
     await worker.load();
     await worker.loadLanguage(language);

@@ -1,9 +1,9 @@
-import * as _ from 'lodash';
 import { Mat, Rect } from 'opencv4nodejs';
 import { Scheduler } from 'tesseract.js';
 import RecognizedItem from '../../data/RecognizedItem';
-import { containRect, getCenterY } from '../../data/rectUtils';
+import { containRect, getArea, getCenterY } from '../../data/rectUtils';
 import { TesseractSchedulers } from '../../ExternalDependency';
+import deduplicateSiblingBoundingRects from './deduplicateSiblingBoundingRects';
 import locateItemStacks, { LocatedObject } from './locateItemStacks';
 import recognizeDigit from './recognizeDigit';
 import recognizeItemIcon from './recognizeItemIcon';
@@ -12,7 +12,7 @@ import removeFactionSuperscript from './removeFactionSuperscript';
 
 async function recognizeItems(
   imagePath: string,
-  schedulers: TesseractSchedulers,
+  schedulers: TesseractSchedulers
 ): Promise<readonly Promise<RecognizedItem | null>[]> {
   console.debug('Recognizing image:', imagePath);
 
@@ -28,7 +28,7 @@ async function recognizeItems(
 
 async function recognizeItemStack(
   locatedItemStack: LocatedObject,
-  languageRecognizer: Scheduler,
+  languageRecognizer: Scheduler
 ): Promise<RecognizedItem | null> {
   const { image, boundingRects } = locatedItemStack;
   const [name, amount] = await Promise.all([
@@ -36,7 +36,7 @@ async function recognizeItemStack(
       recognizeText(languageRecognizer, itemNameImage)
     ),
     Promise.all(
-      getItemAmountDigitImages(image, boundingRects).map(recognizeDigit),
+      getItemAmountDigitImages(image, boundingRects).map(recognizeDigit)
     ).then((amountDigits) => amountDigits.join('')),
   ]);
   if (!name && !amount) {
@@ -52,35 +52,17 @@ async function recognizeItemStack(
 function getItemAmountDigitImages(image: Mat, boundingRects: readonly Rect[]): readonly Mat[] {
   const amountBoundingRect = getItemAmountBoundingRect(image);
   const amountCenterY = getCenterY(amountBoundingRect);
-  return removeContainingSiblingBoundingRects(
-    boundingRects.filter(
-      (boundingRect) =>
-        containRect(boundingRect, amountBoundingRect) &&
-        // Choose only rects close to the horizontal center.
-        Math.abs(getCenterY(boundingRect) - amountCenterY) <= amountBoundingRect.height * 0.2
-    )
-  ).map((boundingRect) => image.getRegion(boundingRect));
-}
-
-/** Guarantees the returned `boundingRects` to be sorted by `x`. */
-function removeContainingSiblingBoundingRects(boundingRects: readonly Rect[]): readonly Rect[] {
-  const sortedBoundingRects = _.sortBy(boundingRects, ({ x }) => x);
-  let boundingRectIndex = 1;
-  while (boundingRectIndex < sortedBoundingRects.length) {
-    const previousBoundingRect = sortedBoundingRects[boundingRectIndex - 1];
-    const boundingRect = sortedBoundingRects[boundingRectIndex];
-    if (containRect(previousBoundingRect, boundingRect)) {
-      sortedBoundingRects.splice(boundingRectIndex - 1, 1);
-      continue;
-    }
-    if (containRect(boundingRect, previousBoundingRect)) {
-      sortedBoundingRects.splice(boundingRectIndex, 1);
-      continue;
-    }
-
-    boundingRectIndex++;
-  }
-  return sortedBoundingRects;
+  const rects = deduplicateSiblingBoundingRects(
+    boundingRects.filter((boundingRect) => containRect(boundingRect, amountBoundingRect))
+  ).filter(
+    (boundingRect) =>
+      // The rect should be close to the horizontal center.
+      Math.abs(getCenterY(boundingRect) - amountCenterY) <= amountBoundingRect.height * 0.2
+  );
+  const maxRectArea = Math.max(...rects.map(getArea));
+  return rects
+    .filter((rect) => maxRectArea * 0.8 <= getArea(rect))
+    .map((boundingRect) => image.getRegion(boundingRect));
 }
 
 async function detectLanguage(
@@ -88,17 +70,22 @@ async function detectLanguage(
   schedulers: TesseractSchedulers
 ): Promise<Scheduler> {
   const { languageDetector, chineseRecognizer, englishRecognizer } = schedulers;
-  const { data } = await languageDetector.addJob('detect', imagePath);
-  switch (data.script) {
-    case 'Latin':
-      console.debug('Detected English script');
-      return englishRecognizer;
-    case 'Han':
-      console.debug('Detected Chinese script');
-      return chineseRecognizer;
-    default:
-      console.error('Detected unknown language', data);
-      return chineseRecognizer;
+  try {
+    const { data } = await languageDetector.addJob('detect', imagePath);
+    switch (data.script) {
+      case 'Latin':
+        console.debug('Detected English script');
+        return englishRecognizer;
+      case 'Han':
+        console.debug('Detected Chinese script');
+        return chineseRecognizer;
+      default:
+        console.error('Detected unknown language', data);
+        return chineseRecognizer;
+    }
+  } catch (e) {
+    console.warn('Failed to detect language:', e);
+    return chineseRecognizer;
   }
 }
 

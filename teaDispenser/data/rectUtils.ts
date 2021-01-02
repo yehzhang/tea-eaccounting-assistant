@@ -20,3 +20,16 @@ export function containRect(rect: Rect, container: Rect): boolean {
     getMaxY(rect) <= getMaxY(container)
   );
 }
+
+export function intersectRect(rect: Rect, other: Rect): boolean {
+  return (
+    rect.x <= getMaxX(other) &&
+    other.x <= getMaxX(rect) &&
+    rect.y <= getMaxY(other) &&
+    other.y <= getMaxY(rect)
+  );
+}
+
+export function getArea({ width, height }: Rect): number {
+  return width * height;
+}

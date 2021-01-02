@@ -462,6 +462,24 @@ describe('recognizeItems', () => {
       { name: '引力电容器升级蓝图 II', amount: '2' },
     ]);
   });
+
+  it('recognized items from unknown_chn_smoothened_1', async () => {
+    const actual = await run('inventory/unknown_chn_smoothened_1.png');
+    expectEqual(actual, [
+      { name: '冷凝能量管理单元蓝...', amount: '2' },
+      { name: '纳米机器人加速器蓝...', amount: '2' },
+      { name: '辅助纳米聚合器蓝图 L', amount: '1' },
+      { name: '反爆破聚合器蓝图 I', amount: '1' },
+      { name: '反动能聚合器蓝图 III', amount: '1' },
+      { name: '反热能聚合器蓝图 II', amount: '1' },
+      { name: '反热能聚合器蓝图 III', amount: '3' },
+      { name: '半导体记忆电池蓝图 I...', amount: '1' },
+      { name: '辅助能量路由器蓝图 L', amount: '2' },
+      { name: '放射范围约束装置蓝...', amount: '3' },
+      { name: '采矿器循环加速器蓝...', amount: '1' },
+      { name: '采矿器距离控制器蓝...', amount: '2' },
+    ]);
+  });
 });
 
 function expectEqual(

@@ -1,9 +1,9 @@
 import { CHAIN_APPROX_SIMPLE, imreadAsync, Mat, Rect, RETR_TREE } from 'opencv4nodejs';
-import { containRect } from '../../data/rectUtils';
+import { containRect, getArea } from '../../data/rectUtils';
 
 async function locateItemStacks(imagePath: string): Promise<readonly LocatedObject[]> {
   const image = await imreadAsync(imagePath);
-  const edges = await image.cannyAsync(115, 300);
+  const edges = await image.cannyAsync(1000, 3000, 5);
   const contours = await edges.findContoursAsync(RETR_TREE, CHAIN_APPROX_SIMPLE);
 
   const maxItemContourArea = Math.max(
@@ -21,10 +21,10 @@ async function locateItemStacks(imagePath: string): Promise<readonly LocatedObje
       return parentIndex === -1;
     })
     .map((contour) => contour.boundingRect())
-    .filter((boundingRect) => {
-      const area = boundingRect.width * boundingRect.height;
-      return maxItemContourArea * 0.9 <= area && isRectItemShaped(boundingRect);
-    })
+    .filter(
+      (boundingRect) =>
+        maxItemContourArea * 0.9 <= getArea(boundingRect) && isRectItemShaped(boundingRect)
+    )
     .sort(({ x, y }, { x: otherX, y: otherY }) => {
       // Sort rects by their positions.
       const deltaY = y - otherY;

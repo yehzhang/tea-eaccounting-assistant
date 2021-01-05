@@ -207,6 +207,7 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['蠹', '量'],
   ['重', '量'],
   ['童', '量'],
+  ['矗', '量'],
   ['虹', '血'],
   ['抖', '科'],
   ['囊', '复'],

@@ -3,13 +3,14 @@ import { containRect, getArea } from '../../data/rectUtils';
 
 async function locateItemStacks(imagePath: string): Promise<readonly LocatedObject[]> {
   const image = await imreadAsync(imagePath);
-  const edges = await image.cannyAsync(1000, 3000, 5);
+  const edges = await image.cannyAsync(1500, 3000, 5);
+  // imshowWait('test', edges);
   const contours = await edges.findContoursAsync(RETR_TREE, CHAIN_APPROX_SIMPLE);
 
   const maxItemContourArea = Math.max(
     ...contours
       .filter((contour) => isRectItemShaped(contour.boundingRect()))
-      .map(({ area }) => area)
+      .map(({ area }) => area),
   );
   const allBoundingRects = contours.map((contour) => contour.boundingRect());
   return contours

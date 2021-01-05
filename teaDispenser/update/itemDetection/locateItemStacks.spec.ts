@@ -38,8 +38,18 @@ describe('locateItemStacks', () => {
 
   it('locates items from unknown_chn_smoothened_1', async () => {
     const actual = await locateItemStacks(
-      getTestDataPath('inventory/unknown_chn_smoothened_1.png')
+      getTestDataPath('inventory/unknown_chn_smoothened_1.png'),
     );
     expect(actual.length).toBe(12);
+  });
+
+  it('locates nothing from unselected_1.png', async () => {
+    const actual = await locateItemStacks(getTestDataPath('inventory/unselected_1.png'));
+    expect(actual.length).toBe(0);
+  });
+
+  it('locates nothing from unselected_2.png', async () => {
+    const actual = await locateItemStacks(getTestDataPath('inventory/unselected_2.png'));
+    expect(actual.length).toBe(0);
   });
 });

@@ -76,7 +76,6 @@ fetcher_items_config = [
     44020000010,  # 盖伦特10级受损结构
     44090000000,  # 天蛇受损结构
 
-
     # Delve Stuff
     64000100006,  # MK5 渗透者蓝图
     64000100008,  # MK7 渗透者蓝图
@@ -222,22 +221,66 @@ fetcher_items_config = [
     42001000009,  # 光滑复合物
     42001000010,  # 晶体复合物
     42001000011,  # 黑暗复合物
-    42001000018,  # 活性气体
-    42001000019,  # 稀有气体
     42001000020,  # 基础金属
     42001000021,  # 重金属
     42001000022,  # 贵金属
     42001000023,  # 反应金属
     42001000024,  # 有毒金属
-    42001000025,  # 工业纤维
-    42001000026,  # 超张力塑料
-    42001000027,  # 聚芳酰胺
-    42001000028,  # 冷却剂
-    42001000029,  # 凝缩液
-    42001000030,  # 建筑模块
-    42001000031,  # 纳米体
-    42001000032,  # 硅结构铸材
-    42001000033,  # 灵巧单元建筑模块
+    {
+        # 活性气体
+        'id': 42001000018,
+        'also_fetch_buy_orders': True,
+    },
+    {
+        # 稀有气体
+        'id': 42001000019,
+        'also_fetch_buy_orders': True,
+    },
+    {
+        # 工业纤维
+        'id': 42001000025,
+        'also_fetch_buy_orders': True,
+    },
+    {
+        # 超张力塑料
+        'id': 42001000026,
+        'also_fetch_buy_orders': True,
+    },
+    {
+        # 聚芳酰胺
+        'id': 42001000027,
+        'also_fetch_buy_orders': True,
+    },
+    {
+        # 冷却剂
+        'id': 42001000028,
+        'also_fetch_buy_orders': True,
+    },
+    {
+        # 凝缩液
+        'id': 42001000029,
+        'also_fetch_buy_orders': True,
+    },
+    {
+        # 建筑模块
+        'id': 42001000030,
+        'also_fetch_buy_orders': True,
+    },
+    {
+        # 纳米体
+        'id': 42001000031,
+        'also_fetch_buy_orders': True,
+    },
+    {
+        # 硅结构铸材
+        'id': 42001000032,
+        'also_fetch_buy_orders': True,
+    },
+    {
+        # 灵巧单元建筑模块
+        'id': 42001000033,
+        'also_fetch_buy_orders': True,
+    },
 
     41400000000,  # 烧焦的微电路
     41400000001,  # 烧焦的接口电路
@@ -376,122 +419,121 @@ fetcher_items_config = [
     11513100013,  # 帝国海军 自适应装甲增强器
     11513100024,  # 科波斯C 自适应装甲增强器
 
-
     # Common stuff
     {
         # 凡晶石
-        'id':                    51000000000,
+        'id': 51000000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 双多特石
-        'id':                    51013000000,
+        'id': 51013000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 同位原矿
-        'id':                    51008000000,
+        'id': 51008000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 基腹断岩
-        'id':                    51015000000,
+        'id': 51015000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 奥贝尔石
-        'id':                    51004000000,
+        'id': 51004000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 希莫非特
-        'id':                    51007000000,
+        'id': 51007000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 干焦岩
-        'id':                    51002000000,
+        'id': 51002000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 斜长岩
-        'id':                    51003000000,
+        'id': 51003000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 杰斯贝矿
-        'id':                    51006000000,
+        'id': 51006000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 水硼砂
-        'id':                    51005000000,
+        'id': 51005000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 灰岩
-        'id':                    51009000000,
+        'id': 51009000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 灼烧岩
-        'id':                    51001000000,
+        'id': 51001000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 片麻岩
-        'id':                    51011000000,
+        'id': 51011000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 艾克诺岩
-        'id':                    51014000000,
+        'id': 51014000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 黑赭石
-        'id':                    51010000000,
+        'id': 51010000000,
         'also_fetch_buy_orders': True,
     },
 
     {
         # 三钛合金
-        'id':                    41000000000,
+        'id': 41000000000,
         'also_fetch_buy_orders': True,
     },
     {
         # 类晶体胶矿
-        'id':                    41000000002,
+        'id': 41000000002,
         'also_fetch_buy_orders': True,
     },
     {
         # 类银超金属
-        'id':                    41000000003,
+        'id': 41000000003,
         'also_fetch_buy_orders': True,
     },
     {
         # 同位聚合体
-        'id':                    41000000004,
+        'id': 41000000004,
         'also_fetch_buy_orders': True,
     },
     {
         # 超新星诺克石
-        'id':                    41000000005,
+        'id': 41000000005,
         'also_fetch_buy_orders': True,
     },
     {
         # 晶状石英核岩
-        'id':                    41000000006,
+        'id': 41000000006,
         'also_fetch_buy_orders': True,
     },
     {
         # 超噬矿
-        'id':                    41000000007,
+        'id': 41000000007,
         'also_fetch_buy_orders': True,
     },
     {
         # 莫尔石
-        'id':                    41000000008,
+        'id': 41000000008,
         'also_fetch_buy_orders': True,
     },
 

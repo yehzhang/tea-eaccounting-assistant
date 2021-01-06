@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import MarketOrder from '../../data/MarketOrder';
 
-function getWeightedAverageMarketPrice(orders: readonly MarketOrder[]): number {
+function getWeightedAverageItcPrice(orders: readonly MarketOrder[]): number {
   const itcOrders = orders.filter(({ solarSystemName }) =>
-    highSecItcSolarSystems.has(solarSystemName)
+    empireRegionItcSolarSystems.has(solarSystemName),
   );
   if (itcOrders.length) {
     return getWeightedAveragePrice(itcOrders);
@@ -11,7 +11,7 @@ function getWeightedAverageMarketPrice(orders: readonly MarketOrder[]): number {
   return getWeightedAveragePrice(orders);
 }
 
-const highSecItcSolarSystems = new Set([
+const empireRegionItcSolarSystems = new Set([
   '吉他',
   '阿里卡拉',
   '皮埃库拉',
@@ -42,4 +42,4 @@ function getWeightedAveragePrice(orders: readonly MarketOrder[]): number {
   );
 }
 
-export default getWeightedAverageMarketPrice;
+export default getWeightedAverageItcPrice;

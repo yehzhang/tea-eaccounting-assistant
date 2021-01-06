@@ -1,14 +1,20 @@
 import _ from 'lodash';
+import MarketOrder from '../data/MarketOrder';
 import normalizeItemName from '../data/normalizeItemName';
 import Event from '../Event';
 import ExternalDependency from '../ExternalDependency';
-import State, { MarketPriceNotAvailable, SingleMarketQueryResult, UnknownItemName } from '../State';
+import State, {
+  MarketPriceNotAvailable,
+  MarketPriceStats,
+  SingleMarketQueryResult,
+  UnknownItemName,
+} from '../State';
+import fetchMarketOrdersByName from './fetchMarketOrdersByName';
 import fetchTempFile from './fetchTempFile';
 import recognizeItems from './itemDetection/recognizeItems';
-import getJitaPrice from './market/getJitaPrice';
-import getWeightedAverageMarketPrice from './market/getWeightedAverageMarketPrice';
+import getJitaItcPrice from './market/getJitaItcPrice';
+import getWeightedAverageItcPrice from './market/getWeightedAverageItcPrice';
 import populateItemStack from './populateItemStack';
-import queryMarketPriceByName from './queryMarketPriceByName';
 import settleUpParticipants from './settleUpParticipants';
 import createSpreadsheet from './sheets/createSpreadsheet';
 import grantPermission from './sheets/grantPermission';
@@ -21,7 +27,7 @@ import updateSpreadsheetValues from './sheets/updateSpreadsheetValues';
 async function executeEvent(
   event: Event,
   setState: (state: State) => void,
-  { schedulers }: ExternalDependency
+  { schedulers }: ExternalDependency,
 ): Promise<void> {
   switch (event.type) {
     case 'Pinged':
@@ -50,7 +56,7 @@ async function executeEvent(
       const configureSpreadsheetPromise = createSpreadsheetPromise.then(
         (spreadsheet) =>
           spreadsheet &&
-          Promise.all([grantPermission(spreadsheet.id), setDataFormats(spreadsheet.id)])
+          Promise.all([grantPermission(spreadsheet.id), setDataFormats(spreadsheet.id)]),
       );
       const [spreadsheet, itemStacks] = await Promise.all([
         createSpreadsheetPromise,
@@ -62,10 +68,10 @@ async function executeEvent(
               recognizedItemPromises.map((recognizedItemPromise) =>
                 recognizedItemPromise.then(
                   (recognizedItem) => recognizedItem && populateItemStack(recognizedItem),
-                )
-              )
+                ),
+              ),
             );
-          })
+          }),
         ).then((itemStacksList) => _.compact(itemStacksList.flat())),
       ]);
       if (!itemStacks.length) {
@@ -127,7 +133,7 @@ async function executeEvent(
 
       const participants = settleUpParticipants(itemSplit);
       const gainedParticipants = participants.filter(
-        ({ items }, index) => !_.isEqual(items, itemSplit.participants[index].items)
+        ({ items }, index) => !_.isEqual(items, itemSplit.participants[index].items),
       );
 
       if (!gainedParticipants.length) {
@@ -146,14 +152,14 @@ async function executeEvent(
       }
 
       const gainedParticipantNames = gainedParticipants.map(
-        ({ participantName }) => participantName
+        ({ participantName }) => participantName,
       );
       setState({
         type: 'ParticipantsSettledUp',
         gainedParticipants: gainedParticipantNames,
         noOpParticipants: _.difference(
           participants.map(({ participantName }) => participantName),
-          gainedParticipantNames
+          gainedParticipantNames,
         ),
       });
       return;
@@ -163,14 +169,15 @@ async function executeEvent(
       switch (command.type) {
         case 'QueryPrice': {
           const { itemNames } = command;
+          // Does not deduplicate items in different languages.
           const dedupedItemNames = Array.from(new Set(itemNames));
           const results = await Promise.all(
             dedupedItemNames.map(
               async (
-                itemName
+                itemName,
               ): Promise<MarketPriceNotAvailable | SingleMarketQueryResult | UnknownItemName> => {
                 const normalizationResult = await normalizeItemName(itemName, () =>
-                  Promise.resolve(null)
+                  Promise.resolve(null),
                 );
                 if (normalizationResult.type !== 'ExactMatch') {
                   return {
@@ -178,20 +185,25 @@ async function executeEvent(
                     itemName,
                   };
                 }
-                const query = await queryMarketPriceByName(normalizationResult.text);
+
+                const query = await fetchMarketOrdersByName(normalizationResult.text);
                 if (!query || !query.orders.length) {
                   return {
                     type: 'MarketPriceNotAvailable',
-                    itemName,
+                    itemName: normalizationResult.text,
                   };
                 }
+
+                const [sellOrders, buyOrders] = _.partition(query.orders, ({ sell }) => sell);
                 return {
                   type: 'SingleMarketQueryResult',
-                  itemName,
-                  query,
+                  itemName: normalizationResult.text,
+                  buyOrders: _.sortBy(buyOrders, ({ price }) => -price),
+                  sellOrders: _.sortBy(sellOrders, ({ price }) => price),
+                  fetchedAt: query.fetchedAt,
                 };
-              }
-            )
+              },
+            ),
           );
 
           if (results.length === 1) {
@@ -208,14 +220,16 @@ async function executeEvent(
                   return result;
                 case 'SingleMarketQueryResult': {
                   const {
-                    query: { orders, fetchedAt },
+                    buyOrders,
+                    sellOrders,
+                    fetchedAt,
                     itemName,
                   } = result;
                   return {
                     type: 'AggregatedMarketPrice',
                     itemName,
-                    jitaPrice: getJitaPrice(orders),
-                    weightedAveragePrice: getWeightedAverageMarketPrice(orders),
+                    sellPriceStats: getMarketPriceStats(sellOrders, /* buy= */ false),
+                    buyPriceStats: getMarketPriceStats(buyOrders, /* buy= */ true),
                     fetchedAt,
                   };
                 }
@@ -231,6 +245,16 @@ async function executeEvent(
       }
     }
   }
+}
+
+function getMarketPriceStats(orders: readonly MarketOrder[], buy: boolean): MarketPriceStats | null {
+  if (!orders.length) {
+    return null;
+  }
+  return {
+    jitaItcPrice: getJitaItcPrice(orders, buy),
+    weightedAverageItcPrice: getWeightedAverageItcPrice(orders),
+  };
 }
 
 export default executeEvent;

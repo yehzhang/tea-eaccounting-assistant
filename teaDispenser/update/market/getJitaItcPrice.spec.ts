@@ -1,6 +1,6 @@
-import getJitaPrice from './getJitaPrice';
+import getJitaItcPrice from './getJitaItcPrice';
 
-describe('getJitaPrice', () => {
+describe('getJitaItcPrice', () => {
   it('works', () => {
     const orders = [
       {
@@ -221,7 +221,7 @@ describe('getJitaPrice', () => {
         sell: true,
       },
     ];
-    const actual = getJitaPrice(orders);
+    const actual = getJitaItcPrice(orders);
     expect(actual).toBe(2276);
   });
 });

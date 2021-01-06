@@ -6,13 +6,12 @@ function renderTable(header: readonly string[], table: readonly (readonly string
   for (let columnIndex = 0; columnIndex < header.length; columnIndex++) {
     let maxLength = 0;
     for (let rowIndex = 0; rowIndex < fullTable.length; rowIndex++) {
-      maxLength = Math.max(fullTable[rowIndex][columnIndex].length, maxLength);
+      maxLength = Math.max(getCell(fullTable, rowIndex, columnIndex).length, maxLength);
     }
 
-    const numericColumn =
-      header[columnIndex].startsWith('价格') || header[columnIndex].startsWith('数量');
+    const numericColumn = header[columnIndex].search(/[买卖]价|价格|数量/) !== -1;
     for (let rowIndex = 0; rowIndex < fullTable.length; rowIndex++) {
-      const cell = fullTable[rowIndex][columnIndex];
+      const cell = getCell(fullTable, rowIndex, columnIndex);
       const monospacedCell = numericColumn ? cell : toDoubleByteCharacterText(cell);
       const justifiedCell =
         columnIndex === header.length - 1
@@ -27,6 +26,10 @@ function renderTable(header: readonly string[], table: readonly (readonly string
 
   const renderedTable = outputTable.map((row) => row.join('　')).join('\n');
   return '```' + renderedTable + '```';
+}
+
+function getCell(table: readonly (readonly string[])[], rowIndex: number, columnIndex: number): string {
+  return table[rowIndex][columnIndex] || '';
 }
 
 function toDoubleByteCharacterText(text: string): string {

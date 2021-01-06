@@ -2,7 +2,7 @@ import axios from 'axios';
 import MarketOrder from '../../data/MarketOrder';
 import MarketQuery from '../../data/MarketQuery';
 
-async function queryMarketBuyOrders(itemTypeId: number): Promise<MarketQuery | null> {
+async function fetchMarketOrders(itemTypeId: number): Promise<MarketQuery | null> {
   const response = await axios({
     url: `http://138.68.255.93:8000/${itemTypeId}`,
   });
@@ -27,7 +27,7 @@ async function queryMarketBuyOrders(itemTypeId: number): Promise<MarketQuery | n
 
   return {
     orders: (data as any).orders
-      .map((order: any) => {
+      .map((order: any): MarketOrder | null => {
         const {
           price,
           remaining_volume: remainingVolume,
@@ -45,18 +45,16 @@ async function queryMarketBuyOrders(itemTypeId: number): Promise<MarketQuery | n
           console.error('Expected valid order, got', order);
           return null;
         }
-        const marketOrder: MarketOrder = {
+        return {
           price,
           remainingVolume,
           solarSystemName,
           stationId,
           sell: !bid,
         };
-        return marketOrder;
-      })
-      .filter((order: any) => order?.sell),
+      }),
     fetchedAt,
   };
 }
 
-export default queryMarketBuyOrders;
+export default fetchMarketOrders;

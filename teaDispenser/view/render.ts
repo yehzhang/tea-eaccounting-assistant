@@ -20,12 +20,12 @@ function render(state: State): readonly Rendering[] {
     case 'DetectingItems': {
       const { magnifierDirection } = state;
       return renderEmbedMessage({
-        title: `${magnifierDirection ? '🔍' : '🔎'}正在识别物品`,
+        title: `${magnifierDirection ? '🔍' : '🔎'}正在识别物品。只有游戏内选择的物品会被识别。`,
       });
     }
     case 'NoItemsDetected':
       return renderEmbedMessage({
-        title: '未能识别物品',
+        title: '未能识别任何物品',
         description: '请在游戏中选择需要分赃的物品',
       });
     case 'PopulatingSpreadsheet':
@@ -39,19 +39,22 @@ function render(state: State): readonly Rendering[] {
       });
     case 'SpreadsheetCreated': {
       const { url, linkTitle } = state;
-      return renderEmbedMessage({
-        title: linkTitle,
-        url,
-        description: [
-          '',
-          '️**分赃指南**',
-          '1. 在"参与者"格填写参与者的名字',
-          '2. 填写物品的价格与数量，如果有缺的话',
-          '3. 邀请参与者填写需求',
-          `4. 按下方${handsUpIcon}按钮以自动分配未分配的物品`,
-          '5. 若分赃不均，可将赃物抵押奶茶当铺，然后分钱',
-        ].join('\n'),
-      }, [handsUpIcon]);
+      return renderEmbedMessage(
+        {
+          title: linkTitle,
+          url,
+          description: [
+            '',
+            '️**分赃指南**',
+            '1. 在"参与者"格填写参与者的名字',
+            '2. 填写物品的价格与数量，如果有缺的话',
+            '3. 邀请参与者填写需求',
+            `4. 按下方${handsUpIcon}按钮以自动分配未分配的物品`,
+            '5. 若分赃不均，可将赃物抵押奶茶当铺，然后分钱',
+          ].join('\n'),
+        },
+        [handsUpIcon]
+      );
     }
     case 'NoParticipantsToSettleUp': {
       return renderEmbedMessage({
@@ -75,8 +78,8 @@ function render(state: State): readonly Rendering[] {
       return renderEmbedMessage({
         title: '分赃完毕，但没有变动',
         description:
-          '已分的赃物不会参与分赃。若要重新自动分赃已分的赃物，' +
-          `请恢复 Google Sheets 历史至自动分赃前，再按${handsUpIcon}按钮`,
+          '已分的赃物不会参与自动分赃。若要重新分赃，' +
+          `请恢复 Google Sheets 历史至自动分赃前，再按${handsUpIcon}按钮。或者手动微调每个人物品的数量。`,
       });
     case 'SingleMarketQueryResult': {
       const { buyOrders, sellOrders, fetchedAt } = state;
@@ -84,55 +87,48 @@ function render(state: State): readonly Rendering[] {
       return renderSingleMessage(
         !!sellOrders.length && `**卖单**\n${renderMarketOrdersTable(sellOrders)}`,
         !!buyOrders.length && `**买单**\n${renderMarketOrdersTable(buyOrders)}`,
-        renderPriceTimestamp(fetchedAt),
+        renderPriceTimestamp(fetchedAt)
       );
     }
     case 'UnknownItemName': {
       return renderSingleMessage('未知物品名。请使用全称。');
     }
     case 'MarketPriceNotAvailable': {
+      const { itemTypeId } = state;
       return renderSingleMessage(
         '尚未录入这件物品的价格。' +
-        '由于网易限制市场查询频率，目前仅支持绝地常见的产出，包括改装件蓝图、装备、结构、矿、菜等。',
+          '由于网易限制市场查询频率，目前仅支持绝地常见的产出，包括改装件蓝图、装备、结构、矿、菜等。' +
+          `请移步 https://eve-echoes-market.com/${itemTypeId}/_`
       );
     }
     case 'MultipleMarketQueryResult': {
       const { results } = state;
       const sellPriceStats = results.some(
-        (result) => result.type === 'AggregatedMarketPrice' && result.sellPriceStats,
+        (result) => result.type === 'AggregatedMarketPrice' && result.sellPriceStats
       );
       const buyPriceStats = results.some(
-        (result) => result.type === 'AggregatedMarketPrice' && result.buyPriceStats,
+        (result) => result.type === 'AggregatedMarketPrice' && result.buyPriceStats
       );
       const minFetchedAt = _.minBy(
         results
           .filter(
-            (result): result is AggregatedMarketPrice => result.type === 'AggregatedMarketPrice',
+            (result): result is AggregatedMarketPrice => result.type === 'AggregatedMarketPrice'
           )
           .map(({ fetchedAt }) => fetchedAt),
-        (fetchedAt) => fetchedAt.getTime(),
+        (fetchedAt) => fetchedAt.getTime()
       );
       return renderSingleMessage(
         renderTable(
           [
             '物品',
-            ...(sellPriceStats ? [
-              '吉他最低卖价',
-              '加权平均卖价',
-            ] : []),
-            ...(buyPriceStats ? [
-              '吉他最高买价',
-              '加权平均买价',
-            ] : []),
+            ...(sellPriceStats ? ['吉他最低卖价', '加权平均卖价'] : []),
+            ...(buyPriceStats ? ['吉他最高买价', '加权平均买价'] : []),
           ],
           results.map((result) => {
-            return [
-              result.itemName,
-              ...renderMarketQueryResultTableColumns(result, buyPriceStats),
-            ];
-          }),
+            return [result.itemName, ...renderMarketQueryResultTableColumns(result, buyPriceStats)];
+          })
         ),
-        minFetchedAt && renderPriceTimestamp(minFetchedAt),
+        minFetchedAt && renderPriceTimestamp(minFetchedAt)
       );
     }
     case 'UnknownCommand':
@@ -142,7 +138,7 @@ function render(state: State): readonly Rendering[] {
       return renderSingleMessage(
         renderInvalidCommandReason(reason),
         '例如:',
-        ...renderCommandExamples(commandType),
+        ...renderCommandExamples(commandType)
       );
     }
   }

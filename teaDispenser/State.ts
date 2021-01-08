@@ -74,6 +74,7 @@ export interface UnknownItemName {
 export interface MarketPriceNotAvailable {
   readonly type: 'MarketPriceNotAvailable';
   readonly itemName: string;
+  readonly itemTypeId: number;
 }
 
 interface MultipleMarketQueryResult {

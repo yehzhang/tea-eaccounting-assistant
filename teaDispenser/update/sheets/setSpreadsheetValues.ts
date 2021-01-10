@@ -105,7 +105,7 @@ function getItemRow(
   const safePriceReference = `IF(ISNUMBER(${priceReference}), ${priceReference}, 0)`;
   const amountReference = `C${rowIndex}`;
   return [
-    name,
+    name && escapeText(name),
     price,
     amount,
     // 总价
@@ -135,6 +135,13 @@ function getItemRow(
     null,
     `=Y${rowIndex}*${safePriceReference}`,
   ];
+}
+
+function escapeText(text: string): string {
+  if (text.startsWith(`'`)) {
+    return `'` + text;
+  }
+  return text;
 }
 
 export default setSpreadsheetValues;

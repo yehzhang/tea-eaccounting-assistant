@@ -46,7 +46,7 @@ function render(state: State): readonly Rendering[] {
           description: [
             '',
             '️**分赃指南**',
-            '1. 在"参与者"格填写参与者的名字',
+            '1. 在第一行"参与者"格填写参与者的名字',
             '2. 填写物品的价格与数量，如果有缺的话',
             '3. 邀请参与者填写需求',
             `4. 按下方${handsUpIcon}按钮以自动分配未分配的物品`,
@@ -59,7 +59,7 @@ function render(state: State): readonly Rendering[] {
     case 'NoParticipantsToSettleUp': {
       return renderEmbedMessage({
         title: '无分赃对象',
-        description: '请先在"参与者"格填写参与者的名字',
+        description: '请先在"参与者"格（位于第一行）填写参与者的名字',
       });
     }
     case 'ParticipantsSettledUp': {
@@ -79,7 +79,7 @@ function render(state: State): readonly Rendering[] {
         title: '分赃完毕，但没有变动',
         description:
           '已分的赃物不会参与自动分赃。若要重新分赃，' +
-          `请恢复 Google Sheets 历史至自动分赃前，再按${handsUpIcon}按钮。或者手动微调每个人物品的数量。`,
+          `请使用 Google Sheets 的历史功能恢复至自动分赃前，再按${handsUpIcon}按钮。或者手动调整每个人物品的数量。`,
       });
     case 'SingleMarketQueryResult': {
       const { buyOrders, sellOrders, fetchedAt } = state;

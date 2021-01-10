@@ -25,7 +25,9 @@ async function normalizeItemName(
     .replace(/弓虽/g, '强')
     .replace(/木几/g, '机')
     .replace(/木反/g, '板')
-    .replace(/\\\\/g, 'l');
+    .replace(/\\\\/g, 'l')
+    .replace(/[/′]」\\/g, '小')
+    .replace(/乡佳/g, '维');
   const similarLookingTexts = listSimilarLookingTexts(cleanText);
   const matchedSimilarLookingTexts = [];
   const allItemNameCandidates = [];
@@ -225,6 +227,8 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['胃', '胄'],
   ['川', 'III'],
   ['豇', '置'],
+  ['薹', '置'],
+  ['坩', '增'],
 ];
 
 function trimEllipsis(text: string): string {

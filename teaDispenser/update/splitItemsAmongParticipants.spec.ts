@@ -1,6 +1,11 @@
+import _ from 'lodash';
 import splitItemsAmongParticipants from './splitItemsAmongParticipants';
 
 describe('splitItemsAmongParticipants', () => {
+  beforeEach(() => {
+    spyOn(_, 'sample').and.callFake((values: unknown[]) => values[0]);
+  });
+
   it('works', () => {
     const actual = splitItemsAmongParticipants(
       [[], []],

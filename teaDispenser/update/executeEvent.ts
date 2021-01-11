@@ -20,7 +20,6 @@ import settleUpParticipants from './settleUpParticipants';
 import createSpreadsheet from './sheets/createSpreadsheet';
 import grantPermission from './sheets/grantPermission';
 import readSpreadsheetValues from './sheets/readSpreadsheetValues';
-import setAutoResize from './sheets/setAutoResize';
 import setDataFormats from './sheets/setDataFormats';
 import setSpreadsheetValues from './sheets/setSpreadsheetValues';
 import updateSpreadsheetValues from './sheets/updateSpreadsheetValues';
@@ -103,8 +102,6 @@ async function executeEvent(
         });
         return;
       }
-
-      await setAutoResize(spreadsheet.id);
 
       setState({
         type: 'SpreadsheetCreated',

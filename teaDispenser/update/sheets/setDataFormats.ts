@@ -45,13 +45,17 @@ async function setDataFormats(spreadsheetId: string): Promise<boolean> {
           buildPriceNumberFormat(23),
           buildPriceNumberFormat(25),
           {
-            // Resize the item name column.
-            autoResizeDimensions: {
-              dimensions: {
+            // Make the name column wider by default.
+            updateDimensionProperties: {
+              range: {
                 dimension: 'COLUMNS',
                 startIndex: 0,
                 endIndex: 1,
               },
+              properties: {
+                pixelSize: 185,
+              },
+              fields: 'pixelSize',
             },
           },
         ],

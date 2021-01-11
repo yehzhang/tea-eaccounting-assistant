@@ -26,7 +26,7 @@ async function readSpreadsheetValues(spreadsheetId: string): Promise<ItemSplit |
 
 function parseSpareItems(values: SheetValues): readonly ItemRow[] {
   return mapItemRows(values, (row, rowIndex) => {
-    const [, price, , , , remainingAmount] = row;
+    const [, , price, , remainingAmount] = row;
     if (price === ' ' || !price) {
       return null;
     }
@@ -59,7 +59,7 @@ function mapItemRows(
 
 function parseParticipantColumns(values: SheetValues): readonly ParticipantColumn[] {
   return _.compact(
-    [6, 8, 10, 12, 14, 16, 18, 20, 22, 24].map((columnIndex) => {
+    [5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((columnIndex) => {
       const participantName = parseParticipantName(values, columnIndex);
       if (
         participantName.startsWith('参与者') &&
@@ -90,7 +90,7 @@ function hasCellValue(value: string | number | null | undefined): value is strin
 
 function parseParticipantItemRows(values: SheetValues, columnIndex: number): readonly ItemRow[] {
   return mapItemRows(values, (row, rowIndex) => {
-    const [, price] = row;
+    const [, , price] = row;
     const amount = row[columnIndex];
     if (price === ' ' || !price || !amount) {
       return null;

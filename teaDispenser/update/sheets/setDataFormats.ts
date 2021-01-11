@@ -8,12 +8,12 @@ async function setDataFormats(spreadsheetId: string): Promise<boolean> {
       data: {
         requests: [
           {
-            // Validate price and amount numbers.
+            // Validate the price and amount numbers.
             setDataValidation: {
               range: {
                 startRowIndex: 2,
                 startColumnIndex: 1,
-                endColumnIndex: 3,
+                endColumnIndex: 2,
               },
               rule: {
                 condition: {
@@ -27,23 +27,25 @@ async function setDataFormats(spreadsheetId: string): Promise<boolean> {
               },
             },
           },
-          // Market price.
-          buildPriceNumberFormat(1),
-          // Total price.
-          buildPriceNumberFormat(3),
-          // Expected gain per participant.
-          buildPriceNumberFormat(4),
-          // Actual gain per participant.
-          buildPriceNumberFormat(7),
-          buildPriceNumberFormat(9),
-          buildPriceNumberFormat(11),
-          buildPriceNumberFormat(13),
-          buildPriceNumberFormat(15),
-          buildPriceNumberFormat(17),
-          buildPriceNumberFormat(19),
-          buildPriceNumberFormat(21),
-          buildPriceNumberFormat(23),
-          buildPriceNumberFormat(25),
+          {
+            // Make all numbers comma separator.
+            repeatCell: {
+              range: {
+                // Applies to all cells.
+              },
+              cell: {
+                userEnteredFormat: {
+                  numberFormat: {
+                    type: 'NUMBER',
+                    // `#,#` adds separators, while `0` makes a single digit 0 visible.
+                    // No idea what the middle `#` does. ¯\_(ツ)_/¯
+                    pattern: '#,##0',
+                  },
+                },
+              },
+              fields: 'userEnteredFormat.numberFormat',
+            },
+          },
           {
             // Make the name column wider by default.
             updateDimensionProperties: {
@@ -66,27 +68,6 @@ async function setDataFormats(spreadsheetId: string): Promise<boolean> {
     console.error('Unexpected error when setting data formats', e);
     return false;
   }
-}
-
-function buildPriceNumberFormat(columnIndex: number) {
-  return {
-    repeatCell: {
-      range: {
-        startRowIndex: 1,
-        startColumnIndex: columnIndex,
-        endColumnIndex: columnIndex + 1,
-      },
-      cell: {
-        userEnteredFormat: {
-          numberFormat: {
-            type: 'NUMBER',
-            pattern: '#,#',
-          },
-        },
-      },
-      fields: 'userEnteredFormat.numberFormat',
-    },
-  };
 }
 
 export default setDataFormats;

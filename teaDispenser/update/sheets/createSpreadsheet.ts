@@ -16,9 +16,8 @@ async function createSpreadsheet(username: string): Promise<Spreadsheet | null> 
             properties: {
               sheetId: 0,
               gridProperties: {
-                columnCount: 38,
                 frozenRowCount: 2,
-                frozenColumnCount: 6,
+                frozenColumnCount: 5,
               },
             },
             conditionalFormats: [
@@ -79,43 +78,34 @@ async function createSpreadsheet(username: string): Promise<Spreadsheet | null> 
                   },
                 },
               },
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 5), 'F2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 6), 'G2'),
               ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 7), 'H2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 8), 'I2'),
               ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 9), 'J2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 10), 'K2'),
               ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 11), 'L2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 12), 'M2'),
               ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 13), 'N2'),
-              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 15), 'P2'),
-              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 17), 'R2'),
-              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 19), 'T2'),
-              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 21), 'V2'),
-              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 23), 'X2'),
-              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 25), 'Z2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 14), 'O2'),
             ],
             data: [
               {
-                startColumn: 6,
+                // Make the participant names bold.
+                startColumn: 5,
                 rowData: [
                   {
                     values: [
                       buildBoldTextFormatCell(),
-                      {},
                       buildBoldTextFormatCell(),
-                      {},
                       buildBoldTextFormatCell(),
-                      {},
                       buildBoldTextFormatCell(),
-                      {},
                       buildBoldTextFormatCell(),
-                      {},
                       buildBoldTextFormatCell(),
-                      {},
                       buildBoldTextFormatCell(),
-                      {},
                       buildBoldTextFormatCell(),
-                      {},
                       buildBoldTextFormatCell(),
-                      {},
                       buildBoldTextFormatCell(),
-                      {},
                     ],
                   },
                 ],
@@ -159,7 +149,7 @@ function buildSplitValueConditionalFormatRules(gridRange: GridRange, cellReferen
   ];
 }
 
-const averageSplitValueCellReference = 'E2';
+const averageSplitValueCellReference = 'D2';
 
 function buildConditionalFormatRule(
   gridRange: GridRange,
@@ -195,8 +185,8 @@ function buildSingleCellGridRange(rowIndex: number, columnIndex: number): GridRa
 
 const splitAmountGridRange = {
   startRowIndex: 2,
-  startColumnIndex: 5,
-  endColumnIndex: 6,
+  startColumnIndex: 4,
+  endColumnIndex: 5,
 };
 const yellow: Color = {
   red: 252 / 255,

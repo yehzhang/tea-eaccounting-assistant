@@ -16,13 +16,9 @@ async function recognizeItems(
 ): Promise<readonly Promise<RecognizedItem | null>[]> {
   console.debug('Recognizing image:', imagePath);
 
-  const [locatedItemStacks, languageRecognizer] = await Promise.all([
-    locateItemStacks(imagePath),
-    detectLanguage(imagePath, schedulers),
-  ]);
-
+  const locatedItemStacks = await locateItemStacks(imagePath);
   return locatedItemStacks.map((locatedItemStack) =>
-    recognizeItemStack(locatedItemStack, languageRecognizer)
+    recognizeItemStack(locatedItemStack, schedulers.chineseRecognizer)
   );
 }
 
@@ -63,30 +59,6 @@ function getItemAmountDigitImages(image: Mat, boundingRects: readonly Rect[]): r
   return rects
     .filter((rect) => maxRectArea * 0.8 <= getArea(rect))
     .map((boundingRect) => image.getRegion(boundingRect));
-}
-
-async function detectLanguage(
-  imagePath: string,
-  schedulers: TesseractSchedulers
-): Promise<Scheduler> {
-  const { languageDetector, chineseRecognizer, englishRecognizer } = schedulers;
-  try {
-    const { data } = await languageDetector.addJob('detect', imagePath);
-    switch (data.script) {
-      case 'Latin':
-        console.debug('Detected English script');
-        return englishRecognizer;
-      case 'Han':
-        console.debug('Detected Chinese script');
-        return chineseRecognizer;
-      default:
-        console.error('Detected unknown language', data);
-        return chineseRecognizer;
-    }
-  } catch (e) {
-    console.warn('Failed to detect language:', e);
-    return chineseRecognizer;
-  }
 }
 
 function getItemNameImage(itemStackImage: Mat): Mat {

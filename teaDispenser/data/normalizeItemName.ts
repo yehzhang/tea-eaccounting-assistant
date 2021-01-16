@@ -21,7 +21,7 @@ async function normalizeItemName(
     // Hopefully, their frequencies are scarce.
     .replace(/([宅茎])冈/g, '钢')
     .replace(/士兽/g, '增')
-    .replace(/力口/g, '加')
+    .replace(/力[口D]/g, '加')
     .replace(/弓虽/g, '强')
     .replace(/木几/g, '机')
     .replace(/木反/g, '板')
@@ -228,7 +228,13 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['川', 'III'],
   ['豇', '置'],
   ['薹', '置'],
+  ['薹', '鲁'],
+  ['膏', '鲁'],
+  ['矗', '鲁'],
+  ['·', '鲁'],
   ['坩', '增'],
+  ['夭', '天'],
+  ['然', '燃'],
 ];
 
 function trimEllipsis(text: string): string {

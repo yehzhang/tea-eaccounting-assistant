@@ -47,7 +47,7 @@ function render(state: State): readonly Rendering[] {
             '',
             '️**分赃指南**',
             '1. 在第一行"参与者"格填写参与者的名字',
-            '2. 填写物品的价格与数量，如果有缺的话',
+            '2. 填写物品的数量与价格，如果有缺的话',
             '3. 邀请参与者填写需求',
             `4. 按下方${handsUpIcon}按钮以自动分配未分配的物品`,
             '5. 若分赃不均，可将赃物抵押奶茶当铺，然后分钱',
@@ -79,7 +79,8 @@ function render(state: State): readonly Rendering[] {
         title: '分赃完毕，但没有变动',
         description:
           '已分的赃物不会参与自动分赃。若要重新分赃，' +
-          `请使用 Google Sheets 的历史功能恢复至自动分赃前，再按${handsUpIcon}按钮。或者手动调整每个人物品的数量。`,
+          `请使用 Google Sheets 的历史功能恢复至自动分赃前，再按${handsUpIcon}按钮。或者手动调整每个人物品的数量。` +
+          '\n此外，请填写所有空缺的数量与价格。',
       });
     case 'SingleMarketQueryResult': {
       const { buyOrders, sellOrders, fetchedAt } = state;
@@ -96,8 +97,8 @@ function render(state: State): readonly Rendering[] {
     case 'MarketPriceNotAvailable': {
       const { itemTypeId } = state;
       return renderSingleMessage(
-        '尚未录入这件物品的价格。' +
-          '由于网易限制市场查询频率，目前仅支持绝地常见的产出，包括改装件蓝图、装备、结构、矿、菜等。' +
+        '这件物品的价格尚未录入。' +
+          '由于网易限制市场查询频率，目前仅录入绝地与源泉常见的产出，包括改装件蓝图、装备、结构、矿、菜等。' +
           `请移步 https://eve-echoes-market.com/${itemTypeId}/_`
       );
     }
@@ -155,13 +156,13 @@ function renderMarketOrdersTable(orders: readonly MarketOrder[]): string {
       solarSystemName,
       remainingVolume.toLocaleString('en'),
       renderPrice(price),
-    ]),
+    ])
   );
 }
 
 function renderMarketQueryResultTableColumns(
   result: MarketQueryResult,
-  sellColumnPlaceHolder: boolean,
+  sellColumnPlaceHolder: boolean
 ): string[] {
   switch (result.type) {
     case 'UnknownItemName':
@@ -182,7 +183,7 @@ const priceNotAvailable = '未录入价格';
 
 function renderMarketPriceStatsTableColumns(
   marketPriceStats: MarketPriceStats | null,
-  placeHolder: boolean,
+  placeHolder: boolean
 ): string[] {
   if (!marketPriceStats) {
     if (placeHolder) {
@@ -223,7 +224,9 @@ export const handsUpIcon = '🙌';
 const yzDiscordUserId = '202649496381816832';
 
 /** Convenience method that constructs a single message to return. */
-function renderSingleMessage(...lines: (string | null | undefined | false)[]): readonly RenderedMessage[] {
+function renderSingleMessage(
+  ...lines: (string | null | undefined | false)[]
+): readonly RenderedMessage[] {
   return [
     {
       type: 'RenderedMessage',
@@ -233,17 +236,22 @@ function renderSingleMessage(...lines: (string | null | undefined | false)[]): r
   ];
 }
 
-function renderEmbedMessage(embed: MessageEmbedOptions, reactionContents?: readonly string[]): readonly RenderedMessage[] {
-  return [{
-    type: 'RenderedMessage',
-    content: {
-      embed: {
-        color: dispenserSilver,
-        ...embed,
+function renderEmbedMessage(
+  embed: MessageEmbedOptions,
+  reactionContents?: readonly string[]
+): readonly RenderedMessage[] {
+  return [
+    {
+      type: 'RenderedMessage',
+      content: {
+        embed: {
+          color: dispenserSilver,
+          ...embed,
+        },
       },
+      reactionContents,
     },
-    reactionContents,
-  }];
+  ];
 }
 
 const dispenserSilver = 0xd3d3d3;

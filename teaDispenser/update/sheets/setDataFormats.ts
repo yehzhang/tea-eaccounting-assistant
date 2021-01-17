@@ -13,7 +13,7 @@ async function setDataFormats(spreadsheetId: string): Promise<boolean> {
               range: {
                 startRowIndex: 2,
                 startColumnIndex: 1,
-                endColumnIndex: 2,
+                endColumnIndex: 3,
               },
               rule: {
                 condition: {

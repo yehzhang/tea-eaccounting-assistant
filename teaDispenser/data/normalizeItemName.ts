@@ -231,10 +231,13 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['薹', '鲁'],
   ['膏', '鲁'],
   ['矗', '鲁'],
+  ['音', '鲁'],
   ['·', '鲁'],
   ['坩', '增'],
   ['夭', '天'],
   ['然', '燃'],
+  ['贡', '贯'],
+  ['贵', '贯'],
 ];
 
 function trimEllipsis(text: string): string {

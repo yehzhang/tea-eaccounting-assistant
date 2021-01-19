@@ -30,6 +30,12 @@ export function intersectRect(rect: Rect, other: Rect): boolean {
   );
 }
 
-export function getArea({ width, height }: Rect): number {
+export function getArea({
+  width,
+  height,
+}: {
+  readonly width: number;
+  readonly height: number;
+}): number {
   return width * height;
 }

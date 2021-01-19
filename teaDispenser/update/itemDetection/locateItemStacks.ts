@@ -1,30 +1,27 @@
-import { CHAIN_APPROX_SIMPLE, Mat, Rect, RETR_TREE } from 'opencv4nodejs';
+import { CHAIN_APPROX_SIMPLE, Contour, Mat, Rect, RETR_TREE } from 'opencv4nodejs';
 import { containRect, getArea, getCenterY } from '../../data/rectUtils';
 import deduplicateSiblingBoundingRects from './deduplicateSiblingBoundingRects';
 
 async function locateItemStacks(image: Mat): Promise<readonly LocatedItemStack[]> {
-  const edges = await image.cannyAsync(1500, 3000, 5);
+  const edges = await image.cannyAsync(1350, 3200, 5);
   const contours = await edges.findContoursAsync(RETR_TREE, CHAIN_APPROX_SIMPLE);
 
-  const maxItemContourArea = Math.max(
-    ...contours
-      .filter((contour) => isRectItemShaped(contour.boundingRect()))
-      .map(({ area }) => area)
-  );
+  const maxItemContourArea = Math.max(...contours.filter(isContourItemShaped).map(getContourArea));
   const allBoundingRects = contours.map((contour) => contour.boundingRect());
   return contours
     .filter((contour) => {
-      // Exterior contours only.
       const {
         hierarchy: { z: parentIndex },
       } = contour;
-      return parentIndex === -1;
+      return (
+        // Exterior contours
+        parentIndex === -1 &&
+        // In similar shape and area
+        isContourItemShaped(contour) &&
+        maxItemContourArea * 0.9 <= getContourArea(contour)
+      );
     })
     .map((contour) => contour.boundingRect())
-    .filter(
-      (boundingRect) =>
-        maxItemContourArea * 0.9 <= getArea(boundingRect) && isRectItemShaped(boundingRect)
-    )
     .sort(({ x, y }, { x: otherX, y: otherY }) => {
       // Sort rects by their positions.
       const deltaY = y - otherY;
@@ -43,8 +40,20 @@ async function locateItemStacks(image: Mat): Promise<readonly LocatedItemStack[]
     }));
 }
 
-function isRectItemShaped({ height, width }: Rect): boolean {
+function isContourItemShaped(contour: Contour): boolean {
+  const { angle, size } = contour.minAreaRect();
+  const orthogonalAngleThreshold = 1;
+  if (orthogonalAngleThreshold < angle + 90 && orthogonalAngleThreshold < -angle) {
+    return false;
+  }
+
+  const { width, height } = angle === -90 ? { width: size.height, height: size.width } : size;
   return 65 <= height && 100 <= width && height * 1.3 < width && width < height * 1.7;
+}
+
+function getContourArea(contour: Contour): number {
+  // The contour may be open, so do not directly use `contour.area` which can be close to zero.
+  return getArea(contour.minAreaRect().size);
 }
 
 export interface LocatedItemStack {

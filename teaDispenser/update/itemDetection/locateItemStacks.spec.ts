@@ -24,10 +24,6 @@ describe('locateItemStacks', () => {
   });
 
   it('locates items from chn_blueprints_1', async () => {
-    await expectNoRegression('chn_blueprints_1.jpg');
-  });
-
-  it('locates items from chn_blueprints_1', async () => {
     await expectNoRegression('chn_blueprints_1.png');
   });
 
@@ -37,6 +33,10 @@ describe('locateItemStacks', () => {
 
   it('locates items from chn_blueprints_3', async () => {
     await expectNoRegression('chn_blueprints_3.png');
+  });
+
+  it('locates items from chn_blueprints_4', async () => {
+    await expectNoRegression('chn_blueprints_4.png');
   });
 
   it('locates items from chn_datacores_1', async () => {
@@ -129,6 +129,10 @@ describe('locateItemStacks', () => {
 });
 
 async function expectNoRegression(imageFilename: string) {
+  if (!imageFilename.endsWith('png')) {
+    throw new TypeError('Only PNG images are supported');
+  }
+
   const testDataDirectory = 'inventory';
   const testImage = await getTestImage(join(testDataDirectory, imageFilename));
   const locatedItems = await locateItemStacks(testImage);
@@ -164,7 +168,11 @@ async function expectNoRegression(imageFilename: string) {
   await imwriteAsync(diffImagePath, diffImage);
   const testImagePath = getTempPath(`test_${imageFilename}`);
   await imwriteAsync(testImagePath, testImage);
-  fail(`Unexpected image diff: ${diffImagePath}. Test image: ${testImagePath}. Reference image: ${referenceImagePath}`);
+  fail(
+    `Unexpected image diff: ${diffImagePath}\nTest image: ${testImagePath}` +
+    `\nReference image: ${referenceImagePath}` +
+    `\nUpdate golden by: mv ${testImagePath} ${referenceImagePath}`
+  );
 }
 
 async function existFile(path: string): Promise<boolean> {

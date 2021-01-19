@@ -1,10 +1,8 @@
-import { Mat, Rect } from 'opencv4nodejs';
+import { imreadAsync, Mat } from 'opencv4nodejs';
 import { Scheduler } from 'tesseract.js';
 import RecognizedItem from '../../data/RecognizedItem';
-import { containRect, getArea, getCenterY } from '../../data/rectUtils';
 import { TesseractSchedulers } from '../../ExternalDependency';
-import deduplicateSiblingBoundingRects from './deduplicateSiblingBoundingRects';
-import locateItemStacks, { LocatedObject } from './locateItemStacks';
+import locateItemStacks, { LocatedItemStack } from './locateItemStacks';
 import recognizeDigit from './recognizeDigit';
 import recognizeItemIcon from './recognizeItemIcon';
 import recognizeText from './recognizeText';
@@ -16,68 +14,38 @@ async function recognizeItems(
 ): Promise<readonly Promise<RecognizedItem | null>[]> {
   console.debug('Recognizing image:', imagePath);
 
-  const locatedItemStacks = await locateItemStacks(imagePath);
+  const image = await imreadAsync(imagePath);
+  const locatedItemStacks = await locateItemStacks(image);
   return locatedItemStacks.map((locatedItemStack) =>
-    recognizeItemStack(locatedItemStack, schedulers.chineseRecognizer)
+    recognizeItemStack(image, locatedItemStack, schedulers.chineseRecognizer)
   );
 }
 
 async function recognizeItemStack(
-  locatedItemStack: LocatedObject,
+  image: Mat,
+  locatedItemStack: LocatedItemStack,
   languageRecognizer: Scheduler
 ): Promise<RecognizedItem | null> {
-  const { image, boundingRects } = locatedItemStack;
-  const [name, amount] = await Promise.all([
-    removeFactionSuperscript(getItemNameImage(image)).then((itemNameImage) =>
+  const { itemStackBoundingBox, nameBoundingRect, amountDigitBoundingRects } = locatedItemStack;
+  const [name, amountDigits] = await Promise.all([
+    removeFactionSuperscript(image.getRegion(nameBoundingRect)).then((itemNameImage) =>
       recognizeText(languageRecognizer, itemNameImage)
     ),
     Promise.all(
-      getItemAmountDigitImages(image, boundingRects).map(recognizeDigit)
-    ).then((amountDigits) => amountDigits.join('')),
+      amountDigitBoundingRects.map((boundingRects) =>
+        recognizeDigit(image.getRegion(boundingRects))
+      )
+    ),
   ]);
+  const amount = amountDigits.join('');
   if (!name && !amount) {
     return null;
   }
   return {
     name,
     amount,
-    findIcon: (itemType) => recognizeItemIcon(image, itemType),
+    findIcon: (itemType) => recognizeItemIcon(image.getRegion(itemStackBoundingBox), itemType),
   };
-}
-
-function getItemAmountDigitImages(image: Mat, boundingRects: readonly Rect[]): readonly Mat[] {
-  const amountBoundingRect = getItemAmountBoundingRect(image);
-  const amountCenterY = getCenterY(amountBoundingRect);
-  const rects = deduplicateSiblingBoundingRects(
-    boundingRects.filter((boundingRect) => containRect(boundingRect, amountBoundingRect))
-  ).filter(
-    (boundingRect) =>
-      // The rect should be close to the horizontal center.
-      Math.abs(getCenterY(boundingRect) - amountCenterY) <= amountBoundingRect.height * 0.2
-  );
-  const maxRectArea = Math.max(...rects.map(getArea));
-  return rects
-    .filter((rect) => maxRectArea * 0.8 <= getArea(rect))
-    .map((boundingRect) => image.getRegion(boundingRect));
-}
-
-function getItemNameImage(itemStackImage: Mat): Mat {
-  const padding = 2;
-  const height = Math.round(itemStackImage.rows * 0.211);
-  const itemNameRect = new Rect(
-    padding,
-    padding,
-    itemStackImage.cols - padding * 2,
-    height - padding * 2
-  );
-  return itemStackImage.getRegion(itemNameRect);
-}
-
-function getItemAmountBoundingRect(itemStackImage: Mat): Rect {
-  const padding = 2;
-  const width = Math.round(itemStackImage.cols * 0.21);
-  const height = Math.round(itemStackImage.rows * 0.186);
-  return new Rect(padding, itemStackImage.rows - height - padding, width - padding, height);
 }
 
 export default recognizeItems;

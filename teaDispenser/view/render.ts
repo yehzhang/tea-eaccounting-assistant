@@ -44,6 +44,7 @@ function render(state: State): readonly Rendering[] {
           title: linkTitle,
           url,
           description: [
+            '_^ 该表可随意编辑：增减物品，修改数量与价格，添加参与者，等等_',
             '',
             '️**分赃指南**',
             '1. 在第一行"参与者"格填写参与者的名字',

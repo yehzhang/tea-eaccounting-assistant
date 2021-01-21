@@ -42,6 +42,7 @@ const blueprintsIconTemplatesPromise: Promise<BlueprintsIconTemplates> = (async 
     miningRigBlueprintTemplates,
     droneRigBlueprintTemplates,
     railgunRigBlueprintTemplates,
+    decomposerRigBlueprintTemplates,
     navigationRigBlueprintTemplates,
   ] = await Promise.all([
     Promise.all([
@@ -87,6 +88,12 @@ const blueprintsIconTemplatesPromise: Promise<BlueprintsIconTemplates> = (async 
       getTemplate('11700000003.png'),
     ]),
     Promise.all([
+      getTemplate('11005050002.png'),
+      getTemplate('11005050004.png'),
+      getTemplate('11005050006.png'),
+      getTemplate('11005050008.png'),
+    ]),
+    Promise.all([
       getTemplate('11710000000.png'),
       getTemplate('11710000001.png'),
       getTemplate('11710000002.png'),
@@ -101,6 +108,7 @@ const blueprintsIconTemplatesPromise: Promise<BlueprintsIconTemplates> = (async 
     ScanRigBlueprint: scanRigBlueprintTemplates,
     MiningRigBlueprint: miningRigBlueprintTemplates,
     RailgunRigBlueprint: railgunRigBlueprintTemplates,
+    DecomposerRigBlueprint: decomposerRigBlueprintTemplates,
     NavigationRigBlueprint: navigationRigBlueprintTemplates,
   };
 })();

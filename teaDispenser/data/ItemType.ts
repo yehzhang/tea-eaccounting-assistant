@@ -6,6 +6,7 @@ type ItemType =
   | 'ScanRigBlueprint'
   | 'MiningRigBlueprint'
   | 'RailgunRigBlueprint'
+  | 'DecomposerRigBlueprint'
   | 'NavigationRigBlueprint';
 
 export default ItemType;

@@ -27,6 +27,7 @@ async function normalizeItemName(
     .replace(/木反/g, '板')
     .replace(/\\\\/g, 'l')
     .replace(/[/′]」\\/g, '小')
+    .replace(/苷旨/g, '能')
     .replace(/乡佳/g, '维');
   const similarLookingTexts = listSimilarLookingTexts(cleanText);
   const matchedSimilarLookingTexts = [];
@@ -125,6 +126,7 @@ const itemTypeNameRegexps: { readonly [T in ItemType]: RegExp } = {
   ScanRigBlueprint: /^(引力电容器升级|放射范围约束)/,
   MiningRigBlueprint: /^采矿器/,
   RailgunRigBlueprint: /^磁轨炮/,
+  DecomposerRigBlueprint: /^裂解炮/,
   NavigationRigBlueprint: /^(动态燃料控制阀|超空间速度|货柜舱优化|辅助推进器|复合碳素|希格斯粒子|跃迁核心优化)/,
 };
 
@@ -132,7 +134,7 @@ function getItemNameFilterBy(itemIcon: ItemIcon): RegExp {
   switch (itemIcon.type) {
     case 'BlueprintIcon': {
       const { techLevel } = itemIcon;
-      return new RegExp(`蓝图 ${'I'.repeat(techLevel)}$`);
+      return new RegExp(`蓝图 ${techLevel === 4 ? 'IV' : 'I'.repeat(techLevel)}$`);
     }
   }
 }
@@ -187,6 +189,8 @@ function listSimilarLookingTexts(text: string): ReadonlySet<string> {
 const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['\\', 'l'],
   ['I', 'l'],
+  ['[', 'l'],
+  ['[', 'I'],
   ['L', 'I'],
   ['l', 'I'],
   ['l', 'i'],
@@ -238,6 +242,7 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['·', '鲁'],
   ['坩', '增'],
   ['堵', '增'],
+  ['蹭', '增'],
   ['夭', '天'],
   ['然', '燃'],
   ['贡', '贯'],

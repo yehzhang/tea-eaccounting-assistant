@@ -170,6 +170,12 @@ async function executeEvent(
           const { itemNames } = command;
           // Does not deduplicate items in different languages.
           const dedupedItemNames = Array.from(new Set(itemNames));
+          if (2 <= dedupedItemNames.length) {
+            setState({
+              type: 'LookingUpHistoryPrice',
+            });
+          }
+
           const results = await Promise.all(
             dedupedItemNames.map(
               async (

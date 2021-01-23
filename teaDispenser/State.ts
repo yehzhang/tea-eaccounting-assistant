@@ -15,6 +15,7 @@ type State =
   | SingleMarketQueryResult
   | UnknownItemName
   | MarketPriceNotAvailable
+  | LookingUpHistoryPrice
   | MultipleMarketQueryResult;
 
 interface Pong {
@@ -75,6 +76,10 @@ export interface MarketPriceNotAvailable {
   readonly type: 'MarketPriceNotAvailable';
   readonly itemName: string;
   readonly itemTypeId: number;
+}
+
+interface LookingUpHistoryPrice {
+  readonly type: 'LookingUpHistoryPrice';
 }
 
 interface MultipleMarketQueryResult {

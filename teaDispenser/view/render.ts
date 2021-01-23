@@ -103,6 +103,10 @@ function render(state: State): readonly Rendering[] {
           `请移步 https://eve-echoes-market.com/${itemTypeId}/_`
       );
     }
+    case 'LookingUpHistoryPrice':
+      return renderEmbedMessage({
+        title: '📈️正在查询历史价格',
+      });
     case 'MultipleMarketQueryResult': {
       const { results } = state;
       const sellPriceStats = results.some(

@@ -59,7 +59,11 @@ async function syncMessageContent(
           reply: replyTo,
         };
   if (messageContext.sentMessage) {
-    await messageContext.sentMessage.edit(discordMessage);
+    await messageContext.sentMessage.edit({
+      // Remove the existing embed message, if any.
+      embed: null,
+      ...discordMessage,
+    });
   } else {
     messageContext.sentMessage = await message.channel.send(discordMessage);
   }

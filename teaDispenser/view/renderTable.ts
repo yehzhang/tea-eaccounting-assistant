@@ -16,7 +16,9 @@ function renderTable(header: readonly string[], table: readonly (readonly string
       const justifiedCell =
         columnIndex === header.length - 1
           ? monospacedCell
-          : monospacedCell.padEnd(maxLength, numericColumn ? ' ' : '　');
+          : numericColumn
+          ? monospacedCell.padStart(maxLength, ' ')
+          : monospacedCell.padEnd(maxLength, '　');
       outputTable[rowIndex].push(justifiedCell);
     }
   }
@@ -28,7 +30,11 @@ function renderTable(header: readonly string[], table: readonly (readonly string
   return '```' + renderedTable + '```';
 }
 
-function getCell(table: readonly (readonly string[])[], rowIndex: number, columnIndex: number): string {
+function getCell(
+  table: readonly (readonly string[])[],
+  rowIndex: number,
+  columnIndex: number
+): string {
   return table[rowIndex][columnIndex] || '';
 }
 

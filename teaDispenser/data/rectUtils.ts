@@ -4,11 +4,11 @@ export function getCenterY({ y, height }: Rect): number {
   return y + height / 2;
 }
 
-function getMaxX({ x, width }: Rect): number {
+export function getMaxX({ x, width }: Rect): number {
   return x + width;
 }
 
-function getMaxY({ y, height }: Rect): number {
+export function getMaxY({ y, height }: Rect): number {
   return y + height;
 }
 
@@ -30,12 +30,22 @@ export function intersectRect(rect: Rect, other: Rect): boolean {
   );
 }
 
-export function getArea({
-  width,
-  height,
-}: {
+export function getArea({ width, height }: RectLike): number {
+  return width * height;
+}
+
+export interface RectLike {
   readonly width: number;
   readonly height: number;
-}): number {
-  return width * height;
+}
+
+export function areRectsOverlapping(rect: Rect, other: Rect, threshold: number): boolean {
+  const intersectionArea = getIntersectionArea(rect, other);
+  return Math.min(getArea(rect), getArea(other)) * threshold <= intersectionArea;
+}
+
+function getIntersectionArea(rect: Rect, other: Rect): number {
+  const deltaX = Math.min(getMaxX(rect), getMaxX(other)) - Math.max(rect.x, other.x);
+  const deltaY = Math.min(getMaxY(rect), getMaxY(other)) - Math.max(rect.y, other.y);
+  return Math.max(deltaX, 0) * Math.max(deltaY, 0);
 }

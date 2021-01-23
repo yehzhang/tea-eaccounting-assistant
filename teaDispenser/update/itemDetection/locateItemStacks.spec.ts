@@ -7,6 +7,11 @@ import getTestDataPath from './testData/getTestDataPath';
 import getTestImage from './testData/getTestImage';
 
 describe('locateItemStacks', () => {
+  beforeEach(() => {
+    // Increased for debugging.
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000000;
+  });
+
   it('locates items from chn_armors_1', async () => {
     await expectNoRegression('chn_armors_1.png');
   });
@@ -37,6 +42,15 @@ describe('locateItemStacks', () => {
 
   it('locates items from chn_blueprints_4', async () => {
     await expectNoRegression('chn_blueprints_4.png');
+  });
+
+  // P2 bug: Recognize items obstructed by the filter bar.
+  it('locates items from chn_blueprints_5', async () => {
+    await expectNoRegression('chn_blueprints_5.png');
+  });
+
+  it('locates items from chn_blueprints_6', async () => {
+    await expectNoRegression('chn_blueprints_6.png');
   });
 
   it('locates items from chn_datacores_1', async () => {
@@ -83,6 +97,10 @@ describe('locateItemStacks', () => {
     await expectNoRegression('chn_remotes_2.png');
   });
 
+  it('locates items from chn_remotes_3', async () => {
+    await expectNoRegression('chn_remotes_3.png');
+  });
+
   it('locates items from chn_reps_1', async () => {
     await expectNoRegression('chn_reps_1.png');
   });
@@ -111,6 +129,10 @@ describe('locateItemStacks', () => {
     await expectNoRegression('chn_unselected_3.png');
   });
 
+  it('locates items from chn_unselected_4', async () => {
+    await expectNoRegression('chn_unselected_4.png');
+  });
+
   it('locates items from eng_filtered_1', async () => {
     await expectNoRegression('eng_filtered_1.png');
   });
@@ -125,6 +147,68 @@ describe('locateItemStacks', () => {
 
   it('locates items from eng_unselected_1', async () => {
     await expectNoRegression('eng_unselected_1.png');
+  });
+
+  it('locates items from chn_deadspace_1', async () => {
+    await expectNoRegression('chn_deadspace_1.png');
+  });
+
+  it('locates items from chn_deadspace_2', async () => {
+    await expectNoRegression('chn_deadspace_2.png');
+  });
+
+  it('locates items from chn_deadspace_3', async () => {
+    await expectNoRegression('chn_deadspace_3.png');
+  });
+
+  // P2 bug: Recognize digit contours close to the item border.
+  it('locates items from chn_deadspace_4', async () => {
+    await expectNoRegression('chn_deadspace_4.png');
+  });
+
+  it('locates items from chn_deadspace_5', async () => {
+    await expectNoRegression('chn_deadspace_5.png');
+  });
+
+  it('locates items from chn_lowres_1', async () => {
+    await expectNoRegression('chn_lowres_1.png');
+  });
+
+  it('locates items from chn_unselected_5', async () => {
+    await expectNoRegression('chn_unselected_5.png');
+  });
+
+  it('locates items from eng_blueprints_1', async () => {
+    await expectNoRegression('eng_blueprints_1.png');
+  });
+
+  it('locates items from eng_lossy_1', async () => {
+    await expectNoRegression('eng_lossy_1.png');
+  });
+
+  it('locates items from chn_decomposers_1', async () => {
+    await expectNoRegression('chn_decomposers_1.png');
+  });
+
+  it('locates items from chn_lossy_1', async () => {
+    await expectNoRegression('chn_lossy_1.png');
+  });
+
+  it('locates items from chn_lossy_2', async () => {
+    await expectNoRegression('chn_lossy_2.png');
+  });
+
+  // P2 bug: Recognize item stacks partially obstructed by the yellow filter bar.
+  it('locates items from chn_lossy_3', async () => {
+    await expectNoRegression('chn_lossy_3.png');
+  });
+
+  it('locates items from chn_lossy_4', async () => {
+    await expectNoRegression('chn_lossy_4.png');
+  });
+
+  it('locates items from chn_lossy_5', async () => {
+    await expectNoRegression('chn_lossy_5.png');
   });
 });
 

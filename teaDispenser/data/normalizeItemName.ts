@@ -20,9 +20,9 @@ async function normalizeItemName(
     // Below should be handle by `listSimilarLookingTexts`, but it is too hard.
     // Hopefully, their frequencies are scarce.
     .replace(/([宅茎])冈/g, '钢')
-    .replace(/士兽/g, '增')
+    .replace(/士[兽曾普]/g, '增')
     .replace(/力[口D]/g, '加')
-    .replace(/弓虽/g, '强')
+    .replace(/[百弓]虽/g, '强')
     .replace(/木几/g, '机')
     .replace(/木反/g, '板')
     .replace(/\\\\/g, 'l')

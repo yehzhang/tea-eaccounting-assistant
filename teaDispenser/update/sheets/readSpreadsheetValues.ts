@@ -59,20 +59,25 @@ function mapItemRows(
 
 function parseParticipantColumns(values: SheetValues): readonly ParticipantColumn[] {
   return _.compact(
-    [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24].map((columnIndex) => {
-      const participantName = parseParticipantName(values, columnIndex);
-      if (
-        participantName.startsWith('参与者') &&
-        values.slice(2).every((row) => !hasCellValue(row[columnIndex]))
-      ) {
-        return null;
+    [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24].map(
+      (columnIndex) => {
+        const participantName = parseParticipantName(values, columnIndex);
+        if (
+          participantName.startsWith('参与者') &&
+          values
+            .slice(2)
+            .map((row) => row[columnIndex])
+            .every((cell) => !hasCellValue(cell) || isNaN(Number(cell)))
+        ) {
+          return null;
+        }
+        return {
+          columnIndex,
+          participantName,
+          items: parseParticipantItemRows(values, columnIndex),
+        };
       }
-      return {
-        columnIndex,
-        participantName,
-        items: parseParticipantItemRows(values, columnIndex),
-      };
-    })
+    )
   );
 }
 

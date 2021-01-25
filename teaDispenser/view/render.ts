@@ -44,10 +44,10 @@ function render(state: State): readonly Rendering[] {
           title: linkTitle,
           url,
           description: [
-            '_^ 该表可随意编辑：增减物品，修改数量与价格，添加参与者，等等_',
+            '^ _该表可随意编辑：增减物品，修改数量、价格、参与者，等等_',
             '',
             '️**分赃指南**',
-            '1. 在第一行"参与者"格填写参与者的名字',
+            '1. 填写参与者的名字，覆盖第一行"参与者"格',
             '2. 填写物品的数量与价格，如果有缺的话',
             '3. 邀请参与者填写需求',
             `4. 按下方${handsUpIcon}按钮以自动分配未分配的物品`,
@@ -60,7 +60,7 @@ function render(state: State): readonly Rendering[] {
     case 'NoParticipantsToSettleUp': {
       return renderEmbedMessage({
         title: '无分赃对象',
-        description: '请先在"参与者"格（位于第一行）填写参与者的名字',
+        description: '请填写参与者的名字，覆盖"参与者"格（位于最左侧写着数字"1"的行）',
       });
     }
     case 'ParticipantsSettledUp': {

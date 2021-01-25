@@ -7,7 +7,7 @@ import getAuthClient from './getAuthClient';
 async function readSpreadsheetValues(spreadsheetId: string): Promise<ItemSplit | null> {
   try {
     const response = await getAuthClient().request({
-      url: `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/A:Y`,
+      url: `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/A:Z`,
       method: 'GET',
       params: {
         valueRenderOption: 'UNFORMATTED_VALUE',
@@ -59,7 +59,7 @@ function mapItemRows(
 
 function parseParticipantColumns(values: SheetValues): readonly ParticipantColumn[] {
   return _.compact(
-    [5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((columnIndex) => {
+    [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24].map((columnIndex) => {
       const participantName = parseParticipantName(values, columnIndex);
       if (
         participantName.startsWith('参与者') &&

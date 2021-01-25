@@ -88,6 +88,16 @@ async function createSpreadsheet(username: string): Promise<Spreadsheet | null> 
               ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 12), 'M2'),
               ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 13), 'N2'),
               ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 14), 'O2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 15), 'P2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 16), 'Q2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 17), 'R2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 18), 'S2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 19), 'T2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 20), 'U2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 21), 'V2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 22), 'W2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 23), 'X2'),
+              ...buildSplitValueConditionalFormatRules(buildSingleCellGridRange(1, 24), 'Y2'),
             ],
             data: [
               {
@@ -96,6 +106,16 @@ async function createSpreadsheet(username: string): Promise<Spreadsheet | null> 
                 rowData: [
                   {
                     values: [
+                      buildBoldTextFormatCell(),
+                      buildBoldTextFormatCell(),
+                      buildBoldTextFormatCell(),
+                      buildBoldTextFormatCell(),
+                      buildBoldTextFormatCell(),
+                      buildBoldTextFormatCell(),
+                      buildBoldTextFormatCell(),
+                      buildBoldTextFormatCell(),
+                      buildBoldTextFormatCell(),
+                      buildBoldTextFormatCell(),
                       buildBoldTextFormatCell(),
                       buildBoldTextFormatCell(),
                       buildBoldTextFormatCell(),

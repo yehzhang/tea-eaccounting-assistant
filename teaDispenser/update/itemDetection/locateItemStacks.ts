@@ -13,8 +13,9 @@ import deduplicateSiblingBoundingRects from './deduplicateSiblingBoundingRects';
 
 async function locateItemStacks(image: Mat): Promise<readonly LocatedItemStack[]> {
   // The low threshold should not be lower than ~250, or adjacent contours may merge.
+  // The low threshold should not be higher than ~270, or the same contour may split.
   // The high threshold should not be too high, or lossy image may not be recognized.
-  const digitEdges = await image.cannyAsync(270, 300, 3, true);
+  const digitEdges = await image.cannyAsync(260, 300, 3, true);
   const digitContours = await digitEdges.findContoursAsync(RETR_LIST, CHAIN_APPROX_TC89_KCOS);
   const digitBoundingRects = digitContours.map((contour) => contour.boundingRect());
 

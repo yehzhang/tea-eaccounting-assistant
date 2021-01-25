@@ -210,6 +210,10 @@ describe('locateItemStacks', () => {
   it('locates items from chn_lossy_5', async () => {
     await expectNoRegression('chn_lossy_5.png');
   });
+
+  it('locates items from chn_hybrid_1', async () => {
+    await expectNoRegression('chn_hybrid_1.png');
+  });
 });
 
 async function expectNoRegression(imageFilename: string) {

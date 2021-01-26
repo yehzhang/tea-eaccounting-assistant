@@ -21,6 +21,7 @@ async function normalizeItemName(
     // Hopefully, their frequencies are scarce.
     .replace(/([宅茎])冈/g, '钢')
     .replace(/士[兽曾普]/g, '增')
+    .replace(/」艺/g, '应')
     .replace(/力[口D]/g, '加')
     .replace(/[百弓]虽/g, '强')
     .replace(/木几/g, '机')
@@ -208,6 +209,8 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['爻', '反'],
   ['逮', '速'],
   ['哥', '图'],
+  ['田', '图'],
+  ['田', '围'],
   ['呈', '量'],
   ['皇', '量'],
   ['蠹', '量'],
@@ -217,8 +220,11 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['虹', '血'],
   ['抖', '科'],
   ['囊', '复'],
+  ['蠹', '复'],
   ['藁', '复'],
   ['薹', '复'],
+  ['薹', '管'],
+  ['琶', '管'],
   ['簪', '管'],
   ['譬', '管'],
   ['B', '管'],
@@ -235,12 +241,16 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['量', '置'],
   ['覃', '置'],
   ['装', '装置'],
+  ['覃', '鲁'],
   ['薹', '鲁'],
   ['膏', '鲁'],
   ['矗', '鲁'],
   ['音', '鲁'],
   ['·', '鲁'],
+  ['·', '置'],
+  ['官', '增'],
   ['坩', '增'],
+  ['馏', '增'],
   ['堵', '增'],
   ['蹭', '增'],
   ['夭', '天'],
@@ -248,6 +258,8 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['贡', '贯'],
   ['贵', '贯'],
   ['鬟', '聚'],
+  ['窟', '器'],
+  ['峰', '修'],
 ];
 
 function trimEllipsis(text: string): string {

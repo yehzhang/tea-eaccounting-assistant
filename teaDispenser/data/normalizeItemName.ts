@@ -242,6 +242,7 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['量', '置'],
   ['覃', '置'],
   ['·', '置'],
+  ['罡', '置'],
   ['装', '装置'],
   ['覃', '鲁'],
   ['薹', '鲁'],
@@ -269,6 +270,7 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['峰', '修'],
   ['度', '魔'],
   ['糟', '槽'],
+  ['棒', '槽'],
   ['蔑', '装'],
 ];
 

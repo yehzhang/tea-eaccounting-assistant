@@ -1,5 +1,5 @@
 import InvalidCommand from './data/InvalidCommand';
-import MarketOrder from './data/MarketOrder';
+import ItemPrice from './data/ItemPrice';
 
 type State =
   | Pong
@@ -12,9 +12,6 @@ type State =
   | ParticipantsSettledUp
   | NoOpParticipantsSettledUp
   | InvalidCommand
-  | SingleMarketQueryResult
-  | UnknownItemName
-  | MarketPriceNotAvailable
   | LookingUpHistoryPrice
   | MultipleMarketQueryResult;
 
@@ -62,17 +59,15 @@ interface NoOpParticipantsSettledUp {
 export interface SingleMarketQueryResult {
   readonly type: 'SingleMarketQueryResult';
   readonly itemName: string;
-  readonly buyOrders: readonly MarketOrder[];
-  readonly sellOrders: readonly MarketOrder[];
-  readonly fetchedAt: Date;
+  readonly itemPrice: ItemPrice;
 }
 
-export interface UnknownItemName {
+interface UnknownItemName {
   readonly type: 'UnknownItemName';
   readonly itemName: string;
 }
 
-export interface MarketPriceNotAvailable {
+interface MarketPriceNotAvailable {
   readonly type: 'MarketPriceNotAvailable';
   readonly itemName: string;
   readonly itemTypeId: number;
@@ -87,19 +82,6 @@ interface MultipleMarketQueryResult {
   readonly results: readonly MarketQueryResult[];
 }
 
-export type MarketQueryResult = AggregatedMarketPrice | UnknownItemName | MarketPriceNotAvailable;
-
-export interface AggregatedMarketPrice {
-  readonly type: 'AggregatedMarketPrice';
-  readonly itemName: string;
-  readonly buyPriceStats: MarketPriceStats | null;
-  readonly sellPriceStats: MarketPriceStats | null;
-  readonly fetchedAt: Date;
-}
-
-export interface MarketPriceStats {
-  readonly jitaItcPrice: number | null;
-  readonly weightedAverageItcPrice: number;
-}
+export type MarketQueryResult = SingleMarketQueryResult | UnknownItemName | MarketPriceNotAvailable;
 
 export default State;

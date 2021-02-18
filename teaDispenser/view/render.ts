@@ -2,10 +2,9 @@ import { MessageEmbedOptions } from 'discord.js';
 import * as _ from 'lodash';
 import Command from '../data/Command';
 import { InvalidUsageReason } from '../data/InvalidCommand';
-import MarketOrder from '../data/MarketOrder';
 import RenderedMessage from '../data/RenderedMessage';
 import Rendering from '../data/Rendering';
-import State, { AggregatedMarketPrice, MarketPriceStats, MarketQueryResult } from '../State';
+import State, { MarketQueryResult, SingleMarketQueryResult } from '../State';
 import { commandPrefix, queryPriceCommandView } from './commandViews';
 import renderPrice from './renderPrice';
 import renderRelativeDate from './renderRelativeDate';
@@ -83,56 +82,25 @@ function render(state: State): readonly Rendering[] {
           `请使用 Google Sheets 的历史功能恢复至自动分赃前，再按${handsUpIcon}按钮。或者手动调整每个人物品的数量。` +
           '\n此外，请填写所有空缺的数量与价格。',
       });
-    case 'SingleMarketQueryResult': {
-      const { buyOrders, sellOrders, fetchedAt } = state;
-      // Do not use message embed as its width does not consider code block.
-      return renderSingleMessage(
-        !!sellOrders.length && `**卖单**\n${renderMarketOrdersTable(sellOrders)}`,
-        !!buyOrders.length && `**买单**\n${renderMarketOrdersTable(buyOrders)}`,
-        renderPriceTimestamp(fetchedAt)
-      );
-    }
-    case 'UnknownItemName': {
-      return renderSingleMessage('未知物品名。请使用全称。');
-    }
-    case 'MarketPriceNotAvailable': {
-      const { itemTypeId } = state;
-      return renderSingleMessage(
-        '这件物品的价格尚未录入。' +
-          '由于网易限制市场查询频率，目前仅录入绝地与源泉常见的产出，包括改装件蓝图、装备、结构、矿、菜等。' +
-          `请移步 https://eve-echoes-market.com/${itemTypeId}/_`
-      );
-    }
     case 'LookingUpHistoryPrice':
       return renderEmbedMessage({
         title: '📈️正在查询历史价格',
       });
     case 'MultipleMarketQueryResult': {
       const { results } = state;
-      const sellPriceStats = results.some(
-        (result) => result.type === 'AggregatedMarketPrice' && result.sellPriceStats
-      );
-      const buyPriceStats = results.some(
-        (result) => result.type === 'AggregatedMarketPrice' && result.buyPriceStats
-      );
       const minFetchedAt = _.minBy(
         results
           .filter(
-            (result): result is AggregatedMarketPrice => result.type === 'AggregatedMarketPrice'
+            (result): result is SingleMarketQueryResult & { itemPrice: { date: Date } } =>
+              result.type === 'SingleMarketQueryResult' && result.itemPrice.date !== null
           )
-          .map(({ fetchedAt }) => fetchedAt),
-        (fetchedAt) => fetchedAt.getTime()
+          .map(({ itemPrice: { date } }) => date),
+        (date) => date.getTime()
       );
       return renderSingleMessage(
         renderTable(
-          [
-            '物品',
-            ...(sellPriceStats ? ['吉他最低卖价', '加权平均卖价'] : []),
-            ...(buyPriceStats ? ['吉他最高买价', '加权平均买价'] : []),
-          ],
-          results.map((result) => {
-            return [result.itemName, ...renderMarketQueryResultTableColumns(result, buyPriceStats)];
-          })
+          ['物品', '最低卖价', '估计卖价', '最高买价', '估计买价'],
+          results.map((result) => [result.itemName, ...renderMarketQueryResultTableColumns(result)])
         ),
         minFetchedAt && renderPriceTimestamp(minFetchedAt)
       );
@@ -142,9 +110,9 @@ function render(state: State): readonly Rendering[] {
     case 'InvalidUsage': {
       const { commandType, reason } = state;
       return renderSingleMessage(
-        renderInvalidCommandReason(reason),
-        '例如:',
-        ...renderCommandExamples(commandType)
+          renderInvalidCommandReason(reason),
+          '例如:',
+          ...renderCommandExamples(commandType)
       );
     }
   }
@@ -154,53 +122,24 @@ function renderPriceTimestamp(date: Date): string {
   return `_这是${renderRelativeDate(date)}的价格_`;
 }
 
-function renderMarketOrdersTable(orders: readonly MarketOrder[]): string {
-  return renderTable(
-    ['星系', '数量', '价格'],
-    orders.map(({ price, remainingVolume, solarSystemName }) => [
-      solarSystemName,
-      remainingVolume.toLocaleString('en'),
-      renderPrice(price),
-    ])
-  );
-}
-
-function renderMarketQueryResultTableColumns(
-  result: MarketQueryResult,
-  sellColumnPlaceHolder: boolean
-): string[] {
+function renderMarketQueryResultTableColumns(result: MarketQueryResult): string[] {
   switch (result.type) {
     case 'UnknownItemName':
-      return ['未知物品名'];
+      return ['未知物品名。请使用全称。'];
     case 'MarketPriceNotAvailable':
-      return [priceNotAvailable];
-    case 'AggregatedMarketPrice': {
-      const { sellPriceStats, buyPriceStats } = result;
+      return [`无法从 https://eve-echoes-market.com/${result.itemTypeId}/_ 获取价格`];
+    case 'SingleMarketQueryResult': {
+      const {
+        itemPrice: { estimatedBuy, highestBuy, estimatedSell, lowestSell },
+      } = result;
       return [
-        ...renderMarketPriceStatsTableColumns(sellPriceStats, sellColumnPlaceHolder),
-        ...renderMarketPriceStatsTableColumns(buyPriceStats, /* placeHolder= */ true),
+        renderPrice(lowestSell),
+        renderPrice(estimatedSell),
+        renderPrice(highestBuy),
+        renderPrice(estimatedBuy),
       ];
     }
   }
-}
-
-const priceNotAvailable = '未录入价格';
-
-function renderMarketPriceStatsTableColumns(
-  marketPriceStats: MarketPriceStats | null,
-  placeHolder: boolean
-): string[] {
-  if (!marketPriceStats) {
-    if (placeHolder) {
-      return [priceNotAvailable, ''];
-    }
-    return [];
-  }
-  const { jitaItcPrice, weightedAverageItcPrice } = marketPriceStats;
-  return [
-    jitaItcPrice === null ? 'N/A' : renderPrice(jitaItcPrice),
-    renderPrice(weightedAverageItcPrice),
-  ];
 }
 
 function renderInvalidCommandReason(reason: InvalidUsageReason): string {

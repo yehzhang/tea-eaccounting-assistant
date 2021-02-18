@@ -1,20 +1,12 @@
 import _ from 'lodash';
 import getItemTypeIdByName from '../data/getItemTypeIdByName';
-import MarketOrder from '../data/MarketOrder';
 import normalizeItemName from '../data/normalizeItemName';
 import Event from '../Event';
 import ExternalDependency from '../ExternalDependency';
-import State, {
-  MarketPriceNotAvailable,
-  MarketPriceStats,
-  SingleMarketQueryResult,
-  UnknownItemName,
-} from '../State';
+import State, { MarketQueryResult } from '../State';
 import fetchTempFile from './fetchTempFile';
 import recognizeItems from './itemDetection/recognizeItems';
-import fetchMarketOrders from './market/fetchMarketOrders';
-import getJitaItcPrice from './market/getJitaItcPrice';
-import getWeightedAverageItcPrice from './market/getWeightedAverageItcPrice';
+import fetchPriceByItemTypeId from './market/fetchPriceByItemTypeId';
 import populateItemStack from './populateItemStack';
 import settleUpParticipants from './settleUpParticipants';
 import createSpreadsheet from './sheets/createSpreadsheet';
@@ -178,9 +170,7 @@ async function executeEvent(
 
           const results = await Promise.all(
             dedupedItemNames.map(
-              async (
-                itemName
-              ): Promise<MarketPriceNotAvailable | SingleMarketQueryResult | UnknownItemName> => {
+              async (itemName): Promise<MarketQueryResult> => {
                 const normalizationResult = await normalizeItemName(itemName, () =>
                   Promise.resolve(null)
                 );
@@ -199,8 +189,8 @@ async function executeEvent(
                   };
                 }
 
-                const query = await fetchMarketOrders(itemTypeId);
-                if (!query || !query.orders.length) {
+                const itemPrice = await fetchPriceByItemTypeId(itemTypeId);
+                if (!itemPrice) {
                   return {
                     type: 'MarketPriceNotAvailable',
                     itemName: normalizationResult.text,
@@ -208,42 +198,17 @@ async function executeEvent(
                   };
                 }
 
-                const [sellOrders, buyOrders] = _.partition(query.orders, ({ sell }) => sell);
                 return {
                   type: 'SingleMarketQueryResult',
                   itemName: normalizationResult.text,
-                  buyOrders: _.sortBy(buyOrders, ({ price }) => -price),
-                  sellOrders: _.sortBy(sellOrders, ({ price }) => price),
-                  fetchedAt: query.fetchedAt,
+                  itemPrice,
                 };
               }
             )
           );
-
-          if (results.length === 1) {
-            setState(results[0]);
-            return;
-          }
-
           setState({
             type: 'MultipleMarketQueryResult',
-            results: results.map((result) => {
-              switch (result.type) {
-                case 'MarketPriceNotAvailable':
-                case 'UnknownItemName':
-                  return result;
-                case 'SingleMarketQueryResult': {
-                  const { buyOrders, sellOrders, fetchedAt, itemName } = result;
-                  return {
-                    type: 'AggregatedMarketPrice',
-                    itemName,
-                    sellPriceStats: getMarketPriceStats(sellOrders, /* buy= */ false),
-                    buyPriceStats: getMarketPriceStats(buyOrders, /* buy= */ true),
-                    fetchedAt,
-                  };
-                }
-              }
-            }),
+            results,
           });
           return;
         }
@@ -254,16 +219,6 @@ async function executeEvent(
       }
     }
   }
-}
-
-function getMarketPriceStats(orders: readonly MarketOrder[], buy: boolean): MarketPriceStats | null {
-  if (!orders.length) {
-    return null;
-  }
-  return {
-    jitaItcPrice: getJitaItcPrice(orders, buy),
-    weightedAverageItcPrice: getWeightedAverageItcPrice(orders),
-  };
 }
 
 export default executeEvent;

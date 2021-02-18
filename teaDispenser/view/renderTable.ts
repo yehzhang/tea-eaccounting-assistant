@@ -11,19 +11,17 @@ function renderTable(header: readonly string[], table: readonly (readonly string
 
     const numericColumn = header[columnIndex].search(/[买卖]价|价格|数量/) !== -1;
     for (let rowIndex = 0; rowIndex < fullTable.length; rowIndex++) {
+      // Hack to shrink the header padding.
+      const columnPaddingLength = rowIndex === 0 ? Math.round(maxLength * 0.8) : maxLength;
       const cell = getCell(fullTable, rowIndex, columnIndex);
-      const monospacedCell = numericColumn ? cell : toDoubleByteCharacterText(cell);
-      const justifiedCell =
-        columnIndex === header.length - 1
-          ? monospacedCell
-          : numericColumn
-          ? monospacedCell.padStart(maxLength, ' ')
-          : monospacedCell.padEnd(maxLength, '　');
+      const justifiedCell = numericColumn
+        ? cell.padStart(columnPaddingLength, ' ')
+        : toDoubleByteCharacterText(cell).padEnd(columnPaddingLength, '　');
       outputTable[rowIndex].push(justifiedCell);
     }
   }
 
-  const headerSeparator = '一'.repeat(_.sumBy(outputTable[0], (cell) => cell.length + 1) - 1);
+  const headerSeparator = '一'.repeat(_.sumBy(outputTable[0], (cell) => cell.length));
   outputTable.splice(1, 0, [headerSeparator]);
 
   const renderedTable = outputTable.map((row) => row.join('　')).join('\n');

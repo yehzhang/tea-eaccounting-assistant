@@ -1,13 +1,12 @@
 import * as _ from 'lodash';
-import { imwriteAsync, Mat } from 'opencv4nodejs';
+import { COLOR_RGB2GRAY, imwriteAsync, Mat, THRESH_OTSU } from 'opencv4nodejs';
 import { RecognizeResult, Scheduler } from 'tesseract.js';
 import getTempPath from '../getTempPath';
 import resizeHeightTo from './resizeHeightTo';
 
 /** Returns an empty string if failed to recognize anything. */
 async function recognizeText(languageRecognizer: Scheduler, image: Mat): Promise<string> {
-  // The optimal character size is 30, which roughly translates to 54 in title height.
-  const normalizedImage = await resizeHeightTo(54, image);
+  const normalizedImage = await normalizeImage(image);
 
   const imagePath = await getTempPath(`tmp_${Math.random().toString().slice(2)}.png`);
   await imwriteAsync(imagePath, normalizedImage);
@@ -54,5 +53,16 @@ async function recognizeText(languageRecognizer: Scheduler, image: Mat): Promise
 }
 
 const minRecognizingConfidence = 60;
+
+async function normalizeImage(image: Mat): Promise<Mat> {
+  // The optimal character size is 30, which roughly translates to 54 in title height.
+  const resizedImage = await resizeHeightTo(54, image);
+  return resizedImage;
+
+  // Binarize the image with Otsu's algorithm. Although Tesseract claims to use the algorithm
+  // internally, it significantly improves the result to use it here for certain inputs.
+  const grayscaleImage = await resizedImage.cvtColorAsync(COLOR_RGB2GRAY);
+  return grayscaleImage.thresholdAsync(NaN, 255, THRESH_OTSU);
+}
 
 export default recognizeText;

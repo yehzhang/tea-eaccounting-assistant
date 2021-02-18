@@ -28,6 +28,7 @@ async function setupTesseract(): Promise<TesseractSchedulers> {
     return scheduler;
   }
 
+  // Remove the working copies of the trained data to avoid corruption.
   const trainedDataFilenames = ['chi_sim.traineddata', 'eng.traineddata'];
   await Promise.all(
     trainedDataFilenames.map(async (filename) => {
@@ -41,16 +42,12 @@ async function setupTesseract(): Promise<TesseractSchedulers> {
     })
   );
 
-  const [languageDetector, chineseRecognizer, englishRecognizer] = await Promise.all([
-    createMonolingualScheduler('chi_sim', PSM.SPARSE_TEXT_OSD),
+  const [chineseRecognizer] = await Promise.all([
     createMonolingualScheduler('chi_sim', PSM.SINGLE_LINE),
-    createMonolingualScheduler('eng', PSM.SINGLE_LINE),
   ]);
 
   return {
-    languageDetector,
     chineseRecognizer,
-    englishRecognizer,
   };
 }
 

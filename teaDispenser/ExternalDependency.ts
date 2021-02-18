@@ -5,9 +5,9 @@ interface ExternalDependency {
 }
 
 export interface TesseractSchedulers {
-  readonly languageDetector: Scheduler;
+  // readonly languageDetector: Scheduler;
   readonly chineseRecognizer: Scheduler;
-  readonly englishRecognizer: Scheduler;
+  // readonly englishRecognizer: Scheduler;
 }
 
 export default ExternalDependency;

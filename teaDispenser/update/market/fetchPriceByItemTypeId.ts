@@ -1,5 +1,5 @@
-import fetchMarketSnapshot from './fetchMarketSnapshot';
 import ItemPrice from '../../data/ItemPrice';
+import fetchMarketSnapshot from './fetchMarketSnapshot';
 import MarketSnapshot from './MarketSnapshot';
 
 async function fetchPriceByItemTypeId(itemTypeId: number): Promise<ItemPrice | null> {
@@ -10,10 +10,13 @@ async function fetchPriceByItemTypeId(itemTypeId: number): Promise<ItemPrice | n
 async function fetchMarketSnapshotMemo(): Promise<MarketSnapshot> {
   if (!marketSnapshotState) {
     const fetchedAt = new Date();
-    marketSnapshotState = fetchMarketSnapshot().then((marketSnapshot) => ({
-      marketSnapshot,
-      fetchedAt,
-    }));
+    marketSnapshotState = fetchMarketSnapshot().then((marketSnapshot) => {
+      marketSnapshotState = {
+        marketSnapshot,
+        fetchedAt,
+      };
+      return marketSnapshotState;
+    });
   }
   if (marketSnapshotState instanceof Promise) {
     const { marketSnapshot } = await marketSnapshotState;

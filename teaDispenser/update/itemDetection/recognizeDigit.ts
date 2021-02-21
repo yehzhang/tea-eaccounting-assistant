@@ -1,13 +1,13 @@
 import { readdirSync } from 'fs';
 import * as _ from 'lodash';
-import { BORDER_REPLICATE, COLOR_RGB2GRAY, imread, IMREAD_GRAYSCALE, Mat } from 'opencv4nodejs';
+import { COLOR_RGB2GRAY, imread, IMREAD_GRAYSCALE, Mat } from 'opencv4nodejs';
 import { join } from 'path';
 import matchBestTemplate from './matchBestTemplate';
 import resizeHeightTo from './resizeHeightTo';
 
 /** Assumes the image is larger than the template. */
 async function recognizeDigit(image: Mat): Promise<string> {
-  const normalizedImage = await normalizeImage(image);
+  const normalizedImage = await normalizeImage(image, Object.values(characterTemplates));
   return (
     (await matchBestTemplate(
       normalizedImage,
@@ -17,19 +17,13 @@ async function recognizeDigit(image: Mat): Promise<string> {
   );
 }
 
-async function normalizeImage(image: Mat): Promise<Mat> {
+async function normalizeImage(image: Mat, templates: readonly Mat[]): Promise<Mat> {
   const greyscaleImage = await image.cvtColorAsync(COLOR_RGB2GRAY);
-  const resizedImage = await resizeHeightTo(templateContourHeight, greyscaleImage);
-  return resizedImage.copyMakeBorderAsync(
-    imagePadding,
-    imagePadding,
-    imagePadding,
-    imagePadding,
-    BORDER_REPLICATE
-  );
+
+  const maxTemplateHeight = Math.max(...templates.map((template) => template.rows));
+  return resizeHeightTo(maxTemplateHeight, greyscaleImage);
 }
 
-const imagePadding = 10;
 const minTemplateMatchingConfidence = 0.3;
 
 const characterTemplates: TemplateSet = (() => {
@@ -61,7 +55,5 @@ const characterTemplates: TemplateSet = (() => {
 interface TemplateSet {
   readonly [character: string]: Mat;
 }
-
-const templateContourHeight = 46;
 
 export default recognizeDigit;

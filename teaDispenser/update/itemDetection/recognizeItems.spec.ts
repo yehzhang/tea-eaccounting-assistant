@@ -413,6 +413,24 @@ describe('recognizeItems', () => {
     ]);
   });
 
+  it('recognized items from chn_blueprints_7', async () => {
+    const actual = await run('inventory/chn_blueprints_7.png');
+    expectEqual(actual, [
+      { name: '激光炮范围扩大设备蓝...', amount: '1' },
+      { name: '激光炮发散调节装置蓝...', amount: '2' },
+      { name: '维修增效器蓝图 II', amount: '5' },
+      { name: '三角装甲聚合器蓝图 I', amount: '1' },
+      { name: '反热能聚合器蓝图 II', amount: '3' },
+      { name: '半导体记忆 电池蓝图 I', amount: '3' },
+      { name: '辅助能皇路由器蓝图I', amount: '1' },
+      { name: '锁定系统辅助控制器蓝...', amount: '2' },
+      { name: '无人机火力增幅装置蓝', amount: '1' },
+      { name: '无人机射程扩展装置蓝...', amount: '2' },
+      { name: '无人机射速加强装置蓝...', amount: '1' },
+      { name: '无人机射速加强装置蓝...', amount: '1' },
+    ]);
+  });
+
   it('recognized items from chn_datacores_1', async () => {
     const actual = await run('inventory/chn_datacores_1.png');
     expect(actual).toEqual([
@@ -446,20 +464,6 @@ describe('recognizeItems', () => {
       { name: '加达里4级受损结构', amount: '13' },
       { name: '加达里5级受损结构', amount: '38' },
       { name: '加达里6级受损结构', amount: '141' },
-    ]);
-  });
-
-  it('recognized items from chn_blueprints_1', async () => {
-    const actual = await run('inventory/chn_blueprints_1.jpg');
-    expectEqual(actual, [
-      { name: '反热能聚合器蓝图 川', amount: '1' },
-      { name: '动态燃料控制阀蓝图I', amount: '3' },
-      { name: '动态燃料控制阀蓝图 II', amount: '4' },
-      { name: '货柜舱优化改造蓝图 I...', amount: '1' },
-      { name: '超空间逮度调节器蓝...', amount: '1' },
-      { name: '锁定系统辅助控制器...', amount: '1' },
-      { name: '引力电容器升级蓝图I', amount: '3' },
-      { name: '引力电容器升级蓝图 II', amount: '2' },
     ]);
   });
 

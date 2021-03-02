@@ -17,7 +17,7 @@ async function createSpreadsheet(username: string): Promise<Spreadsheet | null> 
               sheetId: 0,
               gridProperties: {
                 frozenRowCount: 2,
-                frozenColumnCount: 5,
+                frozenColumnCount: 1,
               },
             },
             conditionalFormats: [

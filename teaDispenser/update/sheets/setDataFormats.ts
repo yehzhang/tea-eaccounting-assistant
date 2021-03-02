@@ -60,6 +60,23 @@ async function setDataFormats(spreadsheetId: string): Promise<boolean> {
               fields: 'pixelSize',
             },
           },
+          {
+            // Make the border thicker between item and participant columns.
+            updateBorders: {
+              range: {
+                startColumnIndex: 4,
+                endColumnIndex: 5,
+              },
+              right: {
+                style: 'SOLID_THICK',
+                color: {
+                  red: 0.85,
+                  green: 0.85,
+                  blue: 0.85,
+                },
+              },
+            },
+          },
         ],
       },
     });

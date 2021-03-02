@@ -30,10 +30,10 @@ async function createSpreadsheet(username: string): Promise<Spreadsheet | null> 
                 ],
                 booleanRule: {
                   condition: {
-                    type: 'NUMBER_EQ',
+                    type: 'CUSTOM_FORMULA',
                     values: [
                       {
-                        userEnteredValue: '0',
+                        userEnteredValue: '=AND(INDIRECT("RC",FALSE)=0, INDIRECT("RC",FALSE)<>"")',
                       },
                     ],
                   },
@@ -41,6 +41,51 @@ async function createSpreadsheet(username: string): Promise<Spreadsheet | null> 
                     textFormat: {
                       foregroundColor: silver,
                     },
+                  },
+                },
+              },
+              {
+                // Add stripes to even rows.
+                ranges: [
+                  {
+                    startRowIndex: 2,
+                  },
+                ],
+                booleanRule: {
+                  condition: {
+                    type: 'CUSTOM_FORMULA',
+                    values: [
+                      {
+                        userEnteredValue: '=ISODD(ROW())',
+                      },
+                    ],
+                  },
+                  format: {
+                    backgroundColor: lightGrey,
+                  },
+                },
+              },
+              {
+                // The overlap between the above two formatting rules.
+                ranges: [
+                  {
+                    startRowIndex: 2,
+                  },
+                ],
+                booleanRule: {
+                  condition: {
+                    type: 'CUSTOM_FORMULA',
+                    values: [
+                      {
+                        userEnteredValue: '=AND(ISODD(ROW()), INDIRECT("RC",FALSE)=0, INDIRECT("RC",FALSE)<>"")',
+                      },
+                    ],
+                  },
+                  format: {
+                    textFormat: {
+                      foregroundColor: silver,
+                    },
+                    backgroundColor: lightGrey,
                   },
                 },
               },
@@ -227,6 +272,11 @@ const green: Color = {
   red: 183 / 255,
   green: 225 / 255,
   blue: 205 / 255,
+};
+const lightGrey: Color = {
+  red: 0.95,
+  green: 0.95,
+  blue: 0.95,
 };
 
 interface GridRange {

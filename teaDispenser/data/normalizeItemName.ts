@@ -29,6 +29,7 @@ async function normalizeItemName(
     .replace(/\\\\/g, 'l')
     .replace(/[/′]」\\/g, '小')
     .replace(/苷旨/g, '能')
+    .replace(/弓\s*I/g, '引')
     .replace(/乡佳/g, '维');
   const similarLookingTexts = listSimilarLookingTexts(cleanText);
   const matchedSimilarLookingTexts = [];
@@ -250,6 +251,7 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['覃', '置'],
   ['·', '置'],
   ['罡', '置'],
+  ['篝', '置'],
   ['装', '装置'],
   ['覃', '鲁'],
   ['薹', '鲁'],
@@ -279,6 +281,8 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['糟', '槽'],
   ['棒', '槽'],
   ['蔑', '装'],
+  ['丈', '大'],
+  ['廖', '修'],
 ];
 
 function trimEllipsis(text: string): string {

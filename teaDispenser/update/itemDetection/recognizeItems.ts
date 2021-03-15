@@ -37,13 +37,13 @@ async function recognizeItemStack(
       )
     ),
   ]);
-  const amount = amountDigits.join('');
-  if (!name && !amount) {
+  const amount = Number(amountDigits.join(''));
+  if (!name && isNaN(amount)) {
     return null;
   }
   return {
     name,
-    amount,
+    amount: isNaN(amount) ? null : amount,
     findIcon: (itemType) => recognizeItemIcon(image.getRegion(itemStackBoundingBox), itemType),
   };
 }

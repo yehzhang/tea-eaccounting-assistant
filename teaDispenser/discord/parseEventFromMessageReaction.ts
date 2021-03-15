@@ -1,11 +1,15 @@
 import { MessageReaction } from 'discord.js';
+import DiscordEventContext from '../data/DiscordEventContext';
+import handsUpIcon from '../data/handsUpIcon';
+import kiwiIcon from '../data/kiwiIcon';
 import Event from '../Event';
-import { handsUpIcon } from '../view/render';
+import parseFleetLootRecord from './parseFleetLootRecord';
 
 function parseEventFromMessageReaction(
   messageReaction: MessageReaction,
   userId: string,
-  clientUserId: string
+  clientUserId: string,
+  context: DiscordEventContext
 ): readonly Event[] {
   const events: Event[] = [];
 
@@ -14,13 +18,26 @@ function parseEventFromMessageReaction(
   }
 
   if (messageReaction.emoji.name === handsUpIcon) {
-    const spreadsheetIdMatch = messageReaction.message.embeds[0]?.url?.match(
-      /.*docs\.google\.com\/spreadsheets\/d\/([\w\d-]+)\/edit.*/
-    );
-    if (spreadsheetIdMatch) {
+    const fleetLootRecord = parseFleetLootRecord(messageReaction.message);
+    if (fleetLootRecord) {
       events.push({
-        type: 'HandsUpButtonPressed',
-        spreadsheetId: spreadsheetIdMatch[1],
+        type: '[Discord] HandsUpButtonPressed',
+        fleetLoot: fleetLootRecord.fleetLoot,
+        fleetLootRecordTitle: fleetLootRecord.title,
+        needs: fleetLootRecord.needs,
+        context,
+      });
+    }
+  }
+
+  if (messageReaction.emoji.name === kiwiIcon) {
+    const fleetLootRecord = parseFleetLootRecord(messageReaction.message);
+    if (fleetLootRecord) {
+      events.push({
+        type: '[Discord] KiwiButtonPressed',
+        fleetLootRecord,
+        userId,
+        context,
       });
     }
   }

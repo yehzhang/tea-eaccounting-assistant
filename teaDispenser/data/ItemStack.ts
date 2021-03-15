@@ -1,7 +1,7 @@
-interface ItemStack {
-  readonly name: string;
-  readonly amount: string;
-  readonly price: number | null;
+import Item from './Item';
+
+interface ItemStack extends Item {
+  readonly amount: number;
 }
 
 export default ItemStack;

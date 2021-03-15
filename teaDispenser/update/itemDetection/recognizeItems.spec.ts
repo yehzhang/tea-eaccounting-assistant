@@ -3,7 +3,7 @@ import getSemanticIdentifier from '../../data/getSemanticIdentifier';
 import RecognizedItem from '../../data/RecognizedItem';
 import { TesseractSchedulers } from '../../ExternalDependency';
 import recognizeItems from './recognizeItems';
-import setupTesseract from './setupTesseract';
+import startTesseract from './startTesseract';
 import getTestDataPath from './testData/getTestDataPath';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
@@ -12,7 +12,7 @@ describe('recognizeItems', () => {
   let schedulers: TesseractSchedulers;
 
   beforeAll(async () => {
-    schedulers = await setupTesseract();
+    schedulers = await startTesseract();
   });
 
   beforeEach(() => {

@@ -1,7 +1,9 @@
+import { Client } from 'discord.js';
 import { Scheduler } from 'tesseract.js';
 
 interface ExternalDependency {
   readonly schedulers: TesseractSchedulers;
+  readonly discordBot: Client;
 }
 
 export interface TesseractSchedulers {

@@ -1,13 +1,18 @@
 import { Message, Snowflake } from 'discord.js';
 import _ from 'lodash';
+import DiscordEventContext from '../data/DiscordEventContext';
 import Event from '../Event';
-import parseCommand from '../view/parseCommand';
+import parseCommand from '../view/discord/parseCommand';
 
-function parseEventFromMessage(message: Message, clientUserId: Snowflake): readonly Event[] {
+function parseEventFromMessage(
+  message: Message,
+  clientUserId: Snowflake,
+  context: DiscordEventContext
+): readonly Event[] {
   const events: Event[] = [];
 
-  const { id, author, content, attachments } = message;
-  if (author.id === clientUserId) {
+  const { id, author, content, attachments, channel } = message;
+  if (author.id === clientUserId || !(channel.type === 'text' || channel.type === 'dm')) {
     return events;
   }
 
@@ -15,7 +20,8 @@ function parseEventFromMessage(message: Message, clientUserId: Snowflake): reado
 
   if (content.toLocaleLowerCase() === 'ping') {
     events.push({
-      type: 'Pinged',
+      type: '[Discord] Pinged',
+      context,
     });
   }
 
@@ -33,17 +39,19 @@ function parseEventFromMessage(message: Message, clientUserId: Snowflake): reado
   );
   if (imageUrls.length) {
     events.push({
-      type: 'ImagePosted',
+      type: '[Discord] ImagePosted',
       urls: imageUrls,
-      userName: author.username,
+      username: author.username,
+      context,
     });
   }
 
   const command = parseCommand(content);
   if (command) {
     events.push({
-      type: 'CommandIssued',
+      type: '[Discord] CommandIssued',
       command,
+      context,
     });
   }
 

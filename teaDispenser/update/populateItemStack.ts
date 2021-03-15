@@ -1,10 +1,10 @@
 import getItemTypeIdByName from '../data/getItemTypeIdByName';
-import ItemStack from '../data/ItemStack';
 import normalizeItemName from '../data/normalizeItemName';
 import RecognizedItem from '../data/RecognizedItem';
+import UserInputPricedItemStack from '../data/UserInputPricedItemStack';
 import fetchPriceByItemTypeId from './market/fetchPriceByItemTypeId';
 
-async function populateItemStack({ name, amount, findIcon }: RecognizedItem): Promise<ItemStack> {
+async function populateItemStack({ name, amount, findIcon }: RecognizedItem): Promise<UserInputPricedItemStack> {
   const normalizationResult = await normalizeItemName(name, findIcon);
   if (normalizationResult.type !== 'ExactMatch') {
     return {

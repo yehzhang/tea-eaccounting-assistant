@@ -1,6 +1,6 @@
 import { Scheduler } from 'tesseract.js';
 import recognizeText from './recognizeText';
-import setupTesseract from './setupTesseract';
+import startTesseract from './startTesseract';
 import getTestImage from './testData/getTestImage';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
@@ -10,7 +10,7 @@ describe('recognizeText', () => {
   let englishRecognizer: Scheduler;
 
   beforeAll(async () => {
-    ({ chineseRecognizer } = await setupTesseract());
+    ({ chineseRecognizer } = await startTesseract());
     englishRecognizer = chineseRecognizer;
   });
 

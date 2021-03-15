@@ -49,6 +49,7 @@ async function recognizeText(languageRecognizer: Scheduler, image: Mat): Promise
     .replace('激光炮苜Z调节装置', '激光炮发散调节装置')
     .replace('无\\木几射五亘力口弓虽装置', '无人机射速加强装置')
     .replace('克尔姆', '克尔鲁姆')
+    .replace('装甲合器', '装甲聚合器')
     .replace('短磁', '短管磁');
 }
 

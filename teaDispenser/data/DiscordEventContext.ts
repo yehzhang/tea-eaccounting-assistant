@@ -1,10 +1,10 @@
-import { Message, User } from 'discord.js';
+import { DMChannel, TextChannel, User } from 'discord.js';
 import DiscordMessageContext from './DiscordMessageContext';
 
 interface DiscordEventContext {
-  readonly message: Message;
-  readonly triggeringUser: User;
-  readonly clientUser: User;
+  readonly type: 'DiscordEventContext';
+  readonly channel: TextChannel | DMChannel;
+  readonly triggeringUser?: User;
   readonly messageContexts: DiscordMessageContext[];
 }
 

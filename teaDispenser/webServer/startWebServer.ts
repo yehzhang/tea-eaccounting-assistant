@@ -13,6 +13,16 @@ function startWebServer(dispatchEvent: DispatchEvent<Event>) {
 
   app.use(bodyParser.urlencoded({ extended: true }));
 
+  app.get('/', (request, response, next) => {
+    dispatchEvent({
+      type: '[Web] IndexRequested',
+      context: {
+        type: 'WebServerEventContext',
+        response,
+      },
+    }).catch(next);
+  });
+
   app.get('/editor/discord/:channelId/:messageId', (request, response, next) => {
     const { channelId, messageId } = request.params;
     dispatchEvent({

@@ -261,6 +261,10 @@ async function update(
       }
       return;
     }
+    case '[Web] IndexRequested': {
+      const { context } = event;
+      return dispatchViews.webServer({ type: 'Index' }, context);
+    }
     case '[Web] DiscordFleetLootEditorRequested': {
       const { channelId, messageId, context } = event;
       const fetchResult = await fetchFleetLootRecord(
@@ -419,7 +423,7 @@ async function update(
           return false;
         }
 
-        const { message,channel, fleetLootRecord } = fetchResult;
+        const { message, channel, fleetLootRecord } = fetchResult;
         await dispatchFleetLootRecordUpdatedView(
           {
             ...fleetLootRecord,
@@ -428,7 +432,7 @@ async function update(
               .concat(itemStacks.map((item) => ({ needer, item }))),
           },
           message,
-            channel,
+          channel,
           dispatchViews.discord
         );
 

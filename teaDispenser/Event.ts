@@ -37,6 +37,10 @@ type Event =
       readonly context: DiscordEventContext;
     }
   | {
+      readonly type: '[Web] IndexRequested';
+      readonly context: WebServerEventContext;
+    }
+  | {
       readonly type: '[Web] DiscordFleetLootEditorRequested';
       readonly channelId: string;
       readonly messageId: string;

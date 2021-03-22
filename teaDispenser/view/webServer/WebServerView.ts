@@ -4,6 +4,9 @@ import NeedsEditorLink from '../../data/NeedsEditorLink';
 
 type WebServerView =
   | {
+      readonly type: 'Index';
+    }
+  | {
       readonly type: 'FleetLootEditor';
       readonly fleetLoot: FleetLoot;
     }

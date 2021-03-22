@@ -1,6 +1,7 @@
 import RenderedWebPage from '../../data/RenderedWebPage';
 import renderFleetLootEditor from './renderFleetLootEditor';
 import renderFleetLootEditorInvalidInput from './renderFleetLootEditorInvalidInput';
+import renderIndex from './renderIndex';
 import renderInvalidFleetLootRecord from './renderInvalidFleetLootRecord';
 import renderNeederChooser from './renderNeederChooser';
 import renderNeedsEditor from './renderNeedsEditor';
@@ -10,6 +11,11 @@ import WebServerView from './WebServerView';
 
 function renderWebServerView(state: WebServerView): RenderedWebPage {
   switch (state.type) {
+    case 'Index':
+      return {
+        type: 'RenderedWebPage',
+        html: renderIndex(),
+      };
     case 'FleetLootEditor': {
       const { fleetLoot } = state;
       return {

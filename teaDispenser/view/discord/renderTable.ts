@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import tableColumnSeparator from '../../data/tableColumnSeparator';
-import toDoubleByteCharacterText from '../../data/toDoubleByteCharacterText';
+import toDoubleByteCharacterText from './toDoubleByteCharacterText';
 
 function renderTable(
   header: readonly string[],

@@ -4,7 +4,7 @@ import Container from './Container';
 import NumberInput from './NumberInput';
 import SubmitButton from './SubmitButton';
 
-function renderNeedsEditor(title: string, itemStacks: readonly ItemStack[]): string {
+function viewNeedsEditor(title: string, itemStacks: readonly ItemStack[]): string {
   return (
     <Container title={title}>
       <h2>需求</h2>
@@ -33,4 +33,4 @@ function renderNeedsEditor(title: string, itemStacks: readonly ItemStack[]): str
   );
 }
 
-export default renderNeedsEditor;
+export default viewNeedsEditor;

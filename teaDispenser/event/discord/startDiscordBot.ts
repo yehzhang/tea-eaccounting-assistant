@@ -1,6 +1,6 @@
 import { Client, MessageReaction, NewsChannel, PartialUser, User } from 'discord.js';
-import DiscordEventContext from '../data/DiscordEventContext';
-import DispatchEvent from '../data/DispatchEvent';
+import DiscordEventContext from '../../data/DiscordEventContext';
+import DispatchEvent from '../../data/DispatchEvent';
 import Event from '../Event';
 import parseEventFromMessage from './parseEventFromMessage';
 import parseEventFromMessageReaction from './parseEventFromMessageReaction';
@@ -24,7 +24,6 @@ async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Cli
         type: 'DiscordEventContext',
         channel: message.channel,
         triggeringUser: message.author,
-        messageContexts: [],
       });
       await Promise.all(events.map(dispatchEvent));
     });
@@ -55,7 +54,7 @@ async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Cli
             type: 'DiscordEventContext',
             channel: messageReaction.message.channel,
             triggeringUser: partialUser as User,
-            messageContexts: [{ sentMessage: messageReaction.message }],
+            sentMessage: messageReaction.message,
           }
         );
         await Promise.all(events.map(dispatchEvent));

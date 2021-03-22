@@ -1,11 +1,11 @@
-import Command from './data/Command';
-import DiscordEventContext from './data/DiscordEventContext';
-import FleetLoot from './data/FleetLoot';
-import FleetLootRecord from './data/FleetLootRecord';
-import InvalidCommand from './data/InvalidCommand';
-import ItemStack from './data/ItemStack';
-import Needs from './data/Needs';
-import WebServerEventContext from './data/WebServerEventContext';
+import Command from '../data/Command';
+import DiscordEventContext from '../data/DiscordEventContext';
+import FleetLoot from '../data/FleetLoot';
+import FleetLootRecord from '../data/FleetLootRecord';
+import InvalidCommand from '../data/InvalidCommand';
+import ItemStack from '../data/ItemStack';
+import Needs from '../data/Needs';
+import WebServerEventContext from '../data/WebServerEventContext';
 
 type Event =
   | {

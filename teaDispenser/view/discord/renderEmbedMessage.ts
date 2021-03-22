@@ -4,22 +4,18 @@ import RenderedMessage from '../../data/RenderedMessage';
 function renderEmbedMessage(
   embed: MessageEmbedOptions,
   reactionContents?: readonly string[],
-  overwrite?: boolean,
-): readonly RenderedMessage[] {
-  return [
-    {
-      type: 'RenderedMessage',
-      content: {
-        embed: {
-          color: dispenserSilver,
-          ...embed,
-        },
+  overwrite?: boolean
+): RenderedMessage {
+  return {
+    content: {
+      embed: {
+        color: dispenserSilver,
+        ...embed,
       },
-      reactionContents,
-      replyTo: null,
-      overwrite,
     },
-  ];
+    reactionContents,
+    overwrite,
+  };
 }
 
 const dispenserSilver = 0xd3d3d3;

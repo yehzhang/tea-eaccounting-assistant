@@ -1,7 +1,7 @@
 import h from 'vhtml';
 import Container from './Container';
 
-function renderIndex() {
+function viewIndex() {
   return (
     <Container title="EVE Echoes Loot">
       <h2>EVE Echoes Loot</h2>
@@ -15,4 +15,4 @@ function renderIndex() {
   );
 }
 
-export default renderIndex;
+export default viewIndex;

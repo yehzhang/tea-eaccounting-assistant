@@ -1,5 +1,5 @@
-import RenderedWebPage from '../data/RenderedWebPage';
-import WebServerEventContext from '../data/WebServerEventContext';
+import RenderedWebPage from '../../data/RenderedWebPage';
+import WebServerEventContext from '../../data/WebServerEventContext';
 
 async function sendHttpResponse(
   webPage: RenderedWebPage,

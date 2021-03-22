@@ -1,16 +1,16 @@
 import createDispatchView from './core/createDispatchView';
 import startApp from './core/startApp';
 import DispatchEvent from './data/DispatchEvent';
-import startDiscordBot from './discord/startDiscordBot';
-import syncMessages from './discord/syncMessages';
-import Event from './Event';
+import startDiscordBot from './event/discord/startDiscordBot';
+import Event from './event/Event';
+import startWebServer from './event/webServer/startWebServer';
 import ExternalDependency from './ExternalDependency';
 import startTesseract from './update/itemDetection/startTesseract';
 import update from './update/update';
-import renderDiscordView from './view/discord/renderDiscordView';
-import renderWebServerView from './view/webServer/renderWebServerView';
-import sendHttpResponse from './webServer/sendHttpResponse';
-import startWebServer from './webServer/startWebServer';
+import syncMessages from './view/discord/syncMessages';
+import viewDiscord from './view/discord/viewDiscord';
+import sendHttpResponse from './view/webServer/sendHttpResponse';
+import viewWebServer from './view/webServer/viewWebServer';
 
 async function startExternalDependencies(
   dispatchEvent: DispatchEvent<Event>
@@ -25,6 +25,6 @@ async function startExternalDependencies(
 }
 
 const ignored = startApp(startExternalDependencies, update, {
-  discord: createDispatchView(renderDiscordView, syncMessages),
-  webServer: createDispatchView(renderWebServerView, sendHttpResponse),
+  discord: createDispatchView(viewDiscord, syncMessages),
+  webServer: createDispatchView(viewWebServer, sendHttpResponse),
 });

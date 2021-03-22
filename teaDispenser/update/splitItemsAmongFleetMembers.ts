@@ -1,7 +1,7 @@
-import * as _ from 'lodash';
-import findRandomMinValuedItem from './findRandomMinValuedItem';
+import * as _ from "lodash";
+import findRandomMinValuedItem from "./findRandomMinValuedItem";
 
-function splitItemsAmongParticipants<T extends object>(
+function splitItemsAmongFleetMembers<T>(
   participantsItems: readonly (readonly T[])[],
   spareItems: readonly T[],
   valueGetter: (item: T) => number
@@ -21,4 +21,4 @@ function splitItemsAmongParticipants<T extends object>(
   return participantQueue;
 }
 
-export default splitItemsAmongParticipants;
+export default splitItemsAmongFleetMembers;

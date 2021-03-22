@@ -1,42 +1,30 @@
 import { DMChannel, Message, MessageOptions, TextChannel, UserResolvable } from 'discord.js';
-import DiscordEventContext from '../data/DiscordEventContext';
-import RenderedMessage from '../data/RenderedMessage';
-import RenderedMessageContent from '../data/RenderedMessageContent';
+import DiscordEventContext from '../../data/DiscordEventContext';
+import RenderedMessage from '../../data/RenderedMessage';
+import RenderedMessageContent from '../../data/RenderedMessageContent';
 
 async function syncMessages(
-  renderedMessages: readonly RenderedMessage[],
+  renderedMessage: RenderedMessage | null,
   context: DiscordEventContext
 ): Promise<void> {
-  const { channel, triggeringUser, messageContexts } = context;
-  const messageCount = Math.max(renderedMessages.length, messageContexts.length);
-  for (let messageIndex = 0; messageIndex < messageCount; messageIndex++) {
-    if (!messageContexts[messageIndex]) {
-      messageContexts[messageIndex] = {};
-    } else if (!renderedMessages[messageIndex]) {
-      const messageContext = messageContexts[messageIndex];
-      delete messageContexts[messageIndex];
-
-      await messageContext.sentMessage?.delete();
-
-      continue;
-    }
-
-    const { content, replyTo, reactionContents = [], overwrite } = renderedMessages[messageIndex];
-    if (!overwrite) {
-      messageContexts.splice(messageIndex, 0, {});
-    }
-
-    const messageContext = messageContexts[messageIndex];
-    const sentMessage = await syncMessageContent(
-      content,
-      channel,
-      replyTo ? triggeringUser : undefined,
-      messageContext.sentMessage
-    );
-    messageContext.sentMessage = sentMessage;
-
-    await syncReactions(reactionContents, sentMessage);
+  const { channel, triggeringUser, sentMessage } = context;
+  if (!renderedMessage) {
+    context.sentMessage = undefined;
+    await sentMessage?.delete();
+    return;
   }
+
+  const { content, replyTo, reactionContents = [], overwrite } = renderedMessage;
+
+  const newlySentMessage = await syncMessageContent(
+    content,
+    channel,
+    replyTo ? triggeringUser : undefined,
+    overwrite ? sentMessage : undefined
+  );
+  context.sentMessage = newlySentMessage;
+
+  await syncReactions(reactionContents, newlySentMessage);
 }
 
 async function syncMessageContent(

@@ -1,3 +1,3 @@
-type DispatchView<S, C> = (state: S, context: C) => Promise<void>;
+type DispatchView<S, C> = (view: S, context: C) => Promise<void>;
 
 export default DispatchView;

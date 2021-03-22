@@ -1,7 +1,7 @@
 import h from 'vhtml';
 import Container from './Container';
 
-function renderPendingFleetLootRecord(title: string): string {
+function viewPendingFleetLootRecord(title: string): string {
   return (
     <Container title={title}>
       <h2>无参与者</h2>
@@ -10,4 +10,4 @@ function renderPendingFleetLootRecord(title: string): string {
   );
 }
 
-export default renderPendingFleetLootRecord;
+export default viewPendingFleetLootRecord;

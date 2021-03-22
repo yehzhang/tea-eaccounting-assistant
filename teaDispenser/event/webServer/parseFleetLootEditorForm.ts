@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import FleetLoot from '../data/FleetLoot';
-import UserInputPricedItemStack from '../data/UserInputPricedItemStack';
+import FleetLoot from '../../data/FleetLoot';
+import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
 
 function parseFleetLootEditorForm(form: unknown): FleetLoot | null {
   if (!_.isObject(form)) {

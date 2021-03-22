@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import FleetMemberLoot from '../data/FleetMemberLoot';
 import Needs from '../data/Needs';
 import PricedItemStack from '../data/PricedItemStack';
-import splitItemsAmongParticipants from './splitItemsAmongParticipants';
+import splitItemsAmongFleetMembers from './splitItemsAmongFleetMembers';
 import splitItemsByNeeds from './splitItemsByNeeds';
 
 function settleUpFleetLoot(
@@ -13,7 +13,7 @@ function settleUpFleetLoot(
   const items = itemStacks.flatMap(splitItemStack);
   const { fleetMembersLoot, spareItems } = splitItemsByNeeds(fleetMembers, items, needs);
 
-  const settledUpLoot = splitItemsAmongParticipants(
+  const settledUpLoot = splitItemsAmongFleetMembers(
     fleetMembersLoot,
     spareItems,
     ({ price }) => price

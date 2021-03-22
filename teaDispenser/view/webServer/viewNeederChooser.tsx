@@ -2,7 +2,7 @@ import h from 'vhtml';
 import NeedsEditorLink from '../../data/NeedsEditorLink';
 import Container from './Container';
 
-function renderNeederChooser(title: string, needsEditorLinks: readonly NeedsEditorLink[]): string {
+function viewNeederChooser(title: string, needsEditorLinks: readonly NeedsEditorLink[]): string {
   return (
     <Container title={title}>
       <h2>选择需求者</h2>
@@ -19,4 +19,4 @@ function renderNeederChooser(title: string, needsEditorLinks: readonly NeedsEdit
   );
 }
 
-export default renderNeederChooser;
+export default viewNeederChooser;

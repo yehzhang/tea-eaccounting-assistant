@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import Command from '../../data/Command';
-import fleetLootEditorLinkName from '../../data/fleetLootEditorLinkName';
 import { InvalidUsageReason } from '../../data/InvalidCommand';
 import RenderedMessage from '../../data/RenderedMessage';
 import { commandPrefix, queryPriceCommandView } from './commandViews';
 import DiscordView, { MarketQueryResult, SingleMarketQueryResult } from './DiscordView';
+import fleetLootEditorLinkName from './fleetLootEditorLinkName';
 import renderEmbedMessage from './renderEmbedMessage';
 import renderFleetLootRecord from './renderFleetLootRecord';
 import renderIsk from './renderIsk';
@@ -12,29 +12,33 @@ import renderNumber from './renderNumber';
 import renderRelativeDate from './renderRelativeDate';
 import renderTable from './renderTable';
 
-function renderDiscordView(state: DiscordView): readonly RenderedMessage[] {
+function viewDiscord(state: DiscordView): RenderedMessage | null {
   switch (state.type) {
-    case 'Pong':
+    case 'PongView':
       return renderEmbedMessage({
         title: 'Pong!',
       });
-    case 'DetectingItems': {
+    case 'DetectingItemsView': {
       const { magnifierDirection } = state;
-      return renderEmbedMessage({
-        title: `${magnifierDirection ? '🔍' : '🔎'}正在识别物品。只有游戏内选择的物品会被识别。`,
-      }, undefined, /* overwrite= */ true);
+      return renderEmbedMessage(
+        {
+          title: `${magnifierDirection ? '🔍' : '🔎'}正在识别物品。只有游戏内选择的物品会被识别。`,
+        },
+        undefined,
+        /* overwrite= */ true
+      );
     }
-    case 'NoItemsDetected':
+    case 'NoItemsDetectedView':
       return renderEmbedMessage({
         title: '未能识别任何物品',
         description: '请在游戏中选择需要分赃的物品',
       });
-    case 'InternalError':
+    case 'InternalErrorView':
       return renderEmbedMessage({
         title: '小助手出了故障 🤷',
         description: `${mention(yzDiscordUserId)} 你来瞅瞅`,
       });
-    case 'ItemsRecognized': {
+    case 'ItemsRecognizedView': {
       const { itemStacks, username, fleetLootEditorUrl, neederChooserUrl } = state;
       const todayLocaleString = new Date().toLocaleString('zh', { month: 'short', day: 'numeric' });
       const title = `${todayLocaleString} @${username} 分赃记录`;
@@ -47,7 +51,7 @@ function renderDiscordView(state: DiscordView): readonly RenderedMessage[] {
         /* needs= */ []
       );
     }
-    case 'FleetLootRecordUpdated': {
+    case 'FleetLootRecordUpdatedView': {
       const {
         title,
         fleetLoot: { loot, fleetMembers },
@@ -64,24 +68,24 @@ function renderDiscordView(state: DiscordView): readonly RenderedMessage[] {
         needs
       );
     }
-    case 'NoParticipantsToSettleUp':
+    case 'NoFleetMemberToSettleUpView':
       return renderEmbedMessage({
         title: '无分赃对象',
         description: `请通过"${fleetLootEditorLinkName}"填写参与者。`,
       });
-    case 'AllItemsFilledInNeeded':
+    case 'AllItemsFilledInNeededView':
       return renderEmbedMessage({
         title: '需要所有物品的名称、数量和价格',
         description: `请通过"${fleetLootEditorLinkName}"填写赃物栏目下所有空缺的格子。`,
       });
-    case 'ParticipantsSettledUp': {
+    case 'FleetMembersSettledUpView': {
       const { fleetMembersLoot, fleetLootRecordTitle } = state;
       const grandTotal = _.sumBy(
         fleetMembersLoot.flatMap(({ loot }) => loot),
         ({ amount, price }) => amount * price
       );
-      return renderSingleMessage(
-        [
+      return {
+        content: [
           '**✨分赃完毕**',
           fleetLootRecordTitle,
           `总价：${renderIsk(grandTotal)}`,
@@ -100,15 +104,14 @@ function renderDiscordView(state: DiscordView): readonly RenderedMessage[] {
               /* visibleHeader= */ false
             ),
           ]),
-        ],
-        /* replyTo= */ null
-      );
+        ].join('\n'),
+      };
     }
-    case 'LookingUpHistoryPrice':
+    case 'LookingUpHistoryPriceView':
       return renderEmbedMessage({
         title: '📈️正在查询历史价格',
       });
-    case 'MultipleMarketQueryResult': {
+    case 'MultipleMarketQueryResultView': {
       const { results } = state;
       const minFetchedAt = _.minBy(
         results
@@ -119,26 +122,35 @@ function renderDiscordView(state: DiscordView): readonly RenderedMessage[] {
           .map(({ itemPrice: { date } }) => date),
         (date) => date.getTime()
       );
-      return renderSingleMessage([
-        renderTable(
-          ['物品', '最低卖价', '估计卖价', '最高买价', '估计买价'],
-          results.map((result) => [result.itemName, ...renderMarketQueryResultTableColumns(result)])
-        ),
-        minFetchedAt && renderPriceTimestamp(minFetchedAt),
-      ]);
+      return {
+        content: [
+          renderTable(
+            ['物品', '最低卖价', '估计卖价', '最高买价', '估计买价'],
+            results.map((result) => [
+              result.itemName,
+              ...renderMarketQueryResultTableColumns(result),
+            ])
+          ),
+          minFetchedAt && renderPriceTimestamp(minFetchedAt),
+        ].join('\n'),
+        replyTo: 'user',
+      };
     }
     case 'UnknownCommand':
-      return renderSingleMessage(['未知指令']);
+      return { content: '未知指令', replyTo: 'user' };
     case 'InvalidUsage': {
       const { commandType, reason } = state;
-      return renderSingleMessage([
-        renderInvalidCommandReason(reason),
-        '例如:',
-        ...renderCommandExamples(commandType),
-      ]);
+      return {
+        content: [
+          renderInvalidCommandReason(reason),
+          '例如:',
+          ...renderCommandExamples(commandType),
+        ].join('\n'),
+        replyTo: 'user',
+      };
     }
-    case 'Deleted':
-      return [];
+    case 'DeletedView':
+      return null;
   }
 }
 
@@ -189,18 +201,4 @@ function mention(userId: string): string {
 
 const yzDiscordUserId = '202649496381816832';
 
-/** Convenience method that constructs a single message to return. */
-function renderSingleMessage(
-  lines: (string | null | undefined | false)[],
-  replyTo: 'user' | 'message' | null = 'user'
-): readonly RenderedMessage[] {
-  return [
-    {
-      type: 'RenderedMessage',
-      content: lines.filter((line) => !!line || line === '').join('\n'),
-      replyTo: replyTo || null,
-    },
-  ];
-}
-
-export default renderDiscordView;
+export default viewDiscord;

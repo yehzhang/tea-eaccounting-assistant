@@ -1,7 +1,7 @@
 import h from 'vhtml';
 import Container from './Container';
 
-function renderUpdatedConfirmation(title: string): string {
+function viewUpdatedConfirmation(title: string): string {
   return (
     <Container title={title}>
       <h2>✅ 已保存</h2>
@@ -10,4 +10,4 @@ function renderUpdatedConfirmation(title: string): string {
   );
 }
 
-export default renderUpdatedConfirmation;
+export default viewUpdatedConfirmation;

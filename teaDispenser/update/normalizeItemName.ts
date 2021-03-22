@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import texts from '../../generated/textPacks.json';
-import powerSet from '../update/powerSet';
+import ItemIcon from '../data/ItemIcon';
+import ItemType from '../data/ItemType';
+import { findTextsByPrefix, makeTrie } from '../data/trie';
 import getSemanticIdentifier from './getSemanticIdentifier';
-import ItemIcon from './ItemIcon';
-import ItemType from './ItemType';
-import { findTextsByPrefix, makeTrie } from './trie';
+import powerSet from './powerSet';
 
 async function normalizeItemName(
   text: string,

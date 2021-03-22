@@ -1,8 +1,8 @@
 import { Message, Snowflake } from 'discord.js';
 import _ from 'lodash';
-import DiscordEventContext from '../data/DiscordEventContext';
+import DiscordEventContext from '../../data/DiscordEventContext';
+import parseCommand from '../../view/discord/parseCommand';
 import Event from '../Event';
-import parseCommand from '../view/discord/parseCommand';
 
 function parseEventFromMessage(
   message: Message,

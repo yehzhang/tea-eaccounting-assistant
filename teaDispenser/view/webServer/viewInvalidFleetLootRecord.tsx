@@ -1,7 +1,7 @@
 import h from 'vhtml';
 import Container from './Container';
 
-function renderInvalidFleetLootRecord(title: string): string {
+function viewInvalidFleetLootRecord(title: string): string {
   return (
     <Container title={title}>
       <h2>🤔 无分赃记录</h2>
@@ -10,4 +10,4 @@ function renderInvalidFleetLootRecord(title: string): string {
   );
 }
 
-export default renderInvalidFleetLootRecord;
+export default viewInvalidFleetLootRecord;

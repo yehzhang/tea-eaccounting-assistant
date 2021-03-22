@@ -5,7 +5,7 @@ import Function from './Function';
 import NumberInput from './NumberInput';
 import SubmitButton from './SubmitButton';
 
-function renderFleetLootEditor({ fleetMembers, loot }: FleetLoot, title: string): string {
+function viewFleetLootEditor({ fleetMembers, loot }: FleetLoot, title: string): string {
   return (
     <Container title={title}>
       <form>
@@ -156,4 +156,4 @@ function addFleetMember() {
   }
 }
 
-export default renderFleetLootEditor;
+export default viewFleetLootEditor;

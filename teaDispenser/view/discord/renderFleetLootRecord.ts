@@ -1,10 +1,10 @@
 import _ from 'lodash';
-import fleetLootEditorLinkName from '../../data/fleetLootEditorLinkName';
 import handsUpIcon from '../../data/handsUpIcon';
 import kiwiIcon from '../../data/kiwiIcon';
 import Needs from '../../data/Needs';
 import RenderedMessage from '../../data/RenderedMessage';
 import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
+import fleetLootEditorLinkName from './fleetLootEditorLinkName';
 import renderEmbedMessage from './renderEmbedMessage';
 import renderNumber from './renderNumber';
 import renderTable from './renderTable';
@@ -16,7 +16,7 @@ function renderFleetLootRecord(
   neederChooserUrl: string | null,
   fleetMembers: readonly string[],
   needs: Needs
-): readonly RenderedMessage[] {
+): RenderedMessage {
   return renderEmbedMessage(
     {
       title,

@@ -1,9 +1,9 @@
 import bodyParser from 'body-parser';
 import express from 'express';
 import { URL } from 'url';
-import DispatchEvent from '../data/DispatchEvent';
-import webServerBaseUrl from '../data/webServerBaseUrl';
-import WebServerEventContext from '../data/WebServerEventContext';
+import DispatchEvent from '../../data/DispatchEvent';
+import webServerBaseUrl from '../../data/webServerBaseUrl';
+import WebServerEventContext from '../../data/WebServerEventContext';
 import Event from '../Event';
 import parseFleetLootEditorForm from './parseFleetLootEditorForm';
 import parseNeedsEditorForm from './parseNeedsEditorForm';

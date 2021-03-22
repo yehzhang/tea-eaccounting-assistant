@@ -14,11 +14,7 @@ async function dispatchFleetLootRecordUpdatedView(
   return dispatchDiscordView(buildFleetLootRecordUpdatedView(fleetLootRecord, message), {
     type: 'DiscordEventContext',
     channel,
-    messageContexts: [
-      {
-        sentMessage: message,
-      },
-    ],
+    sentMessage: message,
   });
 }
 

@@ -2,7 +2,7 @@ import { Client, DMChannel, Message, TextChannel } from 'discord.js';
 import DispatchView from '../data/DispatchView';
 import FleetLootRecord from '../data/FleetLootRecord';
 import WebServerEventContext from '../data/WebServerEventContext';
-import parseFleetLootRecord from '../discord/parseFleetLootRecord';
+import parseFleetLootRecord from '../event/discord/parseFleetLootRecord';
 import WebServerView from '../view/webServer/WebServerView';
 import fetchDiscordMessage from './fetchDiscordMessage';
 
@@ -21,7 +21,7 @@ async function fetchFleetLootRecord(
   if (!fetchResult) {
     return dispatchWebView(
       {
-        type: 'InvalidFleetLootRecord',
+        type: 'InvalidFleetLootRecordView',
       },
       context
     );
@@ -32,7 +32,7 @@ async function fetchFleetLootRecord(
   if (!fleetLootRecord) {
     return dispatchWebView(
       {
-        type: 'InvalidFleetLootRecord',
+        type: 'InvalidFleetLootRecordView',
       },
       context
     );

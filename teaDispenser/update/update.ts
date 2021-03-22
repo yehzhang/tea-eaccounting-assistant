@@ -3,11 +3,9 @@ import _ from 'lodash';
 import DiscordEventContext from '../data/DiscordEventContext';
 import DispatchView from '../data/DispatchView';
 import FleetLootRecord from '../data/FleetLootRecord';
-import getItemTypeIdByName from '../data/getItemTypeIdByName';
-import normalizeItemName from '../data/normalizeItemName';
 import webServerBaseUrl from '../data/webServerBaseUrl';
 import WebServerEventContext from '../data/WebServerEventContext';
-import Event from '../Event';
+import Event from '../event/Event';
 import ExternalDependency from '../ExternalDependency';
 import DiscordView, { MarketQueryResult } from '../view/discord/DiscordView';
 import WebServerView from '../view/webServer/WebServerView';
@@ -18,9 +16,11 @@ import Duplex from './Duplex';
 import fetchFleetLootRecord from './fetchFleetLootRecord';
 import fetchTempFile from './fetchTempFile';
 import getFleetLootEditorUrl from './getFleetLootEditorUrl';
+import getItemTypeIdByName from './getItemTypeIdByName';
 import getNeederChooserUrl from './getNeederChooserUrl';
 import recognizeItems from './itemDetection/recognizeItems';
 import fetchPriceByItemTypeId from './market/fetchPriceByItemTypeId';
+import normalizeItemName from './normalizeItemName';
 import populateItemStack from './populateItemStack';
 import settleUpFleetLoot from './settleUpFleetLoot';
 
@@ -37,7 +37,7 @@ async function update(
       const { context } = event;
       return dispatchViews.discord(
         {
-          type: 'Pong',
+          type: 'PongView',
         },
         context
       );
@@ -50,7 +50,7 @@ async function update(
         while (detectingItems) {
           const ignored = dispatchViews.discord(
             {
-              type: 'DetectingItems',
+              type: 'DetectingItemsView',
               magnifierDirection,
             },
             context
@@ -81,18 +81,18 @@ async function update(
       if (!itemStacks.length) {
         return dispatchViews.discord(
           {
-            type: 'NoItemsDetected',
+            type: 'NoItemsDetectedView',
           },
           context
         );
       }
 
-      const { sentMessage } = context.messageContexts[0] || {};
+      const { sentMessage } = context;
       if (!sentMessage) {
         console.error('Expected a sent message from context:', context);
         return dispatchViews.discord(
           {
-            type: 'InternalError',
+            type: 'InternalErrorView',
           },
           context
         );
@@ -100,7 +100,7 @@ async function update(
 
       return dispatchViews.discord(
         {
-          type: 'ItemsRecognized',
+          type: 'ItemsRecognizedView',
           itemStacks,
           username,
           fleetLootEditorUrl: getFleetLootEditorUrl(sentMessage.channel.id, sentMessage.id),
@@ -119,7 +119,7 @@ async function update(
       if (!fleetMembers.length) {
         return dispatchViews.discord(
           {
-            type: 'NoParticipantsToSettleUp',
+            type: 'NoFleetMemberToSettleUpView',
           },
           context
         );
@@ -133,7 +133,7 @@ async function update(
       if (itemStacks.length !== loot.length) {
         return dispatchViews.discord(
           {
-            type: 'NoParticipantsToSettleUp',
+            type: 'NoFleetMemberToSettleUpView',
           },
           context
         );
@@ -141,7 +141,7 @@ async function update(
 
       return dispatchViews.discord(
         {
-          type: 'ParticipantsSettledUp',
+          type: 'FleetMembersSettledUpView',
           fleetMembersLoot: settleUpFleetLoot(fleetMembers, itemStacks, needs),
           fleetLootRecordTitle,
         },
@@ -162,15 +162,15 @@ async function update(
       const { createdAt } = fleetLootRecord;
       const { createdAt: otherCreatedAt } = otherRecord;
       if (createdAt < otherCreatedAt) {
-        return dispatchViews.discord({ type: 'Deleted' }, context);
+        return dispatchViews.discord({ type: 'DeletedView' }, context);
       }
 
-      const { sentMessage } = context.messageContexts[0] || {};
+      const { sentMessage } = context;
       if (!sentMessage) {
         console.error('Expected a sent message from context:', context);
         return dispatchViews.discord(
           {
-            type: 'InternalError',
+            type: 'InternalErrorView',
           },
           context
         );
@@ -203,7 +203,7 @@ async function update(
           if (2 <= dedupedItemNames.length) {
             const ignored = dispatchViews.discord(
               {
-                type: 'LookingUpHistoryPrice',
+                type: 'LookingUpHistoryPriceView',
               },
               context
             );
@@ -249,7 +249,7 @@ async function update(
           );
           return dispatchViews.discord(
             {
-              type: 'MultipleMarketQueryResult',
+              type: 'MultipleMarketQueryResultView',
               results,
             },
             context
@@ -263,7 +263,7 @@ async function update(
     }
     case '[Web] IndexRequested': {
       const { context } = event;
-      return dispatchViews.webServer({ type: 'Index' }, context);
+      return dispatchViews.webServer({ type: 'IndexView' }, context);
     }
     case '[Web] DiscordFleetLootEditorRequested': {
       const { channelId, messageId, context } = event;
@@ -279,7 +279,7 @@ async function update(
       }
       return dispatchViews.webServer(
         {
-          type: 'FleetLootEditor',
+          type: 'FleetLootEditorView',
           fleetLoot: fetchResult.fleetLootRecord.fleetLoot,
         },
         context
@@ -290,7 +290,7 @@ async function update(
       if (!fleetLoot) {
         return dispatchViews.webServer(
           {
-            type: 'FleetLootEditorInvalidInput',
+            type: 'InvalidFleetLootEditorInputView',
           },
           context
         );
@@ -327,7 +327,7 @@ async function update(
 
       return dispatchViews.webServer(
         {
-          type: 'UpdatedConfirmation',
+          type: 'UpdatedConfirmationView',
         },
         context
       );
@@ -351,7 +351,7 @@ async function update(
       if (!areNeedsEditable(fleetLoot)) {
         return dispatchViews.webServer(
           {
-            type: 'PendingFleetLootRecord',
+            type: 'PendingFleetLootRecordView',
           },
           context
         );
@@ -365,7 +365,7 @@ async function update(
       }));
       return dispatchViews.webServer(
         {
-          type: 'NeederChooser',
+          type: 'NeederChooserView',
           needsEditorLinks,
         },
         context
@@ -388,7 +388,7 @@ async function update(
       if (!areNeedsEditable(fleetLoot)) {
         return dispatchViews.webServer(
           {
-            type: 'PendingFleetLootRecord',
+            type: 'PendingFleetLootRecordView',
           },
           context
         );
@@ -397,7 +397,7 @@ async function update(
       const neederNeeds = needs.filter(({ needer: _needer }) => _needer === needer);
       return dispatchViews.webServer(
         {
-          type: 'NeedsEditor',
+          type: 'NeedsEditorView',
           itemStacks: _.uniq(fleetLoot.loot.map(({ name }) => name)).map((name) => ({
             name,
             amount: _.sumBy(
@@ -444,7 +444,7 @@ async function update(
 
       return dispatchViews.webServer(
         {
-          type: 'UpdatedConfirmation',
+          type: 'UpdatedConfirmationView',
         },
         context
       );

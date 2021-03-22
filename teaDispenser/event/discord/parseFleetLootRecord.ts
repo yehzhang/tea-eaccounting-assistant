@@ -1,10 +1,10 @@
 import { Message } from 'discord.js';
 import _ from 'lodash';
-import FleetLootRecord from '../data/FleetLootRecord';
-import fromDoubleByteCharacterText from '../data/fromDoubleByteCharacterText';
-import Needs from '../data/Needs';
-import tableColumnSeparator from '../data/tableColumnSeparator';
-import UserInputPricedItemStack from '../data/UserInputPricedItemStack';
+import FleetLootRecord from '../../data/FleetLootRecord';
+import Needs from '../../data/Needs';
+import tableColumnSeparator from '../../data/tableColumnSeparator';
+import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
+import fromDoubleByteCharacterText from '../../view/discord/fromDoubleByteCharacterText';
 
 function parseFleetLootRecord(message: Message): FleetLootRecord | null {
   const { title, description } = message.embeds[0] || {};

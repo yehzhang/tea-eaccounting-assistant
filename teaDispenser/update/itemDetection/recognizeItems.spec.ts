@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import getSemanticIdentifier from '../../data/getSemanticIdentifier';
 import RecognizedItem from '../../data/RecognizedItem';
 import { TesseractSchedulers } from '../../ExternalDependency';
+import getSemanticIdentifier from '../getSemanticIdentifier';
 import recognizeItems from './recognizeItems';
 import startTesseract from './startTesseract';
 import getTestDataPath from './testData/getTestDataPath';

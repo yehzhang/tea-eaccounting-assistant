@@ -7,24 +7,24 @@ import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
 
 type DiscordView =
   | {
-      readonly type: 'Pong';
+      readonly type: 'PongView';
     }
   | {
-      readonly type: 'DetectingItems';
+      readonly type: 'DetectingItemsView';
       readonly magnifierDirection: boolean;
     }
   | {
-      readonly type: 'NoItemsDetected';
+      readonly type: 'NoItemsDetectedView';
     }
   | {
-      readonly type: 'ItemsRecognized';
+      readonly type: 'ItemsRecognizedView';
       readonly itemStacks: readonly UserInputPricedItemStack[];
       readonly username: string;
       readonly fleetLootEditorUrl: string;
       readonly neederChooserUrl: string;
     }
   | {
-      readonly type: 'FleetLootRecordUpdated';
+      readonly type: 'FleetLootRecordUpdatedView';
       readonly fleetLoot: FleetLoot;
       readonly needs: Needs;
       readonly title: string;
@@ -32,29 +32,29 @@ type DiscordView =
       readonly neederChooserUrl: string;
     }
   | {
-      readonly type: 'NoParticipantsToSettleUp';
+      readonly type: 'NoFleetMemberToSettleUpView';
     }
   | {
-      readonly type: 'AllItemsFilledInNeeded';
+      readonly type: 'AllItemsFilledInNeededView';
     }
   | {
-      readonly type: 'ParticipantsSettledUp';
+      readonly type: 'FleetMembersSettledUpView';
       readonly fleetMembersLoot: readonly FleetMemberLoot[];
       readonly fleetLootRecordTitle: string;
     }
   | InvalidCommand
   | {
-      readonly type: 'LookingUpHistoryPrice';
+      readonly type: 'LookingUpHistoryPriceView';
     }
   | {
-      readonly type: 'MultipleMarketQueryResult';
+      readonly type: 'MultipleMarketQueryResultView';
       readonly results: readonly MarketQueryResult[];
     }
   | {
-      readonly type: 'Deleted';
+      readonly type: 'DeletedView';
     }
   | {
-      readonly type: 'InternalError';
+      readonly type: 'InternalErrorView';
     };
 
 export interface SingleMarketQueryResult {

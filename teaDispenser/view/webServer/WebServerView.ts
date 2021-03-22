@@ -4,30 +4,30 @@ import NeedsEditorLink from '../../data/NeedsEditorLink';
 
 type WebServerView =
   | {
-      readonly type: 'Index';
+      readonly type: 'IndexView';
     }
   | {
-      readonly type: 'FleetLootEditor';
+      readonly type: 'FleetLootEditorView';
       readonly fleetLoot: FleetLoot;
     }
   | {
-      readonly type: 'FleetLootEditorInvalidInput';
+      readonly type: 'InvalidFleetLootEditorInputView';
     }
   | {
-      readonly type: 'InvalidFleetLootRecord';
+      readonly type: 'InvalidFleetLootRecordView';
     }
   | {
-      readonly type: 'UpdatedConfirmation';
+      readonly type: 'UpdatedConfirmationView';
     }
   | {
-      readonly type: 'NeederChooser';
+      readonly type: 'NeederChooserView';
       readonly needsEditorLinks: readonly NeedsEditorLink[];
     }
   | {
-      readonly type: 'PendingFleetLootRecord';
+      readonly type: 'PendingFleetLootRecordView';
     }
   | {
-      readonly type: 'NeedsEditor';
+      readonly type: 'NeedsEditorView';
       readonly itemStacks: readonly ItemStack[];
     };
 

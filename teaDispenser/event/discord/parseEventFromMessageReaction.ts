@@ -1,7 +1,7 @@
 import { MessageReaction } from 'discord.js';
-import DiscordEventContext from '../data/DiscordEventContext';
-import handsUpIcon from '../data/handsUpIcon';
-import kiwiIcon from '../data/kiwiIcon';
+import DiscordEventContext from '../../data/DiscordEventContext';
+import handsUpIcon from '../../data/handsUpIcon';
+import kiwiIcon from '../../data/kiwiIcon';
 import Event from '../Event';
 import parseFleetLootRecord from './parseFleetLootRecord';
 

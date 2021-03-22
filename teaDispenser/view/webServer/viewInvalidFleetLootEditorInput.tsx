@@ -1,7 +1,7 @@
 import h from 'vhtml';
 import Container from './Container';
 
-function renderFleetLootEditorInvalidInput(title: string): string {
+function viewInvalidFleetLootEditorInput(title: string): string {
   return (
     <Container title={title}>
       <h2>🙇 提交时出现了问题，保存失败</h2>
@@ -10,4 +10,4 @@ function renderFleetLootEditorInvalidInput(title: string): string {
   );
 }
 
-export default renderFleetLootEditorInvalidInput;
+export default viewInvalidFleetLootEditorInput;

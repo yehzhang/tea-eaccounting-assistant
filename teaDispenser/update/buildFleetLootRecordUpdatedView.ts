@@ -9,7 +9,7 @@ function buildFleetLootRecordUpdatedView(
   message: Message
 ): DiscordView {
   return {
-    type: 'FleetLootRecordUpdated',
+    type: 'FleetLootRecordUpdatedView',
     ...fleetLootRecord,
     fleetLootEditorUrl: getFleetLootEditorUrl(message.channel.id, message.id),
     neederChooserUrl: getNeederChooserUrl(message.channel.id, message.id),

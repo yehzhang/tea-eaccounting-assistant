@@ -19,14 +19,10 @@ function settleUpFleetLoot(
     ({ price }) => price
   );
 
+  const itemNames = itemStacks.map(({ name }) => name);
   return _.zipWith(settledUpLoot, fleetMembers, (loot, fleetMemberName) => ({
     fleetMemberName,
-    // Stack items.
-    loot: Object.values(_.groupBy(loot, ({ name }) => name)).map((itemGroup) => ({
-      name: itemGroup[0].name,
-      amount: itemGroup.length,
-      price: itemGroup[0].price,
-    })),
+    loot: _.sortBy(stackItems(loot), ({ name }) => itemNames.indexOf(name)),
   }));
 }
 
@@ -38,6 +34,14 @@ function splitItemStack({ name, amount, price }: PricedItemStack): readonly Pric
       amount: 1,
       price,
     }));
+}
+
+function stackItems(items: readonly PricedItemStack[]): readonly PricedItemStack[] {
+  return Object.values(_.groupBy(items, ({ name }) => name)).map((itemGroup) => ({
+    name: itemGroup[0].name,
+    amount: _.sumBy(itemGroup, ({ amount }) => amount),
+    price: itemGroup[0].price,
+  }));
 }
 
 export default settleUpFleetLoot;

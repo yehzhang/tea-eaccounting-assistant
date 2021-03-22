@@ -11,7 +11,7 @@ function renderFleetLootEditor({ fleetMembers, loot }: FleetLoot, title: string)
       <form>
         <Section id="fleet">
           <h2>👥 参与者</h2>
-          <p>请填写参与者的名字。</p>
+          <p>请填写参与者的名字。别忘了自己 :)</p>
           {[...fleetMembers, ...new Array(Math.max(30 - fleetMembers.length, 5)).fill('')].map(
             (name, index) => (
               <input
@@ -34,7 +34,7 @@ function renderFleetLootEditor({ fleetMembers, loot }: FleetLoot, title: string)
             ...loot,
             ...Array(Math.max(50 - loot.length, 10)).fill({
               name: '',
-              amount: '',
+              amount: null,
               price: null,
             }),
           ].map(({ name, amount, price }, index) => {

@@ -155,13 +155,11 @@ async function update(
         fleetLootRecord,
         /* timeoutMs= */ 30000
       );
-      if (!otherRecord) {
+      if (!otherRecord || fleetLootRecord.id === otherRecord.id) {
         return;
       }
 
-      const { createdAt } = fleetLootRecord;
-      const { createdAt: otherCreatedAt } = otherRecord;
-      if (createdAt < otherCreatedAt) {
+      if (fleetLootRecord.createdAt < otherRecord.createdAt) {
         return dispatchViews.discord({ type: 'DeletedView' }, context);
       }
 

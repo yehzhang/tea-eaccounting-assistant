@@ -23,6 +23,7 @@ function parseFleetLootRecord(message: Message): FleetLootRecord | null {
   }
 
   return {
+    id: message.id,
     fleetLoot: {
       fleetMembers: parseRows(groups.fleetMembers, parseFleetMember),
       loot: parseRows(groups.loot, parseUserInputPricedItemStack),

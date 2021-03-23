@@ -93,7 +93,7 @@ function viewDiscord(view: DiscordView): RenderedMessage | null {
           `总价：${renderIsk(totalLootPrice)}`,
           `${fleetMembersLoot.length}人均分价格：${renderIsk(averageLootPricePerMember)}`,
           !balanceClear &&
-            '补差价公式：(分得价格 - 均分价格) * 0.75，再四舍五入。如果采用所有人向分赃者发送请求合同的模式，分赃者不用补差价，不管写的差价是什么。',
+            '补差价公式：(分得价格 - 均分价格) * 0.75，再四舍五入。分赃者不用补差价，不管写的差价是什么。',
           '',
           ...fleetMembersLoot.flatMap(({ fleetMemberName, loot, payout }) => [
             `**${fleetMemberName}** ${renderIsk(

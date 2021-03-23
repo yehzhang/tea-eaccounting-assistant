@@ -7,6 +7,9 @@ async function startApp<E, S, V, D>(
     if (!externalDependency) {
       throw new TypeError('Unexpected event dispatched during initialization');
     }
+
+    console.info('[Core] event', event);
+
     await update(event, dispatchViews, externalDependency);
   });
 }

@@ -12,14 +12,14 @@ import renderNumber from './renderNumber';
 import renderRelativeDate from './renderRelativeDate';
 import renderTable from './renderTable';
 
-function viewDiscord(state: DiscordView): RenderedMessage | null {
-  switch (state.type) {
+function viewDiscord(view: DiscordView): RenderedMessage | null {
+  switch (view.type) {
     case 'PongView':
       return renderEmbedMessage({
         title: 'Pong!',
       });
     case 'DetectingItemsView': {
-      const { magnifierDirection } = state;
+      const { magnifierDirection } = view;
       return renderEmbedMessage(
         {
           title: `${magnifierDirection ? '🔍' : '🔎'}正在识别物品。只有游戏内选择的物品会被识别。`,
@@ -39,7 +39,7 @@ function viewDiscord(state: DiscordView): RenderedMessage | null {
         description: `${mention(yzDiscordUserId)} 你来瞅瞅`,
       });
     case 'ItemsRecognizedView': {
-      const { itemStacks, username, fleetLootEditorUrl, neederChooserUrl } = state;
+      const { itemStacks, username, fleetLootEditorUrl, neederChooserUrl } = view;
       const todayLocaleString = new Date().toLocaleString('zh', { month: 'short', day: 'numeric' });
       const title = `${todayLocaleString} @${username} 分赃记录`;
       return renderFleetLootRecord(
@@ -58,7 +58,7 @@ function viewDiscord(state: DiscordView): RenderedMessage | null {
         needs,
         fleetLootEditorUrl,
         neederChooserUrl,
-      } = state;
+      } = view;
       return renderFleetLootRecord(
         title,
         loot,
@@ -79,24 +79,30 @@ function viewDiscord(state: DiscordView): RenderedMessage | null {
         description: `请通过"${fleetLootEditorLinkName}"填写赃物栏目下所有空缺的格子。`,
       });
     case 'FleetMembersSettledUpView': {
-      const { fleetMembersLoot, fleetLootRecordTitle } = state;
-      const grandTotal = _.sumBy(
-        fleetMembersLoot.flatMap(({ loot }) => loot),
-        ({ amount, price }) => amount * price
-      );
+      const {
+        fleetMembersLoot,
+        totalLootPrice,
+        averageLootPricePerMember,
+        balanceClear,
+        fleetLootRecordTitle,
+      } = view;
       return {
         content: [
           '**✨分赃完毕**',
           fleetLootRecordTitle,
-          `总价：${renderIsk(grandTotal)}`,
-          `${fleetMembersLoot.length}人均分价格：${renderIsk(
-            grandTotal / fleetMembersLoot.length
-          )}`,
+          `总价：${renderIsk(totalLootPrice)}`,
+          `${fleetMembersLoot.length}人均分价格：${renderIsk(averageLootPricePerMember)}`,
+          !balanceClear &&
+            '补差价公式：(分得价格 - 均分价格) * 0.75，再四舍五入。如果采用所有人向分赃者发送请求合同的模式，分赃者不用补差价，不管写的差价是什么。',
           '',
-          ...fleetMembersLoot.flatMap(({ fleetMemberName, loot }) => [
+          ...fleetMembersLoot.flatMap(({ fleetMemberName, loot, payout }) => [
             `**${fleetMemberName}** ${renderIsk(
               _.sumBy(loot, ({ amount, price }) => amount * price)
             )}`,
+            !balanceClear &&
+              (payout === 0
+                ? '不用补差价'
+                : `${payout < 0 ? '收取' : '支付'}差价：${renderIsk(Math.abs(payout))}`),
             renderTable(
               ['名称', '数量'],
               loot.map(({ name, amount }) => [name, renderNumber(amount)]),
@@ -104,7 +110,9 @@ function viewDiscord(state: DiscordView): RenderedMessage | null {
               /* visibleHeader= */ false
             ),
           ]),
-        ].join('\n'),
+        ]
+          .filter((line) => !!line || line === '')
+          .join('\n'),
       };
     }
     case 'LookingUpHistoryPriceView':
@@ -112,7 +120,7 @@ function viewDiscord(state: DiscordView): RenderedMessage | null {
         title: '📈️正在查询历史价格',
       });
     case 'MultipleMarketQueryResultView': {
-      const { results } = state;
+      const { results } = view;
       const minFetchedAt = _.minBy(
         results
           .filter(
@@ -139,7 +147,7 @@ function viewDiscord(state: DiscordView): RenderedMessage | null {
     case 'UnknownCommand':
       return { content: '未知指令', replyTo: 'user' };
     case 'InvalidUsage': {
-      const { commandType, reason } = state;
+      const { commandType, reason } = view;
       return {
         content: [
           renderInvalidCommandReason(reason),

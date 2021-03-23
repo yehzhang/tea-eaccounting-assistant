@@ -39,7 +39,10 @@ type DiscordView =
     }
   | {
       readonly type: 'FleetMembersSettledUpView';
+      readonly totalLootPrice: number;
+      readonly averageLootPricePerMember: number;
       readonly fleetMembersLoot: readonly FleetMemberLoot[];
+      readonly balanceClear: boolean;
       readonly fleetLootRecordTitle: string;
     }
   | InvalidCommand

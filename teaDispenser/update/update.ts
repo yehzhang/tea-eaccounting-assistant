@@ -142,7 +142,7 @@ async function update(
       return dispatchViews.discord(
         {
           type: 'FleetMembersSettledUpView',
-          fleetMembersLoot: settleUpFleetLoot(fleetMembers, itemStacks, needs),
+          ...settleUpFleetLoot(fleetMembers, itemStacks, needs),
           fleetLootRecordTitle,
         },
         context

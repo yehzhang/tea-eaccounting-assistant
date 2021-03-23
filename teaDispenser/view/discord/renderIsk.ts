@@ -1,6 +1,6 @@
 import renderNumber from './renderNumber';
 
-function renderIsk(price: number | null): string {
+function renderIsk(price: number): string {
   return `__Ƶ ${renderNumber(price)}__`;
 }
 

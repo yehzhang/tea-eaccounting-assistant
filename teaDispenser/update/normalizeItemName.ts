@@ -23,7 +23,7 @@ async function normalizeItemName(
     .replace(/士[兽曾普]/g, '增')
     .replace(/」艺/g, '应')
     .replace(/力[口D]/g, '加')
-    .replace(/[百弓豆]虽/g, '强')
+    .replace(/[百弓豆三]虽/g, '强')
     .replace(/木几/g, '机')
     .replace(/木反/g, '板')
     .replace(/\\\\/g, 'l')
@@ -245,6 +245,7 @@ const similarLookingCharacterMapping: readonly (readonly [string, string])[] = [
   ['胃', '胄'],
   ['川', 'III'],
   ['亿', '忆'],
+  ['贾', '置'],
   ['豇', '置'],
   ['薹', '置'],
   ['量', '置'],

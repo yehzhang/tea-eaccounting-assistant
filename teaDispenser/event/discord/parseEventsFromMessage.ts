@@ -4,7 +4,7 @@ import DiscordEventContext from '../../data/DiscordEventContext';
 import parseCommand from '../../view/discord/parseCommand';
 import Event from '../Event';
 
-function parseEventFromMessage(
+function parseEventsFromMessage(
   message: Message,
   clientUserId: Snowflake,
   context: DiscordEventContext
@@ -58,4 +58,4 @@ function parseEventFromMessage(
   return events;
 }
 
-export default parseEventFromMessage;
+export default parseEventsFromMessage;

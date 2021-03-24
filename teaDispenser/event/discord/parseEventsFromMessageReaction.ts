@@ -5,7 +5,7 @@ import kiwiIcon from '../../data/kiwiIcon';
 import Event from '../Event';
 import parseFleetLootRecord from './parseFleetLootRecord';
 
-function parseEventFromMessageReaction(
+function parseEventsFromMessageReaction(
   messageReaction: MessageReaction,
   userId: string,
   clientUserId: string,
@@ -45,4 +45,4 @@ function parseEventFromMessageReaction(
   return events;
 }
 
-export default parseEventFromMessageReaction;
+export default parseEventsFromMessageReaction;

@@ -2,8 +2,8 @@ import { Client, MessageReaction, NewsChannel, PartialUser, User } from 'discord
 import DiscordEventContext from '../../data/DiscordEventContext';
 import DispatchEvent from '../../data/DispatchEvent';
 import Event from '../Event';
-import parseEventFromMessage from './parseEventFromMessage';
-import parseEventFromMessageReaction from './parseEventFromMessageReaction';
+import parseEventsFromMessage from './parseEventsFromMessage';
+import parseEventsFromMessageReaction from './parseEventsFromMessageReaction';
 
 async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Client> {
   const client = new Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'] });
@@ -20,7 +20,7 @@ async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Cli
       if (!message.channel.isText() || message.channel instanceof NewsChannel) {
         return;
       }
-      const events = parseEventFromMessage(message, clientUser.id, {
+      const events = parseEventsFromMessage(message, clientUser.id, {
         type: 'DiscordEventContext',
         channel: message.channel,
         triggeringUser: message.author,
@@ -46,7 +46,7 @@ async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Cli
           return;
         }
 
-        const events = parseEventFromMessageReaction(
+        const events = parseEventsFromMessageReaction(
           messageReaction,
           partialUser.id,
           clientUser.id,

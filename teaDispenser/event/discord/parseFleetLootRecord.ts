@@ -1,21 +1,21 @@
-import { Message } from 'discord.js';
 import _ from 'lodash';
 import FleetLootRecord from '../../data/FleetLootRecord';
+import Message from '../../data/Message';
 import Needs from '../../data/Needs';
 import tableColumnSeparator from '../../data/tableColumnSeparator';
 import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
-import fromDoubleByteCharacterText from '../../view/discord/fromDoubleByteCharacterText';
+import fromDoubleByteCharacterText from '../../view/message/fromDoubleByteCharacterText';
 
 function parseFleetLootRecord(message: Message): FleetLootRecord | null {
-  const { title, description } = message.embeds[0] || {};
-  if (!title || !description) {
+  if (!message.embed) {
     console.error('Expected a valid message embed, got', message);
     return null;
   }
 
+  const { title, description } = message.embed;
   const { groups } =
     description.match(
-      /^.*\n```(?<loot>[^`]*)```\n(\*\*参与者\*\*\n(?<fleetMembers>(.|\n)*)\n\n)?(\*\*需求\*\*\n```(?<needs>(.|\n)*)```\n)?/m
+      /^.*\n```(?<loot>[^`]*)```\s*(\*\*参与者\*\*\n(?<fleetMembers>[^*]*))?(\*\*需求\*\*\n```(?<needs>(.|\n)*)```\n)?/m
     ) || {};
   if (!groups) {
     console.error('Expected valid description in the message embed, got', message);
@@ -23,7 +23,7 @@ function parseFleetLootRecord(message: Message): FleetLootRecord | null {
   }
 
   return {
-    id: message.id,
+    id: message.internalId,
     fleetLoot: {
       fleetMembers: parseRows(groups.fleetMembers, parseFleetMember),
       loot: parseRows(groups.loot, parseUserInputPricedItemStack),
@@ -56,6 +56,10 @@ function parseUserInputPricedItemStack(text: string): UserInputPricedItemStack |
 }
 
 function parseFleetMember(text: string): string | null {
+  if (!text) {
+    return null;
+  }
+
   const parts = text.split(' ');
   if (parts.length === 1) {
     console.warn('Unexpected fleet member row', text);

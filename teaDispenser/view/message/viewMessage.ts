@@ -3,8 +3,8 @@ import Command from '../../data/Command';
 import { InvalidUsageReason } from '../../data/InvalidCommand';
 import RenderedMessage from '../../data/RenderedMessage';
 import { commandPrefix, queryPriceCommandView } from './commandViews';
-import DiscordView, { MarketQueryResult, SingleMarketQueryResult } from './DiscordView';
 import fleetLootEditorLinkName from './fleetLootEditorLinkName';
+import MessageView, { MarketQueryResult, SingleMarketQueryResult } from './MessageView';
 import renderEmbedMessage from './renderEmbedMessage';
 import renderFleetLootRecord from './renderFleetLootRecord';
 import renderIsk from './renderIsk';
@@ -12,7 +12,7 @@ import renderNumber from './renderNumber';
 import renderRelativeDate from './renderRelativeDate';
 import renderTable from './renderTable';
 
-function viewDiscord(view: DiscordView): RenderedMessage | null {
+function viewMessage(view: MessageView): RenderedMessage | null {
   switch (view.type) {
     case 'PongView':
       return renderEmbedMessage({
@@ -24,15 +24,15 @@ function viewDiscord(view: DiscordView): RenderedMessage | null {
         {
           title: `${magnifierDirection ? '🔍' : '🔎'}正在识别物品。只有游戏内选择的物品会被识别。`,
         },
-        undefined,
-        /* overwrite= */ true
       );
     }
     case 'NoItemsDetectedView':
-      return renderEmbedMessage({
-        title: '未能识别任何物品',
-        description: '请在游戏中选择需要分赃的物品',
-      });
+      return renderEmbedMessage(
+        {
+          title: '未能识别任何物品',
+          description: '请在游戏中选择需要分赃的物品',
+        },
+      );
     case 'InternalErrorView':
       return renderEmbedMessage({
         title: '小助手出了故障 🤷',
@@ -73,11 +73,6 @@ function viewDiscord(view: DiscordView): RenderedMessage | null {
         title: '无分赃对象',
         description: `请通过"${fleetLootEditorLinkName}"填写参与者。`,
       });
-    case 'AllItemsFilledInNeededView':
-      return renderEmbedMessage({
-        title: '需要所有物品的名称、数量和价格',
-        description: `请通过"${fleetLootEditorLinkName}"填写赃物栏目下所有空缺的格子。`,
-      });
     case 'FleetMembersSettledUpView': {
       const {
         fleetMembersLoot,
@@ -94,8 +89,8 @@ function viewDiscord(view: DiscordView): RenderedMessage | null {
           `${fleetMembersLoot.length}人均分价格：${renderIsk(averageLootPricePerMember)}`,
           !balanceClear &&
             '补差价公式：(分得价格 - 均分价格) * 0.75，再四舍五入。分赃者不用补差价，不管写的差价是什么。',
-          '',
           ...fleetMembersLoot.flatMap(({ fleetMemberName, loot, payout }) => [
+            '',
             `**${fleetMemberName}** ${renderIsk(
               _.sumBy(loot, ({ amount, price }) => amount * price)
             )}`,
@@ -115,10 +110,6 @@ function viewDiscord(view: DiscordView): RenderedMessage | null {
           .join('\n'),
       };
     }
-    case 'LookingUpHistoryPriceView':
-      return renderEmbedMessage({
-        title: '📈️正在查询历史价格',
-      });
     case 'MultipleMarketQueryResultView': {
       const { results } = view;
       const minFetchedAt = _.minBy(
@@ -209,4 +200,4 @@ function mention(userId: string): string {
 
 const yzDiscordUserId = '202649496381816832';
 
-export default viewDiscord;
+export default viewMessage;

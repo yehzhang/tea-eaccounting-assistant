@@ -2,7 +2,7 @@ import FleetLoot from '../../data/FleetLoot';
 import ItemStack from '../../data/ItemStack';
 import NeedsEditorLink from '../../data/NeedsEditorLink';
 
-type WebServerView =
+type WebPageView =
   | {
       readonly type: 'IndexView';
     }
@@ -31,4 +31,4 @@ type WebServerView =
       readonly itemStacks: readonly ItemStack[];
     };
 
-export default WebServerView;
+export default WebPageView;

@@ -1,8 +1,7 @@
-import { Response } from 'express';
+import { Context } from 'koa';
 
 interface WebServerEventContext {
-  readonly type: 'WebServerEventContext';
-  readonly response: Response;
+  readonly context: Context;
 }
 
 export default WebServerEventContext;

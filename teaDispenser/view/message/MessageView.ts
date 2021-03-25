@@ -5,7 +5,7 @@ import ItemPrice from '../../data/ItemPrice';
 import Needs from '../../data/Needs';
 import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
 
-type DiscordView =
+type MessageView =
   | {
       readonly type: 'PongView';
     }
@@ -35,9 +35,6 @@ type DiscordView =
       readonly type: 'NoFleetMemberToSettleUpView';
     }
   | {
-      readonly type: 'AllItemsFilledInNeededView';
-    }
-  | {
       readonly type: 'FleetMembersSettledUpView';
       readonly totalLootPrice: number;
       readonly averageLootPricePerMember: number;
@@ -46,9 +43,6 @@ type DiscordView =
       readonly fleetLootRecordTitle: string;
     }
   | InvalidCommand
-  | {
-      readonly type: 'LookingUpHistoryPriceView';
-    }
   | {
       readonly type: 'MultipleMarketQueryResultView';
       readonly results: readonly MarketQueryResult[];
@@ -79,4 +73,4 @@ interface MarketPriceNotAvailable {
 
 export type MarketQueryResult = SingleMarketQueryResult | UnknownItemName | MarketPriceNotAvailable;
 
-export default DiscordView;
+export default MessageView;

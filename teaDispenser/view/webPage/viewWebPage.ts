@@ -7,9 +7,9 @@ import viewNeederChooser from './viewNeederChooser';
 import viewNeedsEditor from './viewNeedsEditor';
 import viewPendingFleetLootRecord from './viewPendingFleetLootRecord';
 import viewUpdatedConfirmation from './viewUpdatedConfirmation';
-import WebServerView from './WebServerView';
+import WebPageView from './WebPageView';
 
-function viewWebServer(view: WebServerView): RenderedWebPage {
+function viewWebPage(view: WebPageView): RenderedWebPage {
   switch (view.type) {
     case 'IndexView':
       return {
@@ -55,4 +55,4 @@ function viewWebServer(view: WebServerView): RenderedWebPage {
 const fleetLootEditorTitle = '分赃记录编辑器';
 const needsEditorTitle = '需求编辑器';
 
-export default viewWebServer;
+export default viewWebPage;

@@ -1,4 +1,6 @@
-async function startApp<E, S, V, D>(
+import logInfo from './logInfo';
+
+async function startApp<E, V, D>(
   initialize: (dispatchEvent: (event: E) => Promise<void>) => Promise<D>,
   update: (event: E, dispatchViews: V, externalDependency: D) => Promise<void>,
   dispatchViews: V
@@ -8,7 +10,7 @@ async function startApp<E, S, V, D>(
       throw new TypeError('Unexpected event dispatched during initialization');
     }
 
-    console.info('[Core] event', event);
+    logInfo('[Core] event', event, /* depth= */ 4);
 
     await update(event, dispatchViews, externalDependency);
   });

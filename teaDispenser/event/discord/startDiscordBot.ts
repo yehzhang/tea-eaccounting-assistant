@@ -1,9 +1,8 @@
-import { Client, MessageReaction, NewsChannel, PartialUser, User } from 'discord.js';
-import DiscordEventContext from '../../data/DiscordEventContext';
+import { Client, MessageReaction, PartialUser, User } from 'discord.js';
 import DispatchEvent from '../../data/DispatchEvent';
 import Event from '../Event';
-import parseEventsFromMessage from './parseEventsFromMessage';
-import parseEventsFromMessageReaction from './parseEventsFromMessageReaction';
+import parseEventFromMessage from './parseEventFromMessage';
+import parseEventFromMessageReaction from './parseEventFromMessageReaction';
 
 async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Client> {
   const client = new Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'] });
@@ -17,15 +16,10 @@ async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Cli
     console.info(`Logged in as ${clientUser.tag}!`);
 
     client.on('message', async (message) => {
-      if (!message.channel.isText() || message.channel instanceof NewsChannel) {
-        return;
+      const event = parseEventFromMessage(message, clientUser.id);
+      if (event) {
+        await dispatchEvent(event);
       }
-      const events = parseEventsFromMessage(message, clientUser.id, {
-        type: 'DiscordEventContext',
-        channel: message.channel,
-        triggeringUser: message.author,
-      });
-      await Promise.all(events.map(dispatchEvent));
     });
 
     client.on(
@@ -34,30 +28,10 @@ async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Cli
         if (messageReaction.message.partial) {
           await messageReaction.message.fetch();
         }
-
-        if (
-          !messageReaction.message.channel.isText() ||
-          messageReaction.message.channel instanceof NewsChannel
-        ) {
-          return;
+        const event = parseEventFromMessageReaction(messageReaction, partialUser.id, clientUser.id);
+        if (event) {
+          await dispatchEvent(event);
         }
-        // TODO Remove this once view parsing is supported.
-        if (partialUser.id === clientUser.id) {
-          return;
-        }
-
-        const events = parseEventsFromMessageReaction(
-          messageReaction,
-          partialUser.id,
-          clientUser.id,
-          {
-            type: 'DiscordEventContext',
-            channel: messageReaction.message.channel,
-            triggeringUser: partialUser as User,
-            sentMessage: messageReaction.message,
-          }
-        );
-        await Promise.all(events.map(dispatchEvent));
       }
     );
   });

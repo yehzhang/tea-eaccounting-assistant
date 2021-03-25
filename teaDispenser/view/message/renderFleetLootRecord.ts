@@ -34,6 +34,7 @@ function renderFleetLootRecord(
           /* visibleColumnSeparator= */ true,
           /* visibleHeader= */ false
         ),
+        '',
         ...renderFleetMembers(fleetMembers),
         ...renderNeeds(
           needs,
@@ -49,7 +50,6 @@ function renderFleetLootRecord(
       ].join('\n'),
     },
     [handsUpIcon, kiwiIcon],
-    /* overwrite= */ true
   );
 }
 
@@ -77,6 +77,7 @@ function renderNeeds(needs: Needs, itemNames: readonly string[]): readonly strin
       /* visibleColumnSeparator= */ true,
       /* visibleHeader= */ false
     ),
+    '',
   ];
 }
 

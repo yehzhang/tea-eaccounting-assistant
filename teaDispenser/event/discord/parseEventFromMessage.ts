@@ -1,30 +1,23 @@
 import { Message, Snowflake } from 'discord.js';
 import _ from 'lodash';
-import DiscordEventContext from '../../data/DiscordEventContext';
-import parseCommand from '../../view/discord/parseCommand';
+import { nanoid } from 'nanoid';
+import MessageEventContext from '../../data/MessageEventContext';
 import Event from '../Event';
+import parseCommand from './parseCommand';
 
-function parseEventsFromMessage(
-  message: Message,
-  clientUserId: Snowflake,
-  context: DiscordEventContext
-): readonly Event[] {
-  const events: Event[] = [];
-
+function parseEventFromMessage(message: Message, clientUserId: Snowflake): Event | null {
   const { id, author, content, attachments, channel } = message;
   if (author.id === clientUserId || !(channel.type === 'text' || channel.type === 'dm')) {
-    return events;
+    return null;
   }
 
-  console.debug(`${author.username}: ${content}`);
-
-  if (content.toLocaleLowerCase() === 'ping') {
-    events.push({
-      type: '[Discord] Pinged',
-      context,
-    });
-  }
-
+  const context: MessageEventContext = {
+    eventId: nanoid(),
+    serviceProvider: 'discord',
+    channelId: message.channel.id,
+    triggeringUserId: message.author.id,
+    messageIdToEdit: null,
+  };
   const imageUrls = _.compact(
     [...attachments.values()].map((attachment) => {
       if (attachment.width === null) {
@@ -38,24 +31,31 @@ function parseEventsFromMessage(
     })
   );
   if (imageUrls.length) {
-    events.push({
+    return {
       type: '[Discord] ImagePosted',
       urls: imageUrls,
       username: author.username,
       context,
-    });
+    };
+  }
+
+  if (content.toLocaleLowerCase() === 'ping') {
+    return {
+      type: '[Discord] Pinged',
+      context,
+    };
   }
 
   const command = parseCommand(content);
   if (command) {
-    events.push({
+    return {
       type: '[Discord] CommandIssued',
       command,
       context,
-    });
+    };
   }
 
-  return events;
+  return null;
 }
 
-export default parseEventsFromMessage;
+export default parseEventFromMessage;

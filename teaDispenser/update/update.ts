@@ -1,17 +1,16 @@
-import AsyncLock from 'async-lock';
 import _ from 'lodash';
-import DiscordEventContext from '../data/DiscordEventContext';
+import chooseMessageApi from '../chooseMessageApi';
 import DispatchView from '../data/DispatchView';
 import FleetLootRecord from '../data/FleetLootRecord';
+import MessageEventContext from '../data/MessageEventContext';
 import webServerBaseUrl from '../data/webServerBaseUrl';
 import WebServerEventContext from '../data/WebServerEventContext';
 import Event from '../event/Event';
 import ExternalDependency from '../ExternalDependency';
-import DiscordView, { MarketQueryResult } from '../view/discord/DiscordView';
-import WebServerView from '../view/webServer/WebServerView';
+import MessageView, { MarketQueryResult } from '../view/message/MessageView';
+import WebPageView from '../view/webPage/WebPageView';
 import areNeedsEditable from './areNeedsEditable';
 import buildFleetLootRecordUpdatedView from './buildFleetLootRecordUpdatedView';
-import dispatchFleetLootRecordUpdatedView from './dispatchFleetLootRecordUpdatedView';
 import Duplex from './Duplex';
 import fetchFleetLootRecord from './fetchFleetLootRecord';
 import fetchTempFile from './fetchTempFile';
@@ -23,37 +22,43 @@ import fetchPriceByItemTypeId from './market/fetchPriceByItemTypeId';
 import normalizeItemName from './normalizeItemName';
 import populateItemStack from './populateItemStack';
 import settleUpFleetLoot from './settleUpFleetLoot';
+import updateFleetLootRecord from './updateFleetLootRecord';
 
 async function update(
   event: Event,
   dispatchViews: {
-    readonly discord: DispatchView<DiscordView, DiscordEventContext>;
-    readonly webServer: DispatchView<WebServerView, WebServerEventContext>;
+    readonly message: DispatchView<MessageView, MessageEventContext, [ExternalDependency]>;
+    readonly webPage: DispatchView<WebPageView, WebServerEventContext>;
   },
-  { schedulers, discordBot }: ExternalDependency
+  externalDependency: ExternalDependency
 ): Promise<void> {
+  const { schedulers } = externalDependency;
   switch (event.type) {
-    case '[Discord] Pinged': {
+    case '[Discord] Pinged':
+    case '[Kaiheila] Pinged': {
       const { context } = event;
-      return dispatchViews.discord(
+      return dispatchViews.message(
         {
           type: 'PongView',
         },
-        context
+        context,
+        externalDependency
       );
     }
-    case '[Discord] ImagePosted': {
+    case '[Discord] ImagePosted':
+    case '[Kaiheila] ImagePosted': {
       const { urls, username, context } = event;
       let detectingItems = true;
       const ignored = (async () => {
         let magnifierDirection = true;
         while (detectingItems) {
-          const ignored = dispatchViews.discord(
+          const ignored = dispatchViews.message(
             {
               type: 'DetectingItemsView',
               magnifierDirection,
             },
-            context
+            context,
+            externalDependency
           );
           await new Promise((resolve) => {
             setTimeout(resolve, 1260);
@@ -79,49 +84,66 @@ async function update(
 
       detectingItems = false;
       if (!itemStacks.length) {
-        return dispatchViews.discord(
+        return dispatchViews.message(
           {
             type: 'NoItemsDetectedView',
           },
-          context
+          context,
+          externalDependency
         );
       }
 
-      const { sentMessage } = context;
-      if (!sentMessage) {
+      const { channelId, messageIdToEdit } = context;
+      if (!messageIdToEdit) {
         console.error('Expected a sent message from context:', context);
-        return dispatchViews.discord(
+        return dispatchViews.message(
           {
             type: 'InternalErrorView',
           },
-          context
+          context,
+          externalDependency
         );
       }
 
-      return dispatchViews.discord(
+      let serviceProvider: 'discord' | 'kaiheila';
+      switch (event.type) {
+        case '[Discord] ImagePosted':
+          serviceProvider = 'discord';
+          break;
+        case '[Kaiheila] ImagePosted':
+          serviceProvider = 'kaiheila';
+          break;
+      }
+      return dispatchViews.message(
         {
           type: 'ItemsRecognizedView',
           itemStacks,
           username,
-          fleetLootEditorUrl: getFleetLootEditorUrl(sentMessage.channel.id, sentMessage.id),
-          neederChooserUrl: getNeederChooserUrl(sentMessage.channel.id, sentMessage.id),
+          fleetLootEditorUrl: getFleetLootEditorUrl(serviceProvider, channelId, messageIdToEdit),
+          neederChooserUrl: getNeederChooserUrl(serviceProvider, channelId, messageIdToEdit),
         },
-        context
+        context,
+        externalDependency
       );
     }
-    case '[Discord] HandsUpButtonPressed': {
+    case '[Discord] HandsUpButtonPressed':
+    case '[Kaiheila] HandsUpButtonPressed': {
       const {
         fleetLoot: { fleetMembers, loot },
         fleetLootRecordTitle,
         needs,
         context,
       } = event;
+
+      context.messageIdToEdit = null;
+
       if (!fleetMembers.length) {
-        return dispatchViews.discord(
+        return dispatchViews.message(
           {
             type: 'NoFleetMemberToSettleUpView',
           },
-          context
+          context,
+          externalDependency
         );
       }
 
@@ -131,24 +153,27 @@ async function update(
         )
       );
       if (itemStacks.length !== loot.length) {
-        return dispatchViews.discord(
+        return dispatchViews.message(
           {
             type: 'NoFleetMemberToSettleUpView',
           },
-          context
+          context,
+          externalDependency
         );
       }
 
-      return dispatchViews.discord(
+      return dispatchViews.message(
         {
           type: 'FleetMembersSettledUpView',
           ...settleUpFleetLoot(fleetMembers, itemStacks, needs),
           fleetLootRecordTitle,
         },
-        context
+        context,
+        externalDependency
       );
     }
-    case '[Discord] KiwiButtonPressed': {
+    case '[Discord] KiwiButtonPressed':
+    case '[Kaiheila] KiwiButtonPressed': {
       const { fleetLootRecord, userId, context } = event;
       const otherRecord = await fleetLootRecordDuplex.connect(
         userId,
@@ -160,22 +185,24 @@ async function update(
       }
 
       if (fleetLootRecord.createdAt < otherRecord.createdAt) {
-        return dispatchViews.discord({ type: 'DeletedView' }, context);
+        return dispatchViews.message({ type: 'DeletedView' }, context, externalDependency);
       }
 
-      const { sentMessage } = context;
-      if (!sentMessage) {
+      const { channelId, messageIdToEdit } = context;
+      if (!messageIdToEdit) {
         console.error('Expected a sent message from context:', context);
-        return dispatchViews.discord(
+        return dispatchViews.message(
           {
             type: 'InternalErrorView',
           },
-          context
+          context,
+          externalDependency
         );
       }
 
-      return dispatchViews.discord(
+      return dispatchViews.message(
         buildFleetLootRecordUpdatedView(
+          context.serviceProvider,
           {
             ...fleetLootRecord,
             fleetLoot: {
@@ -186,27 +213,21 @@ async function update(
             },
             needs: otherRecord.needs.concat(fleetLootRecord.needs),
           },
-          sentMessage
+          channelId,
+          messageIdToEdit
         ),
-        context
+        context,
+        externalDependency
       );
     }
-    case '[Discord] CommandIssued': {
+    case '[Discord] CommandIssued':
+    case '[Kaiheila] CommandIssued': {
       const { command, context } = event;
       switch (command.type) {
         case 'QueryPrice': {
           const { itemNames } = command;
           // Does not deduplicate items in different languages.
           const dedupedItemNames = Array.from(new Set(itemNames));
-          if (2 <= dedupedItemNames.length) {
-            const ignored = dispatchViews.discord(
-              {
-                type: 'LookingUpHistoryPriceView',
-              },
-              context
-            );
-          }
-
           const results = await Promise.all(
             dedupedItemNames.map(
               async (itemName): Promise<MarketQueryResult> => {
@@ -245,48 +266,48 @@ async function update(
               }
             )
           );
-          return dispatchViews.discord(
+          return dispatchViews.message(
             {
               type: 'MultipleMarketQueryResultView',
               results,
             },
-            context
+            context,
+            externalDependency
           );
         }
         case 'InvalidUsage':
         case 'UnknownCommand':
-          return dispatchViews.discord(command, context);
+          return dispatchViews.message(command, context, externalDependency);
       }
       return;
     }
     case '[Web] IndexRequested': {
       const { context } = event;
-      return dispatchViews.webServer({ type: 'IndexView' }, context);
+      return dispatchViews.webPage({ type: 'IndexView' }, context);
     }
-    case '[Web] DiscordFleetLootEditorRequested': {
-      const { channelId, messageId, context } = event;
-      const fetchResult = await fetchFleetLootRecord(
-        discordBot,
+    case '[Web] FleetLootEditorRequested': {
+      const { channelId, messageId, messageServiceProvider, context } = event;
+      const fleetLootRecord = await fetchFleetLootRecord(
+        chooseMessageApi(messageServiceProvider, externalDependency),
         channelId,
-        messageId,
-        dispatchViews.webServer,
-        context
+        messageId
       );
-      if (!fetchResult) {
-        return;
-      }
-      return dispatchViews.webServer(
-        {
-          type: 'FleetLootEditorView',
-          fleetLoot: fetchResult.fleetLootRecord.fleetLoot,
-        },
+      return dispatchViews.webPage(
+        fleetLootRecord
+          ? {
+              type: 'FleetLootEditorView',
+              ...fleetLootRecord,
+            }
+          : {
+              type: 'InvalidFleetLootRecordView',
+            },
         context
       );
     }
-    case '[Web] DiscordFleetLootEditorPosted': {
-      const { messageId, channelId, fleetLoot, context } = event;
+    case '[Web] FleetLootEditorPosted': {
+      const { messageId, channelId, fleetLoot, messageServiceProvider, context } = event;
       if (!fleetLoot) {
-        return dispatchViews.webServer(
+        return dispatchViews.webPage(
           {
             type: 'InvalidFleetLootEditorInputView',
           },
@@ -294,60 +315,44 @@ async function update(
         );
       }
 
-      const updateResult = await lock.acquire(messageId, async () => {
-        const fetchResult = await fetchFleetLootRecord(
-          discordBot,
-          channelId,
-          messageId,
-          dispatchViews.webServer,
-          context
-        );
-        if (!fetchResult) {
-          return false;
-        }
-
-        const { message, channel, fleetLootRecord } = fetchResult;
-        await dispatchFleetLootRecordUpdatedView(
-          {
-            ...fleetLootRecord,
-            fleetLoot,
-          },
-          message,
-          channel,
-          dispatchViews.discord
-        );
-
-        return true;
-      });
-      if (!updateResult) {
-        return;
-      }
-
-      return dispatchViews.webServer(
-        {
-          type: 'UpdatedConfirmationView',
-        },
+      const success = await updateFleetLootRecord(
+        channelId,
+        messageId,
+        messageServiceProvider,
+        externalDependency,
+        dispatchViews.message,
+        (fleetLootRecord) => ({ ...fleetLootRecord, fleetLoot })
+      );
+      return dispatchViews.webPage(
+        success
+          ? {
+              type: 'UpdatedConfirmationView',
+            }
+          : {
+              type: 'InvalidFleetLootRecordView',
+            },
         context
       );
     }
-    case '[Web] DiscordNeederChooserRequested': {
-      const { channelId, messageId, context } = event;
-      const fetchResult = await fetchFleetLootRecord(
-        discordBot,
+    case '[Web] NeederChooserRequested': {
+      const { channelId, messageId, messageServiceProvider, context } = event;
+      const fleetLootRecord = await fetchFleetLootRecord(
+        chooseMessageApi(messageServiceProvider, externalDependency),
         channelId,
-        messageId,
-        dispatchViews.webServer,
-        context
+        messageId
       );
-      if (!fetchResult) {
-        return;
+      if (!fleetLootRecord) {
+        return dispatchViews.webPage(
+          {
+            type: 'InvalidFleetLootRecordView',
+          },
+          context
+        );
       }
 
-      const {
-        fleetLootRecord: { fleetLoot },
-      } = fetchResult;
+      const { fleetLoot } = fleetLootRecord;
       if (!areNeedsEditable(fleetLoot)) {
-        return dispatchViews.webServer(
+        return dispatchViews.webPage(
           {
             type: 'PendingFleetLootRecordView',
           },
@@ -357,11 +362,11 @@ async function update(
 
       const needsEditorLinks = fleetLoot.fleetMembers.map((fleetMember) => ({
         needer: fleetMember,
-        needsEditorUrl: `${webServerBaseUrl}/needs-editor/discord/${channelId}/${messageId}/${encodeURIComponent(
+        needsEditorUrl: `${webServerBaseUrl}/needs-editor/${messageServiceProvider}/${channelId}/${messageId}/${encodeURIComponent(
           fleetMember
         )}`,
       }));
-      return dispatchViews.webServer(
+      return dispatchViews.webPage(
         {
           type: 'NeederChooserView',
           needsEditorLinks,
@@ -369,22 +374,25 @@ async function update(
         context
       );
     }
-    case '[Web] DiscordNeedsEditorRequested': {
-      const { channelId, messageId, needer, context } = event;
-      const fetchResult = await fetchFleetLootRecord(
-        discordBot,
+    case '[Web] NeedsEditorRequested': {
+      const { channelId, messageId, needer, messageServiceProvider, context } = event;
+      const fleetLootRecord = await fetchFleetLootRecord(
+        chooseMessageApi(messageServiceProvider, externalDependency),
         channelId,
-        messageId,
-        dispatchViews.webServer,
-        context
+        messageId
       );
-      if (!fetchResult) {
-        return;
+      if (!fleetLootRecord) {
+        return dispatchViews.webPage(
+          {
+            type: 'InvalidFleetLootRecordView',
+          },
+          context
+        );
       }
 
-      const { fleetLoot, needs } = fetchResult.fleetLootRecord;
+      const { fleetLoot, needs } = fleetLootRecord;
       if (!areNeedsEditable(fleetLoot)) {
-        return dispatchViews.webServer(
+        return dispatchViews.webPage(
           {
             type: 'PendingFleetLootRecordView',
           },
@@ -393,7 +401,7 @@ async function update(
       }
 
       const neederNeeds = needs.filter(({ needer: _needer }) => _needer === needer);
-      return dispatchViews.webServer(
+      return dispatchViews.webPage(
         {
           type: 'NeedsEditorView',
           itemStacks: _.uniq(fleetLoot.loot.map(({ name }) => name)).map((name) => ({
@@ -407,53 +415,38 @@ async function update(
         context
       );
     }
-    case '[Web] DiscordNeedsEditorPosted': {
-      const { channelId, messageId, needer, itemStacks, context } = event;
-      const updateResult = await lock.acquire(messageId, async () => {
-        const fetchResult = await fetchFleetLootRecord(
-          discordBot,
-          channelId,
-          messageId,
-          dispatchViews.webServer,
-          context
-        );
-        if (!fetchResult) {
-          return false;
-        }
-
-        const { message, channel, fleetLootRecord } = fetchResult;
-        await dispatchFleetLootRecordUpdatedView(
-          {
-            ...fleetLootRecord,
-            needs: fleetLootRecord.needs
-              .filter(({ needer: _needer }) => _needer !== needer)
-              .concat(itemStacks.map((item) => ({ needer, item }))),
-          },
-          message,
-          channel,
-          dispatchViews.discord
-        );
-
-        return true;
-      });
-      if (!updateResult) {
-        return;
-      }
-
-      return dispatchViews.webServer(
-        {
-          type: 'UpdatedConfirmationView',
-        },
+    case '[Web] NeedsEditorPosted': {
+      const { channelId, messageId, needer, itemStacks, messageServiceProvider, context } = event;
+      const success = await updateFleetLootRecord(
+        channelId,
+        messageId,
+        messageServiceProvider,
+        externalDependency,
+        dispatchViews.message,
+        (fleetLootRecord) => ({
+          ...fleetLootRecord,
+          needs: fleetLootRecord.needs
+            .filter(({ needer: _needer }) => _needer !== needer)
+            .concat(itemStacks.map((item) => ({ needer, item }))),
+        })
+      );
+      return dispatchViews.webPage(
+        success
+          ? {
+              type: 'UpdatedConfirmationView',
+            }
+          : {
+              type: 'InvalidFleetLootRecordView',
+            },
         context
       );
     }
     default: {
+      // noinspection JSUnusedLocalSymbols
       const assertExhaustive: never = event;
     }
   }
 }
-
-const lock = new AsyncLock();
 
 const fleetLootRecordDuplex = new Duplex<FleetLootRecord>();
 

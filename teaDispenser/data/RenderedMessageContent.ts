@@ -1,5 +1,9 @@
-import { MessageOptions } from 'discord.js';
+import EmbedMessage from './EmbedMessage';
 
-type RenderedMessageContent = string | (MessageOptions & { split?: false });
+type RenderedMessageContent =
+  | string
+  | {
+      embed: EmbedMessage;
+    };
 
 export default RenderedMessageContent;

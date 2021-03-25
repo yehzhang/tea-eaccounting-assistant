@@ -38,7 +38,7 @@ function renderTable(
 
   const columnSeparator = visibleColumnSeparator ? tableColumnSeparator : '　';
   const renderedTable = outputTable.map((row) => row.join(columnSeparator)).join('\n');
-  return '```' + renderedTable + '```';
+  return '```\n' + renderedTable + '```';
 }
 
 function getCell(

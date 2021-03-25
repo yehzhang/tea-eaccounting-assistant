@@ -1,23 +1,20 @@
-import { MessageEmbedOptions } from 'discord.js';
 import RenderedMessage from '../../data/RenderedMessage';
 
 function renderEmbedMessage(
-  embed: MessageEmbedOptions,
+  embed: { readonly title: string; readonly description?: string },
   reactionContents?: readonly string[],
-  overwrite?: boolean
 ): RenderedMessage {
   return {
     content: {
       embed: {
-        color: dispenserSilver,
         ...embed,
+        color: dispenserSilver,
       },
     },
     reactionContents,
-    overwrite,
   };
 }
 
-const dispenserSilver = 0xd3d3d3;
+const dispenserSilver = '#d3d3d3';
 
 export default renderEmbedMessage;

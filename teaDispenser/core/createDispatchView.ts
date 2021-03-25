@@ -1,17 +1,15 @@
 import DispatchView from '../data/DispatchView';
+import logInfo from './logInfo';
 
-function createDispatchView<S, R, C>(
-  render: (view: S) => R,
-  dispatchRendering: (rendering: R, context: C) => Promise<void>
-): DispatchView<any, any> {
-  return async (view: S, context: C) => {
-    console.info('[Core] view', view);
+function createDispatchView<V, R, C, A extends readonly unknown[]>(
+  render: (view: V) => R,
+  dispatchRendering: (rendering: R, context: C, ...args: A) => Promise<void>
+): DispatchView<V, C, A> {
+  return async (view, context, ...args) => {
+    logInfo('[Core] view', view, /* depth= */ null);
 
     const rendering = render(view);
-
-    console.info('[Core] rendering', rendering);
-
-    return dispatchRendering(rendering, context);
+    return dispatchRendering(rendering, context, ...args);
   };
 }
 

@@ -1,18 +1,19 @@
-import { Message } from 'discord.js';
 import FleetLootRecord from '../data/FleetLootRecord';
-import DiscordView from '../view/discord/DiscordView';
+import MessageView from '../view/message/MessageView';
 import getFleetLootEditorUrl from './getFleetLootEditorUrl';
 import getNeederChooserUrl from './getNeederChooserUrl';
 
 function buildFleetLootRecordUpdatedView(
+  serviceProvider: 'discord' | 'kaiheila',
   fleetLootRecord: FleetLootRecord,
-  message: Message
-): DiscordView {
+  channelId: string,
+  messageId: string,
+): MessageView {
   return {
     type: 'FleetLootRecordUpdatedView',
     ...fleetLootRecord,
-    fleetLootEditorUrl: getFleetLootEditorUrl(message.channel.id, message.id),
-    neederChooserUrl: getNeederChooserUrl(message.channel.id, message.id),
+    fleetLootEditorUrl: getFleetLootEditorUrl(serviceProvider, channelId, messageId),
+    neederChooserUrl: getNeederChooserUrl(serviceProvider, channelId, messageId),
   };
 }
 

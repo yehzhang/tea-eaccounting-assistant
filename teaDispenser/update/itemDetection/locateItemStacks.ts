@@ -7,8 +7,9 @@ import {
   Rect,
   RETR_LIST,
   RETR_TREE,
+  Vec3
 } from 'opencv4nodejs';
-import { containRect, getArea, getCenterY, RectLike } from '../../data/rectUtils';
+import { containRect, getArea, getCenterY } from '../../data/rectUtils';
 import deduplicateSiblingBoundingRects from './deduplicateSiblingBoundingRects';
 
 async function locateItemStacks(image: Mat): Promise<readonly LocatedItemStack[]> {
@@ -23,23 +24,12 @@ async function locateItemStacks(image: Mat): Promise<readonly LocatedItemStack[]
   // The low threshold should not be higher than ~1500, or borders in lossy images may not be recognized.
   const itemStackEdges = await image.cannyAsync(1450, 3200, 5);
   const itemStackContours = await itemStackEdges.findContoursAsync(RETR_TREE, CHAIN_APPROX_SIMPLE);
-  const maxItemStackContourArea = Math.max(
-    ...itemStackContours.filter(isContourItemShaped).map(getContourArea)
+  const itemLookedBoundingRects = _.compact(
+    await Promise.all(itemStackContours.map((contour) => getItemLookedBoundingRect(contour, image)))
   );
-  return itemStackContours
-    .filter((contour) => {
-      const {
-        hierarchy: { z: parentIndex },
-      } = contour;
-      return (
-        // Exterior contours
-        parentIndex === -1 &&
-        // In similar shape and area
-        isContourItemShaped(contour) &&
-        maxItemStackContourArea * 0.9 <= getContourArea(contour)
-      );
-    })
-    .map((contour) => contour.boundingRect())
+  const maxItemLookedBoundingRectArea = Math.max(...itemLookedBoundingRects.map(getArea));
+  return itemLookedBoundingRects
+    .filter((boundingRect) => maxItemLookedBoundingRectArea * 0.7 <= getArea(boundingRect))
     .sort(({ x, y }, { x: otherX, y: otherY }) => {
       // Sort rects by their positions.
       const deltaY = y - otherY;
@@ -58,31 +48,41 @@ async function locateItemStacks(image: Mat): Promise<readonly LocatedItemStack[]
     }));
 }
 
-function isContourItemShaped(contour: Contour): boolean {
-  const { angle, size } = contour.minAreaRect();
-  const orthogonalAngleThreshold = 1;
-  if (orthogonalAngleThreshold < angle + 90 && orthogonalAngleThreshold < -angle) {
-    return false;
+async function getItemLookedBoundingRect(contour: Contour, image: Mat): Promise<Rect | null> {
+  const {
+    hierarchy: { z: parentIndex },
+  } = contour;
+  if (parentIndex !== -1) {
+    return null;
   }
 
-  const normalizedMinAreaRect = angle === -90 ? { width: size.height, height: size.width } : size;
-  return isRectItemShaped(normalizedMinAreaRect) && isRectItemShaped(contour.boundingRect());
-}
+  const boundingRect = contour.boundingRect();
+  const { width, height } = boundingRect;
+  // The lowest aspect ratio of a complete item stack seen is 1.48.
+  // The maximum upper bound should be ~2.1, or the activated ship will be recognized.
+  if (!_.inRange(width / height, 1.1, 1.8)) {
+    return null;
+  }
+  // Disallow ridiculous sizes.
+  if (width < 153 || 800 <= width || 600 <= height) {
+    return null;
+  }
 
-function isRectItemShaped({ width, height }: RectLike): boolean {
-  return (
-    100 <= height &&
-    153 <= width &&
-    // The ratio is roughly 1.55.
-    // The upper threshold should not be lower than ~1.63, or overflown items may not be recognized.
-    _.inRange(width / height, 1.5, 1.63)
+  const boundingImage = image.getRegion(boundingRect);
+  const backgroundImage = await boundingImage.inRangeAsync(
+    itemBackgroundColorLowerBound,
+    itemBackgroundColorHigherBound
   );
+  const backgroundPixelCount = await backgroundImage.countNonZeroAsync();
+  // The maximum upper bound is 0.413.
+  if (backgroundPixelCount / getArea(boundingRect) < 0.3) {
+    return null;
+  }
+  return boundingRect;
 }
 
-function getContourArea(contour: Contour): number {
-  // The contour may be open, so do not directly use `contour.area` which can be close to zero.
-  return getArea(contour.minAreaRect().size);
-}
+const itemBackgroundColorLowerBound = new Vec3(82, 75, 64);
+const itemBackgroundColorHigherBound = new Vec3(103, 100, 91);
 
 export interface LocatedItemStack {
   readonly itemStackBoundingBox: Rect;

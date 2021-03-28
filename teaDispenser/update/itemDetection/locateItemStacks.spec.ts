@@ -170,6 +170,10 @@ describe('locateItemStacks', () => {
     await expectNoRegression('chn_deadspace_5.png');
   });
 
+  it('locates items from chn_deadspace_6', async () => {
+    await expectNoRegression('chn_deadspace_6.jpeg');
+  });
+
   it('locates items from chn_lowres_1', async () => {
     await expectNoRegression('chn_lowres_1.png');
   });
@@ -216,15 +220,16 @@ describe('locateItemStacks', () => {
   });
 });
 
-async function expectNoRegression(imageFilename: string) {
-  if (!imageFilename.endsWith('png')) {
-    throw new TypeError('Only PNG images are supported');
-  }
+async function expectNoRegression(rawInputImageFilename: string) {
+  // Convert the input to PNG.
+  // If the input is JPEG, it will be significantly different when saved as PNG.
+  const rawInputImage = await getTestImage(join('inventory', rawInputImageFilename));
+  const inputImageFilename = replaceImageFileExtension(rawInputImageFilename);
+  const inputImagePath = getTempPath(`input_${inputImageFilename}`);
+  await imwriteAsync(inputImagePath, rawInputImage);
+  const testImage = await imreadAsync(inputImagePath);
 
-  const testDataDirectory = 'inventory';
-  const testImage = await getTestImage(join(testDataDirectory, imageFilename));
   const locatedItems = await locateItemStacks(testImage);
-
   const red = new Vec3(0, 0, 255);
   const green = new Vec3(0, 255, 0);
   const blue = new Vec3(255, 0, 0);
@@ -237,7 +242,7 @@ async function expectNoRegression(imageFilename: string) {
     }
   }
 
-  const referenceImagePath = getTestDataPath(join('inventory/golden', imageFilename));
+  const referenceImagePath = getTestDataPath(join('inventory/golden', inputImageFilename));
   if (!(await existFile(referenceImagePath))) {
     await imwriteAsync(referenceImagePath, testImage);
     console.info('Reference image created:', referenceImagePath);
@@ -248,19 +253,29 @@ async function expectNoRegression(imageFilename: string) {
   const diffImage = testImage.absdiff(referenceImage);
   const greyscaleDiffImage = await diffImage.cvtColorAsync(COLOR_RGB2GRAY);
   const mismatchedPixelCount = await greyscaleDiffImage.countNonZeroAsync();
-
   if (!mismatchedPixelCount) {
     return;
   }
-  const diffImagePath = getTempPath(`diff_${imageFilename}`);
+
+  const diffImagePath = getTempPath(`diff_${inputImageFilename}`);
   await imwriteAsync(diffImagePath, diffImage);
-  const testImagePath = getTempPath(`test_${imageFilename}`);
+  const testImagePath = getTempPath(`test_${inputImageFilename}`);
   await imwriteAsync(testImagePath, testImage);
   fail(
     `Unexpected image diff: ${diffImagePath}\nTest image: ${testImagePath}` +
     `\nReference image: ${referenceImagePath}` +
     `\nUpdate golden by: mv ${testImagePath} ${referenceImagePath}`
   );
+}
+
+function replaceImageFileExtension(filename: string): string {
+  const parts = filename.split('.');
+  if (parts.length <= 1) {
+    return filename;
+  }
+
+  parts[parts.length - 1] = 'png';
+  return parts.join('.');
 }
 
 async function existFile(path: string): Promise<boolean> {

@@ -10,10 +10,10 @@ async function syncRenderedMessage(
   context: MessageEventContext,
   externalDependency: ExternalDependency
 ): Promise<void> {
-  const { eventId, serviceProvider, channelId, triggeringUserId, messageIdToEdit } = context;
-  const messageApi = chooseMessageApi(serviceProvider, externalDependency);
   // Avoid race conditions that create a second message which could have been an edit.
-  await lock.acquire(eventId, async () => {
+  await lock.acquire(context.eventId, async () => {
+    const { serviceProvider, channelId, triggeringUserId, messageIdToEdit } = context;
+    const messageApi = chooseMessageApi(serviceProvider, externalDependency);
     if (!renderedMessage) {
       if (messageIdToEdit) {
         await messageApi.deleteMessage(channelId, messageIdToEdit);

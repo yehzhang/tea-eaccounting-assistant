@@ -17,7 +17,7 @@ function buildWebhookRouter(dispatchEvent: DispatchEvent<Event>, messageApi: Mes
       return next();
     },
     bodyParser(),
-    async (context) => {
+    (context) => {
       if (context.request.body?.s !== 0) {
         console.warn('Expected Kaiheila webhook event, got', context.request.body);
         context.status = 400;
@@ -48,10 +48,10 @@ function buildWebhookRouter(dispatchEvent: DispatchEvent<Event>, messageApi: Mes
         return;
       }
 
-      const event = await parseEventsFromWebhookEvent(data, messageApi);
-      if (event) {
-        const ignored = dispatchEvent(event);
-      }
+      // Do not await here in order to unblock the response.
+      parseEventsFromWebhookEvent(data, messageApi).then(
+        (event) => void (event && dispatchEvent(event))
+      );
     }
   );
   const cachedSns: unknown[] = [];

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import assertExhaustive from '../assertExhaustive';
 import chooseMessageApi from '../chooseMessageApi';
 import DispatchView from '../data/DispatchView';
 import FleetLootRecord from '../data/FleetLootRecord';
@@ -31,7 +32,7 @@ async function update(
     readonly webPage: DispatchView<WebPageView, WebServerEventContext>;
   },
   externalDependency: ExternalDependency
-): Promise<void> {
+): Promise<boolean> {
   const { schedulers } = externalDependency;
   switch (event.type) {
     case '[Discord] Pinged':
@@ -52,7 +53,9 @@ async function update(
       const ignored = (async () => {
         let magnifierDirection = true;
         while (detectingItems) {
-          const ignored = dispatchViews.message(
+          const timeoutPromise = new Promise((resolve) => void setTimeout(resolve, 1260));
+
+          const success = await dispatchViews.message(
             {
               type: 'DetectingItemsView',
               magnifierDirection,
@@ -60,10 +63,11 @@ async function update(
             context,
             externalDependency
           );
-          await new Promise((resolve) => {
-            setTimeout(resolve, 1260);
-          });
-          magnifierDirection = !magnifierDirection;
+          if (success) {
+            magnifierDirection = !magnifierDirection;
+          }
+
+          await timeoutPromise;
         }
       })();
 
@@ -181,7 +185,7 @@ async function update(
         /* timeoutMs= */ 30000
       );
       if (!otherRecord || fleetLootRecord.id === otherRecord.id) {
-        return;
+        return true;
       }
 
       if (fleetLootRecord.createdAt < otherRecord.createdAt) {
@@ -278,8 +282,9 @@ async function update(
         case 'InvalidUsage':
         case 'UnknownCommand':
           return dispatchViews.message(command, context, externalDependency);
+        default:
+          return assertExhaustive(command);
       }
-      return;
     }
     case '[Web] IndexRequested': {
       const { context } = event;
@@ -442,8 +447,7 @@ async function update(
       );
     }
     default: {
-      // noinspection JSUnusedLocalSymbols
-      const assertExhaustive: never = event;
+      return assertExhaustive(event);
     }
   }
 }

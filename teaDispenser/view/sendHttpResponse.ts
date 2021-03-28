@@ -4,9 +4,11 @@ import WebServerEventContext from '../data/WebServerEventContext';
 async function sendHttpResponse(
   webPage: RenderedWebPage,
   { context }: WebServerEventContext
-): Promise<void> {
+): Promise<boolean> {
   const { html } = webPage;
   context.body = html;
+
+  return true;
 }
 
 export default sendHttpResponse;

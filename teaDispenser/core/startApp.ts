@@ -2,7 +2,7 @@ import logInfo from './logInfo';
 
 async function startApp<E, V, D>(
   initialize: (dispatchEvent: (event: E) => Promise<void>) => Promise<D>,
-  update: (event: E, dispatchViews: V, externalDependency: D) => Promise<void>,
+  update: (event: E, dispatchViews: V, externalDependency: D) => Promise<unknown>,
   dispatchViews: V
 ): Promise<void> {
   const externalDependency = await initialize(async (event) => {

@@ -9,7 +9,11 @@ async function syncRenderedMessage(
   renderedMessage: RenderedMessage | null,
   context: MessageEventContext,
   externalDependency: ExternalDependency
-): Promise<void> {
+): Promise<boolean> {
+  if (lock.isBusy(context.eventId) && renderedMessage?.skippable) {
+    return false;
+  }
+
   // Avoid race conditions that create a second message which could have been an edit.
   await lock.acquire(context.eventId, async () => {
     const { serviceProvider, channelId, triggeringUserId, messageIdToEdit } = context;
@@ -36,6 +40,7 @@ async function syncRenderedMessage(
       await syncReactions(reactionContents, channelId, newlySentMessageId, messageApi);
     }
   });
+  return true;
 }
 
 async function syncMessageContent(

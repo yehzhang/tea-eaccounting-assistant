@@ -24,6 +24,8 @@ function viewMessage(view: MessageView): RenderedMessage | null {
         {
           title: `${magnifierDirection ? '🔍' : '🔎'}正在识别物品。只有游戏内选择的物品会被识别。`,
         },
+        undefined,
+        /* skippable= */ true,
       );
     }
     case 'NoItemsDetectedView':

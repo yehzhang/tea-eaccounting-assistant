@@ -207,10 +207,10 @@ async function waitForRateLimit(): Promise<void> {
     if (rateLimitUntil < now) {
       now.setSeconds(now.getSeconds() + 120);
       rateLimitUntil = now;
-      rateLimitRemainingQuota = 120;
+      rateLimitRemainingQuota = 119;
+    } else {
+      await waitUntil(rateLimitUntil);
     }
-
-    await waitUntil(rateLimitUntil);
   }
   rateLimitRemainingQuota--;
 }
@@ -219,7 +219,7 @@ async function waitUntil(date: Date): Promise<void> {
   return new Promise((resolve) => void setTimeout(resolve, date.getTime() - Date.now()));
 }
 
-let rateLimitRemainingQuota = 120;
+let rateLimitRemainingQuota = 0;
 let rateLimitUntil = new Date();
 
 if (!process.env.KAIHEILA_BOT_TOKEN) {

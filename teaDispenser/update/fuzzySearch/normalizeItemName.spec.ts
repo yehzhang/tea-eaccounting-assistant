@@ -1,4 +1,4 @@
-import ItemIcon from '../data/ItemIcon';
+import ItemIcon from '../../data/ItemIcon';
 import normalizeItemName, { NormalizationResult } from './normalizeItemName';
 
 describe('normalizeItemName', () => {

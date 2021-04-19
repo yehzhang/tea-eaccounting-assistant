@@ -1,9 +1,7 @@
-import { nanoid } from 'nanoid';
 import KaiheilaMessageType from '../../data/KaiheilaMessageType';
-import MessageEventContext from '../../data/MessageEventContext';
-import { MessageApi } from '../../ExternalDependency';
+import MessageApi from '../../data/MessageApi';
 import parseFleetLootRecord from '../discord/parseFleetLootRecord';
-import Event from '../Event';
+import Event, { MessageServiceEventCommon } from '../Event';
 
 async function parseEventsFromWebhookEvent(
   data: { readonly [key: string]: any },
@@ -25,17 +23,12 @@ async function parseEventsFromWebhookEvent(
       return null;
     }
 
-    const context: MessageEventContext = {
-      eventId: nanoid(),
-      serviceProvider: 'kaiheila',
-      channelId,
-      triggeringUserId,
-      messageIdToEdit: null,
-    };
     if (content === 'ping') {
       return {
-        type: '[Kaiheila] Pinged',
-        context,
+        type: '[Message] Pinged',
+        messageServiceProvider: 'kaiheila',
+        channelId,
+        triggeringUserId,
       };
     }
 
@@ -61,16 +54,12 @@ async function parseEventsFromWebhookEvent(
     }
 
     return {
-      type: '[Kaiheila] ImagePosted',
+      type: '[Message] ImagePosted',
+      messageServiceProvider: 'kaiheila',
+      channelId,
+      triggeringUserId,
       urls: [data.content],
       username,
-      context: {
-        eventId: nanoid(),
-        serviceProvider: 'kaiheila',
-        channelId,
-        triggeringUserId,
-        messageIdToEdit: null,
-      },
     };
   }
   if (data.type === KaiheilaMessageType.SYSTEM) {
@@ -113,28 +102,27 @@ async function parseEventsFromWebhookEvent(
       return null;
     }
 
-    const context: MessageEventContext = {
-      eventId: nanoid(),
-      serviceProvider: 'kaiheila',
+    const eventCommon: MessageServiceEventCommon = {
+      messageServiceProvider: 'kaiheila',
       channelId,
       triggeringUserId,
-      messageIdToEdit: messageId,
     };
     if (emoji.id === '[#128588;]') {
       return {
-        type: '[Kaiheila] HandsUpButtonPressed',
+        type: '[Message] HandsUpButtonPressed',
+        ...eventCommon,
         fleetLoot: fleetLootRecord.fleetLoot,
         fleetLootRecordTitle: fleetLootRecord.title,
         needs: fleetLootRecord.needs,
-        context,
       };
     }
     if (emoji.id === '[#129373;]') {
       return {
-        type: '[Kaiheila] KiwiButtonPressed',
+        type: '[Message] KiwiButtonPressed',
+        ...eventCommon,
         fleetLootRecord,
         userId: triggeringUserId,
-        context,
+        buttonAssociatedMessageId: messageId,
       };
     }
     return null;

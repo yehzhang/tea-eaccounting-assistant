@@ -25,16 +25,14 @@ function viewMessage(view: MessageView): RenderedMessage | null {
           title: `${magnifierDirection ? '🔍' : '🔎'}正在识别物品。只有游戏内选择的物品会被识别。`,
         },
         undefined,
-        /* skippable= */ true,
+        /* skippable= */ true
       );
     }
     case 'NoItemsDetectedView':
-      return renderEmbedMessage(
-        {
-          title: '未能识别任何物品',
-          description: '请在游戏中选择需要分赃的物品',
-        },
-      );
+      return renderEmbedMessage({
+        title: '未能识别任何物品',
+        description: '请在游戏中选择需要分赃的物品',
+      });
     case 'InternalErrorView':
       return renderEmbedMessage({
         title: '小助手出了故障 🤷',

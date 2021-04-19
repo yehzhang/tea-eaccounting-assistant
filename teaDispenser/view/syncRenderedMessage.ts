@@ -1,14 +1,12 @@
 import AsyncLock from 'async-lock';
-import chooseMessageApi from '../chooseMessageApi';
+import MessageApi from '../data/MessageApi';
 import MessageEventContext from '../data/MessageEventContext';
 import RenderedMessage from '../data/RenderedMessage';
 import RenderedMessageContent from '../data/RenderedMessageContent';
-import ExternalDependency, { MessageApi } from '../ExternalDependency';
 
 async function syncRenderedMessage(
   renderedMessage: RenderedMessage | null,
-  context: MessageEventContext,
-  externalDependency: ExternalDependency
+  context: MessageEventContext
 ): Promise<boolean> {
   if (lock.isBusy(context.eventId) && renderedMessage?.skippable) {
     return false;
@@ -16,8 +14,7 @@ async function syncRenderedMessage(
 
   // Avoid race conditions that create a second message which could have been an edit.
   await lock.acquire(context.eventId, async () => {
-    const { serviceProvider, channelId, triggeringUserId, messageIdToEdit } = context;
-    const messageApi = chooseMessageApi(serviceProvider, externalDependency);
+    const { channelId, replyToUserId, messageIdToEdit, messageApi } = context;
     if (!renderedMessage) {
       if (messageIdToEdit) {
         await messageApi.deleteMessage(channelId, messageIdToEdit);
@@ -30,7 +27,7 @@ async function syncRenderedMessage(
     const newlySentMessageId = await syncMessageContent(
       content,
       channelId,
-      replyTo ? triggeringUserId : undefined,
+      (replyTo && replyToUserId) ?? undefined,
       messageIdToEdit,
       messageApi
     );

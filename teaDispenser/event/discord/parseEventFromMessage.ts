@@ -1,8 +1,6 @@
 import { Message, Snowflake } from 'discord.js';
 import _ from 'lodash';
-import { nanoid } from 'nanoid';
-import MessageEventContext from '../../data/MessageEventContext';
-import Event from '../Event';
+import Event, { MessageServiceEventCommon } from '../Event';
 import parseCommand from './parseCommand';
 
 function parseEventFromMessage(message: Message, clientUserId: Snowflake): Event | null {
@@ -11,12 +9,10 @@ function parseEventFromMessage(message: Message, clientUserId: Snowflake): Event
     return null;
   }
 
-  const context: MessageEventContext = {
-    eventId: nanoid(),
-    serviceProvider: 'discord',
+  const eventCommon: MessageServiceEventCommon = {
+    messageServiceProvider: 'discord',
     channelId: message.channel.id,
     triggeringUserId: message.author.id,
-    messageIdToEdit: null,
   };
   const imageUrls = _.compact(
     [...attachments.values()].map((attachment) => {
@@ -32,26 +28,26 @@ function parseEventFromMessage(message: Message, clientUserId: Snowflake): Event
   );
   if (imageUrls.length) {
     return {
-      type: '[Discord] ImagePosted',
+      type: '[Message] ImagePosted',
+      ...eventCommon,
       urls: imageUrls,
       username: author.username,
-      context,
     };
   }
 
   if (content.toLocaleLowerCase() === 'ping') {
     return {
-      type: '[Discord] Pinged',
-      context,
+      type: '[Message] Pinged',
+      ...eventCommon,
     };
   }
 
   const command = parseCommand(content);
   if (command) {
     return {
-      type: '[Discord] CommandIssued',
+      type: '[Message] CommandIssued',
+      ...eventCommon,
       command,
-      context,
     };
   }
 

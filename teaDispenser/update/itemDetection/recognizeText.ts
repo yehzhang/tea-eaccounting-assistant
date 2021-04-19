@@ -26,7 +26,8 @@ async function recognizeText(languageRecognizer: Scheduler, image: Mat): Promise
   ).join(' ');
   const ellipsis = confidentText.replace(/[·',"]/g, '.').search(/(\.\.\.|…)$/) !== -1;
   const cleanText =
-    confidentText.trim()
+    confidentText
+      .trim()
       .replace(/[‘'",/#!$%^&*;:=\-_`~()\[\]{}\\·….«]/g, '')
       .replace(/[丨|]/g, 'I')
       .replace(/‖/g, 'II') + (ellipsis ? '...' : '');

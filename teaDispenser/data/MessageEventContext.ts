@@ -1,8 +1,10 @@
+import MessageApi from './MessageApi';
+
 interface MessageEventContext {
   readonly eventId: string;
-  readonly serviceProvider: 'discord' | 'kaiheila';
   readonly channelId: string;
-  readonly triggeringUserId?: string;
+  readonly replyToUserId: string | null;
+  readonly messageApi: MessageApi;
   messageIdToEdit: string | null;
 }
 

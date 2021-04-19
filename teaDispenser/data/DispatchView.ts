@@ -1,7 +1,3 @@
-type DispatchView<S, C, A extends readonly unknown[] = []> = (
-  view: S,
-  context: C,
-  ...args: A
-) => Promise<boolean>;
+type DispatchView<S, A extends readonly unknown[] = []> = (view: S, ...args: A) => Promise<boolean>;
 
 export default DispatchView;

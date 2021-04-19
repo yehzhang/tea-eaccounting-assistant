@@ -7,10 +7,10 @@ import Event from './event/Event';
 import buildWebhookRouter from './event/kaiheila/buildWebhookRouter';
 import buildWebsiteRouter from './event/webServer/buildWebsiteRouter';
 import startWebServer from './event/webServer/startWebServer';
-import ExternalDependency from './ExternalDependency';
-import buildDiscordApi from './update/buildDiscordApi';
-import buildKaiheilaApi from './update/buildKaiheilaApi';
-import startTesseract from './update/itemDetection/startTesseract';
+import buildDiscordApi from './externalDependency/buildDiscordApi';
+import buildKaiheilaApi from './externalDependency/buildKaiheilaApi';
+import ExternalDependency from './externalDependency/ExternalDependency';
+import startTesseract from './externalDependency/startTesseract';
 import update from './update/update';
 import viewMessage from './view/message/viewMessage';
 import sendHttpResponse from './view/sendHttpResponse';
@@ -35,7 +35,6 @@ async function startExternalDependencies(
     schedulers,
     discordApi: buildDiscordApi(discordBot),
     kaiheilaApi,
-    discordBot,
   };
 }
 

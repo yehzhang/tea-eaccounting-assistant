@@ -49,7 +49,7 @@ function renderFleetLootRecord(
         '6. 若分赃不均，参与者可额外请求差额',
       ].join('\n'),
     },
-    [handsUpIcon, kiwiIcon],
+    [handsUpIcon, kiwiIcon]
   );
 }
 

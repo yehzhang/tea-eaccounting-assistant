@@ -1,10 +1,8 @@
 import AsyncLock from 'async-lock';
-import { nanoid } from 'nanoid';
-import chooseMessageApi from '../chooseMessageApi';
 import DispatchView from '../data/DispatchView';
 import FleetLootRecord from '../data/FleetLootRecord';
-import MessageEventContext from '../data/MessageEventContext';
-import ExternalDependency from '../ExternalDependency';
+import MessageApi from '../data/MessageApi';
+import MessageServiceProvider from '../data/MessageServiceProvider';
 import MessageView from '../view/message/MessageView';
 import buildFleetLootRecordUpdatedView from './buildFleetLootRecordUpdatedView';
 import fetchFleetLootRecord from './fetchFleetLootRecord';
@@ -12,17 +10,13 @@ import fetchFleetLootRecord from './fetchFleetLootRecord';
 async function updateFleetLootRecord(
   channelId: string,
   messageId: string,
-  messageServiceProvider: 'discord' | 'kaiheila',
-  externalDependency: ExternalDependency,
-  dispatchView: DispatchView<MessageView, MessageEventContext, [ExternalDependency]>,
+  messageServiceProvider: MessageServiceProvider,
+  messageApi: MessageApi,
+  dispatchView: DispatchView<MessageView>,
   update: (fleetLootRecord: FleetLootRecord) => FleetLootRecord
 ): Promise<boolean> {
   return lock.acquire(`${messageServiceProvider}/${messageId}`, async () => {
-    const fleetLootRecord = await fetchFleetLootRecord(
-      chooseMessageApi(messageServiceProvider, externalDependency),
-      channelId,
-      messageId
-    );
+    const fleetLootRecord = await fetchFleetLootRecord(messageApi, channelId, messageId);
     if (!fleetLootRecord) {
       return false;
     }
@@ -34,14 +28,7 @@ async function updateFleetLootRecord(
         update(fleetLootRecord),
         channelId,
         messageId
-      ),
-      {
-        eventId: nanoid(),
-        serviceProvider: messageServiceProvider,
-        channelId,
-        messageIdToEdit: messageId
-      },
-      externalDependency
+      )
     );
 
     return true;

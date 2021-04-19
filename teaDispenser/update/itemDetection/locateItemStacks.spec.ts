@@ -263,8 +263,8 @@ async function expectNoRegression(rawInputImageFilename: string) {
   await imwriteAsync(testImagePath, testImage);
   fail(
     `Unexpected image diff: ${diffImagePath}\nTest image: ${testImagePath}` +
-    `\nReference image: ${referenceImagePath}` +
-    `\nUpdate golden by: mv ${testImagePath} ${referenceImagePath}`
+      `\nReference image: ${referenceImagePath}` +
+      `\nUpdate golden by: mv ${testImagePath} ${referenceImagePath}`
   );
 }
 

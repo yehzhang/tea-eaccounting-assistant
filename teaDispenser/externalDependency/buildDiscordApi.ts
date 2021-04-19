@@ -1,9 +1,9 @@
 import { Client, MessageOptions } from 'discord.js';
 import fromDiscordMessage from '../data/fromDiscordMessage';
+import MessageApi from '../data/MessageApi';
 import RenderedMessageContent from '../data/RenderedMessageContent';
-import { MessageApi } from '../ExternalDependency';
-import fetchDiscordChannel from '../view/fetchDiscordChannel';
-import fetchDiscordMessage from '../view/fetchDiscordMessage';
+import fetchDiscordChannel from './fetchDiscordChannel';
+import fetchDiscordMessage from './fetchDiscordMessage';
 
 function buildDiscordApi(discordBot: Client): MessageApi {
   const { user } = discordBot;

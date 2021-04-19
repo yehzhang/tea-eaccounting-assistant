@@ -1,13 +1,14 @@
 import FleetLootRecord from '../data/FleetLootRecord';
+import MessageServiceProvider from '../data/MessageServiceProvider';
 import MessageView from '../view/message/MessageView';
 import getFleetLootEditorUrl from './getFleetLootEditorUrl';
 import getNeederChooserUrl from './getNeederChooserUrl';
 
 function buildFleetLootRecordUpdatedView(
-  serviceProvider: 'discord' | 'kaiheila',
+  serviceProvider: MessageServiceProvider,
   fleetLootRecord: FleetLootRecord,
   channelId: string,
-  messageId: string,
+  messageId: string
 ): MessageView {
   return {
     type: 'FleetLootRecordUpdatedView',

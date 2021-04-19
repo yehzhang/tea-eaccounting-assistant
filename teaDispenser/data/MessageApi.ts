@@ -1,23 +1,8 @@
-import { Client } from 'discord.js';
-import { Scheduler } from 'tesseract.js';
-import Message from './data/Message';
-import Reaction from './data/Reaction';
-import RenderedMessageContent from './data/RenderedMessageContent';
+import Message from './Message';
+import Reaction from './Reaction';
+import RenderedMessageContent from './RenderedMessageContent';
 
-interface ExternalDependency {
-  readonly schedulers: TesseractSchedulers;
-  readonly discordApi: MessageApi;
-  readonly kaiheilaApi: MessageApi;
-  readonly discordBot: Client;
-}
-
-export interface TesseractSchedulers {
-  // readonly languageDetector: Scheduler;
-  readonly chineseRecognizer: Scheduler;
-  // readonly englishRecognizer: Scheduler;
-}
-
-export interface MessageApi {
+interface MessageApi {
   readonly userId: string;
 
   fetchMessage(channelId: string, messageId: MessageId): Promise<Message | null>;
@@ -44,4 +29,4 @@ export interface MessageApi {
 
 type MessageId = string;
 
-export default ExternalDependency;
+export default MessageApi;

@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import RecognizedItem from '../../data/RecognizedItem';
-import { TesseractSchedulers } from '../../ExternalDependency';
-import getSemanticIdentifier from '../getSemanticIdentifier';
+import { TesseractSchedulers } from '../../externalDependency/ExternalDependency';
+import startTesseract from '../../externalDependency/startTesseract';
+import getSemanticIdentifier from '../fuzzySearch/getSemanticIdentifier';
 import recognizeItems from './recognizeItems';
-import startTesseract from './startTesseract';
 import getTestDataPath from './testData/getTestDataPath';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;

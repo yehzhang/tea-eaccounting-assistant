@@ -3,85 +3,98 @@ import FleetLoot from '../data/FleetLoot';
 import FleetLootRecord from '../data/FleetLootRecord';
 import InvalidCommand from '../data/InvalidCommand';
 import ItemStack from '../data/ItemStack';
-import MessageEventContext from '../data/MessageEventContext';
+import MessageServiceProvider from '../data/MessageServiceProvider';
 import Needs from '../data/Needs';
 import WebServerEventContext from '../data/WebServerEventContext';
 
 type Event =
-  | MessageEvent<'discord'>
-  | MessageEvent<'kaiheila'>
-  | {
-      readonly type: '[Web] IndexRequested';
-      readonly context: WebServerEventContext;
-    };
+  | PingedEvent
+  | ImagePostedEvent
+  | HandsUpButtonPressedEvent
+  | CommandIssuedEvent
+  | KiwiButtonPressedEvent
+  | WebFleetLootEditorRequestedEvent
+  | WebFleetLootEditorPostedEvent
+  | WebNeederChooserRequestedEvent
+  | WebNeedsEditorRequestedEvent
+  | WebNeedsEditorPostedEvent
+  | WebIndexRequested;
 
-type MessageEvent<T extends string> =
-  | {
-      readonly type: `[${Capitalize<T>}] Pinged`;
-      readonly context: MessageEventContext;
-    }
-  | {
-      readonly type: `[${Capitalize<T>}] ImagePosted`;
-      readonly urls: readonly string[];
-      readonly username: string;
-      readonly context: MessageEventContext;
-    }
-  | {
-      readonly type: `[${Capitalize<T>}] HandsUpButtonPressed`;
-      readonly fleetLoot: FleetLoot;
-      readonly fleetLootRecordTitle: string;
-      readonly needs: Needs;
-      readonly context: MessageEventContext;
-    }
-  | {
-      readonly type: `[${Capitalize<T>}] CommandIssued`;
-      readonly command: Command | InvalidCommand;
-      readonly context: MessageEventContext;
-    }
-  | {
-      readonly type: `[${Capitalize<T>}] KiwiButtonPressed`;
-      readonly fleetLootRecord: FleetLootRecord;
-      readonly userId: string;
-      readonly context: MessageEventContext;
-    }
-  | {
-      readonly type: '[Web] FleetLootEditorRequested';
-      readonly messageServiceProvider: T;
-      readonly channelId: string;
-      readonly messageId: string;
-      readonly context: WebServerEventContext;
-    }
-  | {
-      readonly type: '[Web] FleetLootEditorPosted';
-      readonly messageServiceProvider: T;
-      readonly channelId: string;
-      readonly messageId: string;
-      readonly fleetLoot: FleetLoot | null;
-      readonly context: WebServerEventContext;
-    }
-  | {
-      readonly type: '[Web] NeederChooserRequested';
-      readonly messageServiceProvider: T;
-      readonly channelId: string;
-      readonly messageId: string;
-      readonly context: WebServerEventContext;
-    }
-  | {
-      readonly type: '[Web] NeedsEditorRequested';
-      readonly messageServiceProvider: T;
-      readonly channelId: string;
-      readonly messageId: string;
-      readonly needer: string;
-      readonly context: WebServerEventContext;
-    }
-  | {
-      readonly type: '[Web] NeedsEditorPosted';
-      readonly messageServiceProvider: T;
-      readonly channelId: string;
-      readonly messageId: string;
-      readonly needer: string;
-      readonly itemStacks: readonly ItemStack[];
-      readonly context: WebServerEventContext;
-    };
+export interface MessageAssociatedEventCommon {
+  readonly messageServiceProvider: MessageServiceProvider;
+  readonly channelId: string;
+}
+
+export interface MessageServiceEventCommon extends MessageAssociatedEventCommon {
+  readonly triggeringUserId: string;
+}
+
+export interface PingedEvent extends MessageServiceEventCommon {
+  readonly type: '[Message] Pinged';
+}
+
+export interface ImagePostedEvent extends MessageServiceEventCommon {
+  readonly type: '[Message] ImagePosted';
+  readonly urls: readonly string[];
+  readonly username: string;
+}
+
+export interface HandsUpButtonPressedEvent extends MessageServiceEventCommon {
+  readonly type: '[Message] HandsUpButtonPressed';
+  readonly fleetLoot: FleetLoot;
+  readonly fleetLootRecordTitle: string;
+  readonly needs: Needs;
+}
+
+export interface CommandIssuedEvent extends MessageServiceEventCommon {
+  readonly type: '[Message] CommandIssued';
+  readonly command: Command | InvalidCommand;
+}
+
+export interface KiwiButtonPressedEvent extends MessageServiceEventCommon {
+  readonly type: '[Message] KiwiButtonPressed';
+  readonly fleetLootRecord: FleetLootRecord;
+  readonly userId: string;
+  readonly buttonAssociatedMessageId: string;
+}
+
+export interface WebFleetLootEditorRequestedEvent extends MessageAssociatedEventCommon {
+  readonly type: '[Web] FleetLootEditorRequested';
+  readonly messageId: string;
+  readonly context: WebServerEventContext;
+}
+
+export interface WebFleetLootEditorPostedEvent extends MessageAssociatedEventCommon {
+  readonly type: '[Web] FleetLootEditorPosted';
+  readonly messageId: string;
+  readonly fleetLoot: FleetLoot | null;
+  readonly context: WebServerEventContext;
+}
+
+export interface WebNeederChooserRequestedEvent extends MessageAssociatedEventCommon {
+  readonly type: '[Web] NeederChooserRequested';
+  readonly messageId: string;
+  readonly context: WebServerEventContext;
+}
+
+export interface WebNeedsEditorRequestedEvent extends MessageAssociatedEventCommon {
+  readonly type: '[Web] NeedsEditorRequested';
+  readonly messageId: string;
+  readonly needer: string;
+  readonly context: WebServerEventContext;
+}
+
+export interface WebNeedsEditorPostedEvent extends MessageAssociatedEventCommon {
+  readonly type: '[Web] NeedsEditorPosted';
+  readonly messageId: string;
+  readonly needer: string;
+  readonly itemStacks: readonly ItemStack[];
+  readonly context: WebServerEventContext;
+}
+
+export interface WebIndexRequested {
+  readonly type: '[Web] IndexRequested';
+  readonly context: WebServerEventContext;
+}
 
 export default Event;

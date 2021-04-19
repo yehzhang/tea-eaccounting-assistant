@@ -3,8 +3,8 @@ import _ from 'lodash';
 import EmbedMessage from '../data/EmbedMessage';
 import fromKaiheilaMessage from '../data/fromKaiheilaMessage';
 import KaiheilaMessageType from '../data/KaiheilaMessageType';
+import MessageApi from '../data/MessageApi';
 import RenderedMessageContent from '../data/RenderedMessageContent';
-import { MessageApi } from '../ExternalDependency';
 
 function buildKaiheilaApi(): MessageApi {
   if (!process.env.KAIHEILA_BOT_USER_ID) {

@@ -1,7 +1,8 @@
+import MessageServiceProvider from '../data/MessageServiceProvider';
 import webServerBaseUrl from '../data/webServerBaseUrl';
 
 function getFleetLootEditorUrl(
-  serviceProvider: 'discord' | 'kaiheila',
+  serviceProvider: MessageServiceProvider,
   channelId: string,
   messageId: string
 ): string {

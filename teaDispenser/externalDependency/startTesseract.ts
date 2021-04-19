@@ -1,7 +1,7 @@
 import { stat, unlink } from 'fs/promises';
 import { join } from 'path';
 import { createScheduler, createWorker, PSM, Scheduler } from 'tesseract.js';
-import { TesseractSchedulers } from '../../ExternalDependency';
+import { TesseractSchedulers } from './ExternalDependency';
 
 async function startTesseract(): Promise<TesseractSchedulers> {
   async function createMonolingualScheduler(

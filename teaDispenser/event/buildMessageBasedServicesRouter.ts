@@ -1,12 +1,13 @@
 import Router from 'koa-router';
 import DispatchEvent from '../data/DispatchEvent';
+import MessageServiceProvider from '../data/MessageServiceProvider';
 import Event from './Event';
 import parseFleetLootEditorForm from './parseFleetLootEditorForm';
 import parseNeedsEditorForm from './parseNeedsEditorForm';
 import useTranscodingMiddlewares from './useTranscodingMiddlewares';
 
 function buildMessageBasedServicesRouter(
-  serviceProvider: 'discord' | 'kaiheila',
+  serviceProvider: MessageServiceProvider,
   dispatchEvent: DispatchEvent<Event>
 ) {
   const router = new Router();

@@ -1,5 +1,5 @@
-import * as _ from "lodash";
-import findRandomMinValuedItem from "./findRandomMinValuedItem";
+import * as _ from 'lodash';
+import findRandomMinValuedItem from './findRandomMinValuedItem';
 
 function splitItemsAmongFleetMembers<T>(
   participantsItems: readonly (readonly T[])[],

@@ -1,6 +1,6 @@
 import FleetLootRecord from '../data/FleetLootRecord';
+import MessageApi from '../data/MessageApi';
 import parseFleetLootRecord from '../event/discord/parseFleetLootRecord';
-import { MessageApi } from '../ExternalDependency';
 
 async function fetchFleetLootRecord(
   messageApi: MessageApi,

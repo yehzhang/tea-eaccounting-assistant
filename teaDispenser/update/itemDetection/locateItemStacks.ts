@@ -7,7 +7,7 @@ import {
   Rect,
   RETR_LIST,
   RETR_TREE,
-  Vec3
+  Vec3,
 } from 'opencv4nodejs';
 import { containRect, getArea, getCenterY } from '../../data/rectUtils';
 import deduplicateSiblingBoundingRects from './deduplicateSiblingBoundingRects';

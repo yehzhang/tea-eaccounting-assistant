@@ -2,7 +2,7 @@ import bodyParser from 'koa-bodyparser';
 import Router from 'koa-router';
 import DispatchEvent from '../../data/DispatchEvent';
 import KaiheilaMessageType from '../../data/KaiheilaMessageType';
-import { MessageApi } from '../../ExternalDependency';
+import MessageApi from '../../data/MessageApi';
 import Event from '../Event';
 import parseEventsFromWebhookEvent from './parseEventsFromWebhookEvent';
 

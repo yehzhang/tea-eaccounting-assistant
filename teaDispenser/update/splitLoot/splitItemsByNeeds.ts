@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import Item from '../data/Item';
-import Needs from '../data/Needs';
+import Item from '../../data/Item';
+import Needs from '../../data/Needs';
 import findRandomMinValuedItem from './findRandomMinValuedItem';
 
 function splitItemsByNeeds<T extends Item>(

@@ -44,7 +44,6 @@
     "train:english": "cd ./training && tesstrain.sh --fontlist 'Source Han Sans CN Semi-Light' --fonts_dir ./font --output_dir ./outputTessdata --tessdata_dir ./inputTessdata --langdata_dir ./langdata --overwrite --lang eng",
     "test": "run(){ ts-node node_modules/jasmine/bin/jasmine ${@:-./**/*.spec.ts}; }; run",
     "start:dev": "ts-node-dev teaDispenser/index.ts",
-    "start": "ts-node teaDispenser/index.ts",
-    "start:all": "./start_all.sh"
+    "start": "ts-node teaDispenser/index.ts"
   }
 }

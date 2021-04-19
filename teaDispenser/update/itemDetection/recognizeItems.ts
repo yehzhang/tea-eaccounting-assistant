@@ -1,7 +1,7 @@
 import { imreadAsync, Mat } from 'opencv4nodejs';
 import { Scheduler } from 'tesseract.js';
 import RecognizedItem from '../../data/RecognizedItem';
-import { TesseractSchedulers } from '../../ExternalDependency';
+import { TesseractSchedulers } from '../../externalDependency/ExternalDependency';
 import locateItemStacks, { LocatedItemStack } from './locateItemStacks';
 import recognizeDigit from './recognizeDigit';
 import recognizeItemIcon from './recognizeItemIcon';

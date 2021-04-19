@@ -1,8 +1,7 @@
 import * as _ from 'lodash';
-import FleetMemberLoot from '../data/FleetMemberLoot';
-import Needs from '../data/Needs';
-import payoutDiscount from '../data/payoutDiscount';
-import PricedItemStack from '../data/PricedItemStack';
+import FleetMemberLoot from '../../data/FleetMemberLoot';
+import Needs from '../../data/Needs';
+import PricedItemStack from '../../data/PricedItemStack';
 import splitItemsAmongFleetMembers from './splitItemsAmongFleetMembers';
 import splitItemsByNeeds from './splitItemsByNeeds';
 
@@ -68,5 +67,7 @@ function stackItems(items: readonly PricedItemStack[]): readonly PricedItemStack
     price: itemGroup[0].price,
   }));
 }
+
+const payoutDiscount = 0.75;
 
 export default settleUpFleetLoot;

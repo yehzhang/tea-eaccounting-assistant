@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
-import texts from '../../generated/textPacks.json';
-import ItemIcon from '../data/ItemIcon';
-import ItemType from '../data/ItemType';
-import { findTextsByPrefix, makeTrie } from '../data/trie';
+import texts from '../../../generated/textPacks.json';
+import ItemIcon from '../../data/ItemIcon';
+import ItemType from '../../data/ItemType';
+import { findTextsByPrefix, makeTrie } from '../../data/trie';
 import getSemanticIdentifier from './getSemanticIdentifier';
 import powerSet from './powerSet';
 

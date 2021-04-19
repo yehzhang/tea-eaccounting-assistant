@@ -1,4 +1,4 @@
-class Duplex<T> {
+class OneShotDuplex<T> {
   connections = new Map<string, (payload: T) => T>();
 
   async connect(key: string, payload: T, timeoutMs: number): Promise<T | null> {
@@ -25,4 +25,4 @@ class Duplex<T> {
   }
 }
 
-export default Duplex;
+export default OneShotDuplex;

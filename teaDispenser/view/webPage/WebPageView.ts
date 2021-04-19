@@ -11,6 +11,9 @@ type WebPageView =
       readonly fleetLoot: FleetLoot;
     }
   | {
+      readonly type: 'UnsupportedIeBrowserView';
+    }
+  | {
       readonly type: 'InvalidFleetLootEditorInputView';
     }
   | {

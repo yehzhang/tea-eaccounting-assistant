@@ -18,6 +18,7 @@ function buildMessageBasedServicesRouter(
     const { channelId, messageId } = context.params;
     await dispatchEvent({
       type: `[Web] FleetLootEditorRequested`,
+      ie10OrBelow: !!(context.headers['user-agent'] || '').match(/\bMSIE\b/),
       messageServiceProvider: serviceProvider,
       channelId,
       messageId,

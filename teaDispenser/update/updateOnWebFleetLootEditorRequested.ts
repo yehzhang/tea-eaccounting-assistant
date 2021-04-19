@@ -9,7 +9,13 @@ async function updateOnWebFleetLootEditorRequested(
   dispatchView: DispatchView<WebPageView>,
   messageApi: MessageApi
 ): Promise<boolean> {
-  const { channelId, messageId } = event;
+  const { channelId, messageId, ie10OrBelow } = event;
+  if (ie10OrBelow) {
+    return dispatchView({
+      type: 'UnsupportedIeBrowserView',
+    });
+  }
+
   const fleetLootRecord = await fetchFleetLootRecord(messageApi, channelId, messageId);
   return dispatchView(
     fleetLootRecord

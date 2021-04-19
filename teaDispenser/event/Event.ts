@@ -60,6 +60,7 @@ export interface KiwiButtonPressedEvent extends MessageServiceEventCommon {
 
 export interface WebFleetLootEditorRequestedEvent extends MessageAssociatedEventCommon {
   readonly type: '[Web] FleetLootEditorRequested';
+  readonly ie10OrBelow: boolean;
   readonly messageId: string;
   readonly context: WebServerEventContext;
 }

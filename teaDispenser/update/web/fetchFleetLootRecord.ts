@@ -1,10 +1,25 @@
 import _ from 'lodash';
-import FleetLootRecord from '../data/FleetLootRecord';
-import Message from '../data/Message';
-import Needs from '../data/Needs';
-import tableColumnSeparator from '../data/tableColumnSeparator';
-import UserInputPricedItemStack from '../data/UserInputPricedItemStack';
-import fromDoubleByteCharacterText from '../view/message/fromDoubleByteCharacterText';
+import ChatService from '../../data/ChatService';
+import FleetLootRecord from '../../data/FleetLootRecord';
+import Message from '../../data/Message';
+import Needs from '../../data/Needs';
+import tableColumnSeparator from '../../data/tableColumnSeparator';
+import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
+import useChatServiceContext from '../../external/useChatServiceContext';
+import fromDoubleByteCharacterText from '../../view/message/fromDoubleByteCharacterText';
+
+async function fetchFleetLootRecord(
+  chatService: ChatService,
+  channelId: string,
+  messageId: string
+): Promise<FleetLootRecord | null> {
+  const { api } = useChatServiceContext(chatService);
+  const message = await api.fetchMessage(channelId, messageId);
+  if (!message || message.externalUserId !== api.botUserId) {
+    return null;
+  }
+  return parseFleetLootRecord(message);
+}
 
 function parseFleetLootRecord(message: Message): FleetLootRecord | null {
   if (!message.embed) {
@@ -121,4 +136,4 @@ function parseString(text: string): string {
   return fromDoubleByteCharacterText(text).trim();
 }
 
-export default parseFleetLootRecord;
+export default fetchFleetLootRecord;

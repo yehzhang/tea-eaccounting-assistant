@@ -5,6 +5,8 @@ import buildChatServiceRouter from './event/buildChatServiceRouter';
 import startDiscordBot from './event/discord/startDiscordBot';
 import Event from './event/Event';
 import buildWebhookRouter from './event/kaiheila/buildWebhookRouter';
+import parseDmvEvent from './event/kaiheila/parseDmvEvent';
+import parseTeaDispenserEvent from './event/kaiheila/parseTeaDispenserEvent';
 import buildWebsiteRouter from './event/webServer/buildWebsiteRouter';
 import startWebServer from './event/webServer/startWebServer';
 import buildDiscordApi from './external/buildDiscordApi';
@@ -19,28 +21,35 @@ import syncRenderedMessage from './view/syncRenderedMessage';
 import viewWebPage from './view/webPage/viewWebPage';
 
 async function startExternalDependencies(dispatchEvent: DispatchEvent<Event>): Promise<void> {
-  const [schedulers, discordBot] = await Promise.all([
-    startTesseract(),
+  const [discordBot, kaiheilaTeaDispenserApi, kaiheilaDmvApi, schedulers] = await Promise.all([
     startDiscordBot(dispatchEvent),
+    buildKaiheilaApi(getEnvironmentVariable('KAIHEILA_TEA_DISPENSER_TOKEN')),
+    buildKaiheilaApi(getEnvironmentVariable('KAIHEILA_DMV_TOKEN')),
+    startTesseract(),
   ]);
-
-  const kaiheilaBotToken = getEnvironmentVariable('KAIHEILA_BOT_TOKEN');
-  const kaiheilaApi = buildKaiheilaApi(kaiheilaBotToken);
 
   startWebServer([
     buildWebsiteRouter(dispatchEvent),
-    buildChatServiceRouter('discord', dispatchEvent),
-    buildChatServiceRouter('kaiheila', dispatchEvent),
-    buildWebhookRouter(dispatchEvent, kaiheilaApi),
+    buildChatServiceRouter('discordTeaDispenser', dispatchEvent),
+    buildChatServiceRouter('kaiheilaTeaDispenser', dispatchEvent),
+    buildWebhookRouter(dispatchEvent, {
+      [getEnvironmentVariable('KAIHEILA_TEA_DISPENSER_VERIFY_TOKENS')]: (event) =>
+        parseTeaDispenserEvent(event, kaiheilaTeaDispenserApi.botUserId),
+      [getEnvironmentVariable('KAIHEILA_DMV_VERIFY_TOKENS')]: (event) =>
+        parseDmvEvent(event, kaiheilaDmvApi.botUserId),
+    }),
   ]);
 
   setExternalContext({
     schedulers,
-    discord: {
+    discordTeaDispenser: {
       api: buildDiscordApi(discordBot),
     },
-    kaiheila: {
-      api: kaiheilaApi,
+    kaiheilaTeaDispenser: {
+      api: kaiheilaTeaDispenserApi,
+    },
+    kaiheilaDmv: {
+      api: kaiheilaDmvApi,
     },
   });
 }

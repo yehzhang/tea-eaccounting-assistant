@@ -1,18 +1,18 @@
-import ChatService from '../data/ChatService';
+import ChatService, { DmvService, TeaDispenserService } from '../data/ChatService';
 import Command from '../data/Command';
 import FleetLoot from '../data/FleetLoot';
-import FleetLootRecord from '../data/FleetLootRecord';
 import InvalidCommand from '../data/InvalidCommand';
 import ItemStack from '../data/ItemStack';
-import Needs from '../data/Needs';
 import WebServerEventContext from '../data/WebServerEventContext';
 
 type Event =
   | PingedEvent
-  | ImagePostedEvent
-  | HandsUpButtonPressedEvent
-  | CommandIssuedEvent
-  | KiwiButtonPressedEvent
+  | TeaDispenserImagePostedEvent
+  | TeaDispenserHandsUpButtonPressedEvent
+  | TeaDispenserCommandIssuedEvent
+  | TeaDispenserKiwiButtonPressedEvent
+  | DmvInstallCommandIssuedEvent
+  | DmvCryButtonPressedEvent
   | WebFleetLootEditorRequestedEvent
   | WebFleetLootEditorPostedEvent
   | WebNeederChooserRequestedEvent
@@ -20,72 +20,90 @@ type Event =
   | WebNeedsEditorPostedEvent
   | WebIndexRequested;
 
-export interface MessageAssociatedEventCommon {
+export interface ChatServiceEventCommon {
   readonly chatService: ChatService;
-  readonly channelId: string;
-}
-
-export interface ChatServiceEventCommon extends MessageAssociatedEventCommon {
-  readonly triggeringUserId: string;
 }
 
 export interface PingedEvent extends ChatServiceEventCommon {
   readonly type: '[Chat] Pinged';
+  readonly channelId: string;
 }
 
-export interface ImagePostedEvent extends ChatServiceEventCommon {
-  readonly type: '[Chat] ImagePosted';
+export interface TeaDispenserEventCommon extends ChatServiceEventCommon {
+  readonly chatService: TeaDispenserService;
+  readonly channelId: string;
+}
+
+export interface TeaDispenserImagePostedEvent extends TeaDispenserEventCommon {
+  readonly type: '[TeaDispenser] ImagePosted';
   readonly urls: readonly string[];
   readonly username: string;
 }
 
-export interface HandsUpButtonPressedEvent extends ChatServiceEventCommon {
-  readonly type: '[Chat] HandsUpButtonPressed';
-  readonly fleetLoot: FleetLoot;
-  readonly fleetLootRecordTitle: string;
-  readonly needs: Needs;
-}
-
-export interface CommandIssuedEvent extends ChatServiceEventCommon {
-  readonly type: '[Chat] CommandIssued';
-  readonly command: Command | InvalidCommand;
-}
-
-export interface KiwiButtonPressedEvent extends ChatServiceEventCommon {
-  readonly type: '[Chat] KiwiButtonPressed';
-  readonly fleetLootRecord: FleetLootRecord;
-  readonly userId: string;
+export interface TeaDispenserHandsUpButtonPressedEvent extends TeaDispenserEventCommon {
+  readonly type: '[TeaDispenser] HandsUpButtonPressed';
   readonly buttonAssociatedMessageId: string;
 }
 
-export interface WebFleetLootEditorRequestedEvent extends MessageAssociatedEventCommon {
+export interface TeaDispenserCommandIssuedEvent extends TeaDispenserEventCommon {
+  readonly type: '[TeaDispenser] CommandIssued';
+  readonly command: Command | InvalidCommand;
+  readonly triggeringUserId: string;
+}
+
+export interface TeaDispenserKiwiButtonPressedEvent extends TeaDispenserEventCommon {
+  readonly type: '[TeaDispenser] KiwiButtonPressed';
+  readonly userId: string;
+  readonly buttonAssociatedMessageId: string;
+  readonly triggeringUserId: string;
+}
+
+export interface DmvChatServiceEventCommon extends ChatServiceEventCommon {
+  readonly chatService: DmvService;
+}
+
+export interface DmvInstallCommandIssuedEvent extends DmvChatServiceEventCommon {
+  readonly type: '[Dmv] InstallCommandIssued';
+  readonly channelId: string;
+  readonly mentionedRoles: readonly number[];
+}
+
+export interface DmvCryButtonPressedEvent extends DmvChatServiceEventCommon {
+  readonly type: '[Dmv] CryButtonPressed';
+  readonly messageId: string;
+  readonly emojiId: string;
+  readonly channelId: string;
+  readonly triggeringUserId: string;
+}
+
+export interface WebFleetLootEditorRequestedEvent extends TeaDispenserEventCommon {
   readonly type: '[Web] FleetLootEditorRequested';
   readonly ie10OrBelow: boolean;
   readonly messageId: string;
   readonly context: WebServerEventContext;
 }
 
-export interface WebFleetLootEditorPostedEvent extends MessageAssociatedEventCommon {
+export interface WebFleetLootEditorPostedEvent extends TeaDispenserEventCommon {
   readonly type: '[Web] FleetLootEditorPosted';
   readonly messageId: string;
   readonly fleetLoot: FleetLoot | null;
   readonly context: WebServerEventContext;
 }
 
-export interface WebNeederChooserRequestedEvent extends MessageAssociatedEventCommon {
+export interface WebNeederChooserRequestedEvent extends TeaDispenserEventCommon {
   readonly type: '[Web] NeederChooserRequested';
   readonly messageId: string;
   readonly context: WebServerEventContext;
 }
 
-export interface WebNeedsEditorRequestedEvent extends MessageAssociatedEventCommon {
+export interface WebNeedsEditorRequestedEvent extends TeaDispenserEventCommon {
   readonly type: '[Web] NeedsEditorRequested';
   readonly messageId: string;
   readonly needer: string;
   readonly context: WebServerEventContext;
 }
 
-export interface WebNeedsEditorPostedEvent extends MessageAssociatedEventCommon {
+export interface WebNeedsEditorPostedEvent extends TeaDispenserEventCommon {
   readonly type: '[Web] NeedsEditorPosted';
   readonly messageId: string;
   readonly needer: string;

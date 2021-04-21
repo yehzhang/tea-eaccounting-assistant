@@ -87,6 +87,10 @@ function buildDiscordApi(discordBot: Client): ChatServiceApi {
       }
     },
 
+    fetchReactionUsers() {
+      throw new TypeError('Not implemented');
+    },
+
     async reactMessage(channelId, messageId, content) {
       const channel = await fetchDiscordChannel(discordBot, channelId);
       const message = channel && (await fetchDiscordMessage(channel, messageId));
@@ -101,6 +105,18 @@ function buildDiscordApi(discordBot: Client): ChatServiceApi {
         console.error('Unexpected error when reacting to a Discord message', e);
         return false;
       }
+    },
+
+    createChannel() {
+      throw new TypeError('Not implemented');
+    },
+
+    createChannelPermission() {
+      throw new TypeError('Not implemented');
+    },
+
+    fetchChannel() {
+      throw new TypeError('Not implemented');
     },
   };
 }

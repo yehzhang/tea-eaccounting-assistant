@@ -1,8 +1,9 @@
-import KaiheilaMessageType from './KaiheilaMessageType';
+import _ from 'lodash';
+import KaiheilaMessageType from '../event/kaiheila/KaiheilaMessageType';
 import Message from './Message';
 
 function fromKaiheilaMessage(message: { readonly [key: string]: any }): Message | null {
-  const { id, type, author, content, create_at } = message;
+  const { id, type, author, content, create_at, mention_roles: mentionedRoles } = message;
   if (type !== KaiheilaMessageType.MARKDOWN) {
     // Only markdown message is currently sent.
     // TODO Change to support embed message.
@@ -13,7 +14,9 @@ function fromKaiheilaMessage(message: { readonly [key: string]: any }): Message 
     typeof id !== 'string' ||
     typeof author.id !== 'string' ||
     typeof content !== 'string' ||
-    isNaN(createdAt.getTime())
+    isNaN(createdAt.getTime()) ||
+    !_.isArray(mentionedRoles) ||
+    !mentionedRoles.every(_.isNumber)
   ) {
     console.error('Expected valid Kaiheila message, got', message);
     return null;
@@ -32,6 +35,7 @@ function fromKaiheilaMessage(message: { readonly [key: string]: any }): Message 
         }
       : null,
     createdAt,
+    mentionedRoles,
   };
 }
 

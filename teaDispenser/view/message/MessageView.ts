@@ -48,6 +48,13 @@ type MessageView =
       readonly results: readonly MarketQueryResult[];
     }
   | {
+      readonly type: 'BlueFuckeryQueueIntroductionView';
+      readonly mentionedRoles: readonly number[];
+    }
+  | {
+      readonly type: 'BlueFuckeryTicketIntroductionView';
+    }
+  | {
       readonly type: 'DeletedView';
     }
   | {

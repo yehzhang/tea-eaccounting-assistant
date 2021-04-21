@@ -1,14 +1,14 @@
 import Router from 'koa-router';
-import ChatService from '../data/ChatService';
+import { TeaDispenserService } from '../data/ChatService';
 import DispatchEvent from '../data/DispatchEvent';
-import Event from './Event';
+import Event, { TeaDispenserEventCommon } from './Event';
 import parseFleetLootEditorForm from './parseFleetLootEditorForm';
 import parseNeedsEditorForm from './parseNeedsEditorForm';
 import useTranscodingMiddlewares from './useTranscodingMiddlewares';
 
 function buildChatServiceRouter(
-  serviceProvider: ChatService,
-  dispatchEvent: DispatchEvent<Event>
+  serviceProvider: TeaDispenserService,
+  dispatchEvent: DispatchEvent<Event & TeaDispenserEventCommon>
 ) {
   const router = new Router();
 
@@ -17,7 +17,7 @@ function buildChatServiceRouter(
   router.get(`/editor/${serviceProvider}/:channelId/:messageId`, async (context) => {
     const { channelId, messageId } = context.params;
     await dispatchEvent({
-      type: `[Web] FleetLootEditorRequested`,
+      type: '[Web] FleetLootEditorRequested',
       ie10OrBelow: !!(context.headers['user-agent'] || '').match(/\bMSIE\b/),
       chatService: serviceProvider,
       channelId,
@@ -30,7 +30,7 @@ function buildChatServiceRouter(
   router.post(`/editor/${serviceProvider}/:channelId/:messageId`, async (context) => {
     const { channelId, messageId } = context.params;
     await dispatchEvent({
-      type: `[Web] FleetLootEditorPosted`,
+      type: '[Web] FleetLootEditorPosted',
       chatService: serviceProvider,
       channelId,
       messageId,
@@ -44,7 +44,7 @@ function buildChatServiceRouter(
   router.get(`/needs-editor/${serviceProvider}/:channelId/:messageId`, async (context) => {
     const { channelId, messageId } = context.params;
     await dispatchEvent({
-      type: `[Web] NeederChooserRequested`,
+      type: '[Web] NeederChooserRequested',
       chatService: serviceProvider,
       channelId,
       messageId,
@@ -56,7 +56,7 @@ function buildChatServiceRouter(
   router.get(`/needs-editor/${serviceProvider}/:channelId/:messageId/:needer`, async (context) => {
     const { channelId, messageId, needer } = context.params;
     await dispatchEvent({
-      type: `[Web] NeedsEditorRequested`,
+      type: '[Web] NeedsEditorRequested',
       chatService: serviceProvider,
       channelId,
       messageId,
@@ -69,7 +69,7 @@ function buildChatServiceRouter(
   router.post(`/needs-editor/${serviceProvider}/:channelId/:messageId/:needer`, async (context) => {
     const { channelId, messageId, needer } = context.params;
     await dispatchEvent({
-      type: `[Web] NeedsEditorPosted`,
+      type: '[Web] NeedsEditorPosted',
       chatService: serviceProvider,
       channelId,
       messageId,

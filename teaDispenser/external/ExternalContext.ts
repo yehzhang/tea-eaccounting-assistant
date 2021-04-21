@@ -3,8 +3,9 @@ import ChatServiceContext from './ChatServiceContext';
 
 interface ExternalContext {
   readonly schedulers: TesseractContext;
-  readonly discord: ChatServiceContext;
-  readonly kaiheila: ChatServiceContext;
+  readonly discordTeaDispenser: ChatServiceContext;
+  readonly kaiheilaTeaDispenser: ChatServiceContext;
+  readonly kaiheilaDmv: ChatServiceContext;
 }
 
 export interface TesseractContext {

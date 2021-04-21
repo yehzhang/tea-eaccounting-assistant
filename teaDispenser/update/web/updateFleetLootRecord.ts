@@ -1,9 +1,9 @@
 import AsyncLock from 'async-lock';
-import ChatService from '../data/ChatService';
-import DispatchView from '../data/DispatchView';
-import FleetLootRecord from '../data/FleetLootRecord';
-import MessageView from '../view/message/MessageView';
-import buildFleetLootRecordUpdatedView from './buildFleetLootRecordUpdatedView';
+import ChatService from '../../data/ChatService';
+import DispatchView from '../../data/DispatchView';
+import FleetLootRecord from '../../data/FleetLootRecord';
+import MessageView from '../../view/message/MessageView';
+import buildFleetLootRecordUpdatedView from '../buildFleetLootRecordUpdatedView';
 import fetchFleetLootRecord from './fetchFleetLootRecord';
 
 async function updateFleetLootRecord(

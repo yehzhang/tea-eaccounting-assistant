@@ -2,20 +2,24 @@ import { nanoid } from 'nanoid';
 import DispatchView from '../data/DispatchView';
 import MessageEventContext from '../data/MessageEventContext';
 import WebServerEventContext from '../data/WebServerEventContext';
-import Event, { MessageAssociatedEventCommon } from '../event/Event';
+import Event, { ChatServiceEventCommon } from '../event/Event';
 import MessageView from '../view/message/MessageView';
 import WebPageView from '../view/webPage/WebPageView';
-import updateOnCommandIssued from './updateOnCommandIssued';
-import updateOnHandsUpButtonPressed from './updateOnHandsUpButtonPressed';
-import updateOnImagePosted from './updateOnImagePosted';
-import updateOnKiwiButtonPressed from './updateOnKiwiButtonPressed';
+import updateOnDmvCryButtonPressed from './dmv/updateOnDmvCryButtonPressed';
+import updateOnDmvInstallCommandIssued from './dmv/updateOnDmvInstallCommandIssued';
+import updateOnTeaDispenserCommandIssued from './teaDispenser/updateOnTeaDispenserCommandIssued';
+import updateOnTeaDispenserHandsUpButtonPressed
+  from './teaDispenser/updateOnTeaDispenserHandsUpButtonPressed';
+import updateOnTeaDispenserImagePosted from './teaDispenser/updateOnTeaDispenserImagePosted';
+import updateOnTeaDispenserKiwiButtonPressed
+  from './teaDispenser/updateOnTeaDispenserKiwiButtonPressed';
 import updateOnPinged from './updateOnPinged';
-import updateOnWebFleetLootEditorPosted from './updateOnWebFleetLootEditorPosted';
-import updateOnWebFleetLootEditorRequested from './updateOnWebFleetLootEditorRequested';
-import updateOnWebIndexRequested from './updateOnWebIndexRequested';
-import updateOnWebNeederChooserRequested from './updateOnWebNeederChooserRequested';
-import updateOnWebNeedsEditorPosted from './updateOnWebNeedsEditorPosted';
-import updateOnWebNeedsEditorRequested from './updateOnWebNeedsEditorRequested';
+import updateOnWebFleetLootEditorPosted from './web/updateOnWebFleetLootEditorPosted';
+import updateOnWebFleetLootEditorRequested from './web/updateOnWebFleetLootEditorRequested';
+import updateOnWebIndexRequested from './web/updateOnWebIndexRequested';
+import updateOnWebNeederChooserRequested from './web/updateOnWebNeederChooserRequested';
+import updateOnWebNeedsEditorPosted from './web/updateOnWebNeedsEditorPosted';
+import updateOnWebNeedsEditorRequested from './web/updateOnWebNeedsEditorRequested';
 
 async function update(
   event: Event,
@@ -26,25 +30,35 @@ async function update(
 ): Promise<boolean> {
   switch (event.type) {
     case '[Chat] Pinged':
-    case '[Chat] ImagePosted':
-    case '[Chat] HandsUpButtonPressed':
-    case '[Chat] KiwiButtonPressed':
-    case '[Chat] CommandIssued': {
-      const context = buildMessageEventContext(event);
+    case '[TeaDispenser] ImagePosted':
+    case '[TeaDispenser] HandsUpButtonPressed':
+    case '[TeaDispenser] KiwiButtonPressed':
+    case '[TeaDispenser] CommandIssued':
+    case '[Dmv] InstallCommandIssued': {
+      const context = buildMessageEventContext(event, event.channelId);
       const dispatchMessageView: DispatchView<MessageView> = (view) =>
         dispatchViews.message(view, context);
       switch (event.type) {
         case '[Chat] Pinged':
           return updateOnPinged(dispatchMessageView);
-        case '[Chat] ImagePosted':
-          return updateOnImagePosted(event, context, dispatchMessageView);
-        case '[Chat] HandsUpButtonPressed':
-          return updateOnHandsUpButtonPressed(event, dispatchMessageView);
-        case '[Chat] KiwiButtonPressed':
-          return updateOnKiwiButtonPressed(event, dispatchMessageView);
-        case '[Chat] CommandIssued':
-          return updateOnCommandIssued(event, dispatchMessageView);
+        case '[TeaDispenser] ImagePosted':
+          return updateOnTeaDispenserImagePosted(event, context, dispatchMessageView);
+        case '[TeaDispenser] HandsUpButtonPressed':
+          return updateOnTeaDispenserHandsUpButtonPressed(event, dispatchMessageView);
+        case '[TeaDispenser] KiwiButtonPressed':
+          return updateOnTeaDispenserKiwiButtonPressed(event, dispatchMessageView);
+        case '[TeaDispenser] CommandIssued':
+          return updateOnTeaDispenserCommandIssued(event, dispatchMessageView);
+        case '[Dmv] InstallCommandIssued':
+          return updateOnDmvInstallCommandIssued(event, dispatchMessageView);
       }
+    }
+    case '[Dmv] CryButtonPressed': {
+      const dispatchMessageView: DispatchView<MessageView, [channelId: string]> = (
+        view,
+        channelId
+      ) => dispatchViews.message(view, buildMessageEventContext(event, channelId));
+      return updateOnDmvCryButtonPressed(event, dispatchMessageView);
     }
     case '[Web] IndexRequested':
     case '[Web] FleetLootEditorRequested':
@@ -59,7 +73,7 @@ async function update(
       }
 
       const dispatchMessageView: DispatchView<MessageView> = (view) =>
-        dispatchViews.message(view, buildMessageEventContext(event));
+        dispatchViews.message(view, buildMessageEventContext(event, event.channelId));
       switch (event.type) {
         case '[Web] FleetLootEditorRequested':
           return updateOnWebFleetLootEditorRequested(event, dispatchWebView);
@@ -76,8 +90,8 @@ async function update(
   }
 }
 
-function buildMessageEventContext(event: MessageAssociatedEvent): MessageEventContext {
-  const { channelId, chatService } = event;
+function buildMessageEventContext(event: ChatServiceEvent, channelId: string): MessageEventContext {
+  const { chatService } = event;
   return {
     eventId: nanoid(),
     channelId,
@@ -87,16 +101,18 @@ function buildMessageEventContext(event: MessageAssociatedEvent): MessageEventCo
   };
 }
 
-type MessageAssociatedEvent = Extract<Event, MessageAssociatedEventCommon>;
+type ChatServiceEvent = Extract<Event, ChatServiceEventCommon>;
 
-function getReplyToUserId(event: MessageAssociatedEvent): string | null {
+function getReplyToUserId(event: ChatServiceEvent): string | null {
   switch (event.type) {
-    case '[Chat] KiwiButtonPressed':
-    case '[Chat] HandsUpButtonPressed':
-    case '[Chat] Pinged':
-    case '[Chat] ImagePosted':
-    case '[Chat] CommandIssued':
+    case '[TeaDispenser] CommandIssued':
+    case '[Dmv] CryButtonPressed':
       return event.triggeringUserId;
+    case '[Chat] Pinged':
+    case '[TeaDispenser] ImagePosted':
+    case '[TeaDispenser] KiwiButtonPressed':
+    case '[TeaDispenser] HandsUpButtonPressed':
+    case '[Dmv] InstallCommandIssued':
     case '[Web] FleetLootEditorRequested':
     case '[Web] FleetLootEditorPosted':
     case '[Web] NeederChooserRequested':
@@ -106,17 +122,19 @@ function getReplyToUserId(event: MessageAssociatedEvent): string | null {
   }
 }
 
-function getMessageIdToEdit(event: MessageAssociatedEvent): string | null {
+function getMessageIdToEdit(event: ChatServiceEvent): string | null {
   switch (event.type) {
-    case '[Chat] KiwiButtonPressed':
+    case '[TeaDispenser] KiwiButtonPressed':
       return event.buttonAssociatedMessageId;
     case '[Web] FleetLootEditorPosted':
     case '[Web] NeedsEditorPosted':
       return event.messageId;
-    case '[Chat] HandsUpButtonPressed':
     case '[Chat] Pinged':
-    case '[Chat] ImagePosted':
-    case '[Chat] CommandIssued':
+    case '[TeaDispenser] HandsUpButtonPressed':
+    case '[TeaDispenser] ImagePosted':
+    case '[TeaDispenser] CommandIssued':
+    case '[Dmv] CryButtonPressed':
+    case '[Dmv] InstallCommandIssued':
     case '[Web] FleetLootEditorRequested':
     case '[Web] NeederChooserRequested':
     case '[Web] NeedsEditorRequested':

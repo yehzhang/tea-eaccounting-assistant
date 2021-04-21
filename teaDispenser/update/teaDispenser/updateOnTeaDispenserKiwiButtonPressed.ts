@@ -1,22 +1,26 @@
 import _ from 'lodash';
-import DispatchView from '../data/DispatchView';
-import FleetLootRecord from '../data/FleetLootRecord';
-import { KiwiButtonPressedEvent } from '../event/Event';
-import MessageView from '../view/message/MessageView';
-import buildFleetLootRecordUpdatedView from './buildFleetLootRecordUpdatedView';
+import DispatchView from '../../data/DispatchView';
+import FleetLootRecord from '../../data/FleetLootRecord';
+import { TeaDispenserKiwiButtonPressedEvent } from '../../event/Event';
+import MessageView from '../../view/message/MessageView';
+import buildFleetLootRecordUpdatedView from '../buildFleetLootRecordUpdatedView';
+import fetchFleetLootRecord from '../web/fetchFleetLootRecord';
 import OneShotDuplex from './OneShotDuplex';
 
-async function updateOnKiwiButtonPressed(
-  event: KiwiButtonPressedEvent,
+async function updateOnTeaDispenserKiwiButtonPressed(
+  event: TeaDispenserKiwiButtonPressedEvent,
   dispatchView: DispatchView<MessageView>
 ): Promise<boolean> {
-  const {
-    fleetLootRecord,
-    userId,
+  const { userId, chatService, channelId, buttonAssociatedMessageId } = event;
+  const fleetLootRecord = await fetchFleetLootRecord(
     chatService,
     channelId,
-    buttonAssociatedMessageId,
-  } = event;
+    buttonAssociatedMessageId
+  );
+  if (!fleetLootRecord) {
+    return false;
+  }
+
   const otherRecord = await fleetLootRecordDuplex.connect(
     userId,
     fleetLootRecord,
@@ -51,4 +55,4 @@ async function updateOnKiwiButtonPressed(
 
 const fleetLootRecordDuplex = new OneShotDuplex<FleetLootRecord>();
 
-export default updateOnKiwiButtonPressed;
+export default updateOnTeaDispenserKiwiButtonPressed;

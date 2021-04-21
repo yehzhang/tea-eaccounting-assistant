@@ -2,23 +2,23 @@ import axios from 'axios';
 import { createWriteStream } from 'fs';
 import _ from 'lodash';
 import { basename } from 'path';
-import DispatchView from '../data/DispatchView';
-import MessageEventContext from '../data/MessageEventContext';
-import RecognizedItem from '../data/RecognizedItem';
-import UserInputPricedItemStack from '../data/UserInputPricedItemStack';
-import { ImagePostedEvent } from '../event/Event';
-import useExternalContext from '../external/useExternalContext';
-import MessageView from '../view/message/MessageView';
-import normalizeItemName from './fuzzySearch/normalizeItemName';
-import getFleetLootEditorUrl from './getFleetLootEditorUrl';
+import DispatchView from '../../data/DispatchView';
+import MessageEventContext from '../../data/MessageEventContext';
+import RecognizedItem from '../../data/RecognizedItem';
+import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
+import { TeaDispenserImagePostedEvent } from '../../event/Event';
+import useExternalContext from '../../external/useExternalContext';
+import MessageView from '../../view/message/MessageView';
+import normalizeItemName from '../fuzzySearch/normalizeItemName';
+import getFleetLootEditorUrl from '../getFleetLootEditorUrl';
+import getNeederChooserUrl from '../getNeederChooserUrl';
+import getTempPath from '../getTempPath';
+import recognizeItems from '../itemDetection/recognizeItems';
+import fetchPriceByItemTypeId from '../market/fetchPriceByItemTypeId';
 import getItemTypeIdByName from './getItemTypeIdByName';
-import getNeederChooserUrl from './getNeederChooserUrl';
-import getTempPath from './getTempPath';
-import recognizeItems from './itemDetection/recognizeItems';
-import fetchPriceByItemTypeId from './market/fetchPriceByItemTypeId';
 
-async function updateOnImagePosted(
-  event: ImagePostedEvent,
+async function updateOnTeaDispenserImagePosted(
+  event: TeaDispenserImagePostedEvent,
   context: MessageEventContext,
   dispatchView: DispatchView<MessageView>,
 ): Promise<boolean> {
@@ -123,4 +123,4 @@ async function populateItemStack({
   };
 }
 
-export default updateOnImagePosted;
+export default updateOnTeaDispenserImagePosted;

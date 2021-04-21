@@ -1,5 +1,5 @@
-import DispatchView from '../data/DispatchView';
-import WebPageView from '../view/webPage/WebPageView';
+import DispatchView from '../../data/DispatchView';
+import WebPageView from '../../view/webPage/WebPageView';
 
 function updateOnWebIndexRequested(dispatchView: DispatchView<WebPageView>): Promise<boolean> {
   return dispatchView({ type: 'IndexView' });

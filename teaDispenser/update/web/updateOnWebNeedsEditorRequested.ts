@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import DispatchView from '../data/DispatchView';
-import { WebNeedsEditorRequestedEvent } from '../event/Event';
-import WebPageView from '../view/webPage/WebPageView';
+import DispatchView from '../../data/DispatchView';
+import { WebNeedsEditorRequestedEvent } from '../../event/Event';
+import WebPageView from '../../view/webPage/WebPageView';
 import areNeedsEditable from './areNeedsEditable';
 import fetchFleetLootRecord from './fetchFleetLootRecord';
 

@@ -1,6 +1,6 @@
-import DispatchView from '../data/DispatchView';
-import { WebFleetLootEditorRequestedEvent } from '../event/Event';
-import WebPageView from '../view/webPage/WebPageView';
+import DispatchView from '../../data/DispatchView';
+import { WebFleetLootEditorRequestedEvent } from '../../event/Event';
+import WebPageView from '../../view/webPage/WebPageView';
 import fetchFleetLootRecord from './fetchFleetLootRecord';
 
 async function updateOnWebFleetLootEditorRequested(

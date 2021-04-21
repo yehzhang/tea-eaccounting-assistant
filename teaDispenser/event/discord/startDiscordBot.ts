@@ -2,8 +2,8 @@ import { Client, MessageReaction, PartialUser, User } from 'discord.js';
 import DispatchEvent from '../../data/DispatchEvent';
 import getEnvironmentVariable from '../../external/getEnvironmentVariable';
 import Event from '../Event';
-import parseEventFromMessage from './parseEventFromMessage';
-import parseEventFromMessageReaction from './parseEventFromMessageReaction';
+import parseTeaDispenserEventFromMessage from './parseTeaDispenserEventFromMessage';
+import parseTeaDispenserEventFromReaction from './parseTeaDispenserEventFromReaction';
 
 async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Client> {
   const client = new Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'] });
@@ -17,7 +17,7 @@ async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Cli
     console.info(`Logged in as ${clientUser.tag}!`);
 
     client.on('message', async (message) => {
-      const event = parseEventFromMessage(message, clientUser.id);
+      const event = parseTeaDispenserEventFromMessage(message, clientUser.id);
       if (event) {
         await dispatchEvent(event);
       }
@@ -29,7 +29,7 @@ async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Cli
         if (messageReaction.message.partial) {
           await messageReaction.message.fetch();
         }
-        const event = parseEventFromMessageReaction(messageReaction, partialUser.id, clientUser.id);
+        const event = parseTeaDispenserEventFromReaction(messageReaction, partialUser.id, clientUser.id);
         if (event) {
           await dispatchEvent(event);
         }

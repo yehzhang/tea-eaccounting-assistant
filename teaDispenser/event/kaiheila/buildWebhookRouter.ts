@@ -1,13 +1,18 @@
 import bodyParser from 'koa-bodyparser';
 import Router from 'koa-router';
-import ChatServiceApi from '../../data/ChatServiceApi';
 import DispatchEvent from '../../data/DispatchEvent';
-import KaiheilaMessageType from '../../data/KaiheilaMessageType';
-import getEnvironmentVariable from '../../external/getEnvironmentVariable';
 import Event from '../Event';
-import parseEventFromWebhookEvent from './parseEventFromWebhookEvent';
+import KaiheilaMessageType from './KaiheilaMessageType';
+import parseWebhookEvent from './parseWebhookEvent';
+import WebhookEvent from './WebhookEvent';
 
-function buildWebhookRouter(dispatchEvent: DispatchEvent<Event>, chatServiceApi: ChatServiceApi): Router {
+/** The webhook router must be a singleton in order to handle callbacks correctly. */
+function buildWebhookRouter(
+  dispatchEvent: DispatchEvent<Event>,
+  eventParsers: {
+    readonly [verifyToken: string]: (event: WebhookEvent) => Event | null;
+  }
+): Router {
   const router = new Router();
 
   router.post(
@@ -26,8 +31,9 @@ function buildWebhookRouter(dispatchEvent: DispatchEvent<Event>, chatServiceApi:
       }
 
       const { d: data = {}, sn } = context.request.body;
-      const { type, challenge, verify_token } = data;
-      if (verify_token !== verifyToken) {
+      const { type, challenge, verify_token: verifyToken } = data;
+      const parseEvent = eventParsers[verifyToken];
+      if (!parseEvent) {
         console.warn('Unexpected verify token in webhook call', data);
         context.status = 400;
         return;
@@ -49,17 +55,17 @@ function buildWebhookRouter(dispatchEvent: DispatchEvent<Event>, chatServiceApi:
         return;
       }
 
-      // Do not await here in order to unblock the response.
-      parseEventFromWebhookEvent(data, chatServiceApi).then(
-        (event) => void (event && dispatchEvent(event))
-      );
+      const webhookEvent = parseWebhookEvent(data);
+      const event = webhookEvent && parseEvent(webhookEvent);
+      if (event) {
+        // Do not await here in order to unblock the response.
+        void dispatchEvent(event);
+      }
     }
   );
   const cachedSns: unknown[] = [];
 
   return router;
 }
-
-const verifyToken = getEnvironmentVariable('KAIHEILA_VERIFY_TOKEN');
 
 export default buildWebhookRouter;

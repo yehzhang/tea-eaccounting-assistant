@@ -1,7 +1,10 @@
 import _ from 'lodash';
 
 function getEnvironmentVariable(key: string): string;
-function getEnvironmentVariable<T>(key: string, validator: (text: string) => T | null): T;
+function getEnvironmentVariable<T>(
+  key: string,
+  validator: (text: string) => T | null | undefined
+): T;
 function getEnvironmentVariable<T>(
   key: string,
   validator: (text: string) => T | null = _.identity
@@ -12,7 +15,7 @@ function getEnvironmentVariable<T>(
   }
 
   const validatedValue = validator(text);
-  if (validatedValue === null) {
+  if (validatedValue == null) {
     throw new TypeError(`Unexpected \`${key}\` environment variable value`);
   }
 

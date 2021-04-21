@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-export async function fetchKaiheila(
+/** Returns the `data` object of the API response. */
+async function fetchKaiheila(
   botToken: string,
   method: 'GET' | 'POST',
   path: string,
-  payload: object
+  payload?: object
 ): Promise<{ readonly [key: string]: any } | null> {
   await waitForRateLimit();
 
@@ -31,7 +32,7 @@ export async function fetchKaiheila(
   }
 
   if (data.code !== 0) {
-    console.error('Unexpected Kaiheila error response', data);
+    console.error('Unexpected Kaiheila error response', data, path, payload);
     return null;
   }
 

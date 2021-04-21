@@ -1,12 +1,12 @@
-import DispatchView from '../data/DispatchView';
-import { CommandIssuedEvent } from '../event/Event';
-import MessageView, { MarketQueryResult } from '../view/message/MessageView';
-import normalizeItemName from './fuzzySearch/normalizeItemName';
+import DispatchView from '../../data/DispatchView';
+import { TeaDispenserCommandIssuedEvent } from '../../event/Event';
+import MessageView, { MarketQueryResult } from '../../view/message/MessageView';
+import normalizeItemName from '../fuzzySearch/normalizeItemName';
+import fetchPriceByItemTypeId from '../market/fetchPriceByItemTypeId';
 import getItemTypeIdByName from './getItemTypeIdByName';
-import fetchPriceByItemTypeId from './market/fetchPriceByItemTypeId';
 
-async function updateOnCommandIssued(
-  event: CommandIssuedEvent,
+async function updateOnTeaDispenserCommandIssued(
+  event: TeaDispenserCommandIssuedEvent,
   dispatchView: DispatchView<MessageView>
 ): Promise<boolean> {
   const { command } = event;
@@ -64,4 +64,4 @@ async function updateOnCommandIssued(
   }
 }
 
-export default updateOnCommandIssued;
+export default updateOnTeaDispenserCommandIssued;

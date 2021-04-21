@@ -1,18 +1,20 @@
 import { Message, Snowflake } from 'discord.js';
 import _ from 'lodash';
-import Event, { ChatServiceEventCommon } from '../Event';
+import Event, { TeaDispenserEventCommon } from '../Event';
 import parseCommand from '../parseCommand';
 
-function parseEventFromMessage(message: Message, clientUserId: Snowflake): Event | null {
+function parseTeaDispenserEventFromMessage(
+  message: Message,
+  clientUserId: Snowflake
+): Event | null {
   const { id, author, content, attachments, channel } = message;
   if (author.id === clientUserId || !(channel.type === 'text' || channel.type === 'dm')) {
     return null;
   }
 
-  const eventCommon: ChatServiceEventCommon = {
-    chatService: 'discord',
+  const eventCommon: TeaDispenserEventCommon = {
+    chatService: 'discordTeaDispenser',
     channelId: message.channel.id,
-    triggeringUserId: message.author.id,
   };
   const imageUrls = _.compact(
     [...attachments.values()].map((attachment) => {
@@ -28,7 +30,7 @@ function parseEventFromMessage(message: Message, clientUserId: Snowflake): Event
   );
   if (imageUrls.length) {
     return {
-      type: '[Chat] ImagePosted',
+      type: '[TeaDispenser] ImagePosted',
       ...eventCommon,
       urls: imageUrls,
       username: author.username,
@@ -45,13 +47,14 @@ function parseEventFromMessage(message: Message, clientUserId: Snowflake): Event
   const command = parseCommand(content);
   if (command) {
     return {
-      type: '[Chat] CommandIssued',
+      type: '[TeaDispenser] CommandIssued',
       ...eventCommon,
       command,
+      triggeringUserId: message.author.id,
     };
   }
 
   return null;
 }
 
-export default parseEventFromMessage;
+export default parseTeaDispenserEventFromMessage;

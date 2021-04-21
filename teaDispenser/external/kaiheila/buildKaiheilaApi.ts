@@ -1,16 +1,16 @@
 import _ from 'lodash';
+import Channel from '../../data/Channel';
 import ChatServiceApi from '../../data/ChatServiceApi';
 import EmbedMessage from '../../data/EmbedMessage';
 import fromKaiheilaMessage from '../../data/fromKaiheilaMessage';
-import KaiheilaMessageType from '../../data/KaiheilaMessageType';
 import RenderedMessageContent from '../../data/RenderedMessageContent';
-import getEnvironmentVariable from '../getEnvironmentVariable';
-import { fetchKaiheila } from './fetchKaiheila';
+import KaiheilaMessageType from '../../event/kaiheila/KaiheilaMessageType';
+import fetchBotUserId from './fetchBotUserId';
+import fetchKaiheila from './fetchKaiheila';
 
-function buildKaiheilaApi(botToken: string): ChatServiceApi {
+async function buildKaiheilaApi(botToken: string): Promise<ChatServiceApi> {
   return {
-    // TODO read from API.
-    botUserId: getEnvironmentVariable('KAIHEILA_BOT_USER_ID'),
+    botUserId: await fetchBotUserId(botToken),
 
     async fetchMessage(channelId, messageId) {
       const latestMessages = await fetchKaiheilaMessages(botToken, channelId);
@@ -40,11 +40,10 @@ function buildKaiheilaApi(botToken: string): ChatServiceApi {
     },
 
     async sendMessage(channelId, content, replyToUserId) {
-      // TODO implement reply to.
       const response = await fetchKaiheila(botToken, 'POST', '/api/v3/message/create', {
         type: KaiheilaMessageType.MARKDOWN,
         target_id: channelId,
-        content: buildMessageContent(content),
+        content: buildMessageContent(content, replyToUserId),
       });
       if (!response) {
         return null;
@@ -58,10 +57,9 @@ function buildKaiheilaApi(botToken: string): ChatServiceApi {
     },
 
     async editMessage(channelId, messageId, content, replyToUserId) {
-      // TODO implement reply to.
       const response = await fetchKaiheila(botToken, 'POST', '/api/v3/message/update', {
         msg_id: messageId,
-        content: buildMessageContent(content),
+        content: buildMessageContent(content, replyToUserId),
       });
       return !!response;
     },
@@ -74,15 +72,40 @@ function buildKaiheilaApi(botToken: string): ChatServiceApi {
     },
 
     async fetchReactions(channelId, messageId) {
-      // TODO Why does this API have to take an emoji param???
-      // TODO Implement.
-      //
-      // const response = await fetchKaiheila(botToken, 'GET', '/api/v3/message/reaction-list', {
-      //   msg_id: messageId,
-      //   emoji: '???',
-      // });
-      // console.log('fetchReactions response', response)
+      // TODO Remove. Force reactions to be passed from the message event.
       return [];
+    },
+
+    async fetchReactionUsers(messageId, emojiId) {
+      const response = await fetchKaiheila(botToken, 'GET', '/api/v3/message/reaction-list', {
+        msg_id: messageId,
+        emoji: emojiId,
+      });
+      if (!response) {
+        return [];
+      }
+
+      if (!_.isArray(response)) {
+        console.error('Expected user array, got', response);
+        return [];
+      }
+      return _.compact(
+        response.map((userData) => {
+          if (typeof userData !== 'object' || !userData) {
+            console.error('Expected user object, got', response);
+            return null;
+          }
+          const { id, nickname } = userData;
+          if (typeof id !== 'string' || typeof nickname !== 'string') {
+            console.error('Expected valid user object, got', response);
+            return null;
+          }
+          return {
+            id,
+            name: nickname,
+          };
+        })
+      );
     },
 
     async reactMessage(channelId, messageId, content) {
@@ -91,6 +114,72 @@ function buildKaiheilaApi(botToken: string): ChatServiceApi {
         emoji: content,
       });
       return !!response;
+    },
+
+    async createChannel(guildId, name, categoryId): Promise<string | null> {
+      const response = await fetchKaiheila(botToken, 'POST', '/api/v3/channel/create', {
+        guild_id: guildId,
+        parent_id: categoryId,
+        name,
+      });
+      if (!response) {
+        return null;
+      }
+      const { id } = response || {};
+      if (typeof id !== 'string') {
+        console.error('Expected channel id in response, got', response);
+        return null;
+      }
+      return id;
+    },
+
+    async createChannelPermission(channelId, userId, allow, deny): Promise<boolean> {
+      // The everyone role is always created already.
+      if (userId !== 0) {
+        const creationResponse = await fetchKaiheila(
+          botToken,
+          'POST',
+          '/api/v3/channel-role/create',
+          {
+            channel_id: channelId,
+            type: typeof userId === 'number' ? 'role_id' : 'user_id',
+            value: userId,
+          }
+        );
+        if (!creationResponse) {
+          return false;
+        }
+      }
+
+      const response = await fetchKaiheila(botToken, 'POST', '/api/v3/channel-role/update', {
+        channel_id: channelId,
+        type: typeof userId === 'number' ? 'role_id' : 'user_id',
+        value: userId,
+        allow,
+        deny,
+      });
+      return !!response;
+    },
+
+    async fetchChannel(channelId: string): Promise<Channel | null> {
+      const response = await fetchKaiheila(botToken, 'GET', '/api/v3/channel/view', {
+        target_id: channelId,
+      });
+      if (!response) {
+        return null;
+      }
+
+      const { id, guild_id: guildId, parent_id: categoryId } = response;
+      if (typeof id !== 'string' || typeof guildId !== 'string' || typeof categoryId !== 'string') {
+        console.error('Expected valid channel, got', response);
+        return null;
+      }
+
+      return {
+        id,
+        guildId,
+        categoryId,
+      };
     },
   };
 }
@@ -125,10 +214,11 @@ async function fetchKaiheilaMessages(
   return items;
 }
 
-function buildMessageContent(content: RenderedMessageContent): string {
-  return typeof content === 'string'
-    ? formatText(content)
-    : buildKaiheilaCardMessage(content.embed);
+function buildMessageContent(content: RenderedMessageContent, replyToUserId?: string): string {
+  const mentionText = replyToUserId ? `(met)${replyToUserId}(met) ` : '';
+  const bodyText =
+    typeof content === 'string' ? formatText(content) : buildKaiheilaCardMessage(content.embed);
+  return `${mentionText}${bodyText}`;
 }
 
 function buildKaiheilaCardMessage({ title, description }: EmbedMessage): string {

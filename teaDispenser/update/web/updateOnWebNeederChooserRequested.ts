@@ -1,7 +1,7 @@
-import DispatchView from '../data/DispatchView';
-import { WebNeederChooserRequestedEvent } from '../event/Event';
-import webServerBaseUrl from '../external/webServerBaseUrl';
-import WebPageView from '../view/webPage/WebPageView';
+import DispatchView from '../../data/DispatchView';
+import { WebNeederChooserRequestedEvent } from '../../event/Event';
+import webServerBaseUrl from '../../external/webServerBaseUrl';
+import WebPageView from '../../view/webPage/WebPageView';
 import areNeedsEditable from './areNeedsEditable';
 import fetchFleetLootRecord from './fetchFleetLootRecord';
 

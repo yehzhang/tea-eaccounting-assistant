@@ -17,6 +17,8 @@ function fromDiscordMessage(message: DiscordMessage): Message {
         }
       : null,
     createdAt,
+    // TODO implement
+    mentionedRoles: [],
   };
 }
 

@@ -148,6 +148,29 @@ function viewMessage(view: MessageView): RenderedMessage | null {
         replyTo: 'user',
       };
     }
+    case 'BlueFuckeryQueueIntroductionView': {
+      const { mentionedRoles } = view;
+      // Caveat: this is Kaiheila markdown which is not compatible with Discord.
+      const ccedRoles = mentionedRoles
+        .map((mentionedRole) => ` (rol)${mentionedRole}(rol)`)
+        .join('');
+      const ccedRolesView = ccedRoles ? `，会自动抄送给${ccedRoles}` : '';
+      return {
+        content:
+          '如果你无法通过简单沟通自行解决问题，请使用本申诉系统。' +
+          '很多蓝加冲突事件都是在无意和误会中产生的。请准备好尽可能多的蓝加恶意行为证据，请注意：' +
+          '证据越多，调查速度越快，对应惩罚措施也会更严厉。\n\n' +
+          `点击下方${cryButton}表情以开始申诉${ccedRolesView}`,
+        reactionContents: [cryButton],
+      };
+    }
+    case 'BlueFuckeryTicketIntroductionView':
+      return {
+        content:
+          '如遇蓝加恶意行为，请提供尽可能多的截图证据。提供的信息越多越能加快我们的处理时间。' +
+          '同时请提供有关玩家游戏内名片以便我们联系相关军团/联盟。',
+        replyTo: 'user',
+      };
     case 'DeletedView':
       return null;
   }
@@ -199,5 +222,7 @@ function mention(userId: string): string {
 }
 
 const yzDiscordUserId = '202649496381816832';
+
+const cryButton = '😢';
 
 export default viewMessage;

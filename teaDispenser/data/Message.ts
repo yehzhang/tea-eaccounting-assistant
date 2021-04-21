@@ -7,6 +7,7 @@ interface Message {
     readonly description: string;
   } | null;
   readonly createdAt: Date;
+  readonly mentionedRoles: readonly number[];
 }
 
 export default Message;

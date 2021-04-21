@@ -1,10 +1,10 @@
-import MessageApi from './MessageApi';
+import ChatService from './ChatService';
 
 interface MessageEventContext {
   readonly eventId: string;
   readonly channelId: string;
   readonly replyToUserId: string | null;
-  readonly messageApi: MessageApi;
+  readonly chatService: ChatService;
   messageIdToEdit: string | null;
 }
 

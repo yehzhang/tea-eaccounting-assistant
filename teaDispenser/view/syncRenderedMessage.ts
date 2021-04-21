@@ -1,8 +1,9 @@
 import AsyncLock from 'async-lock';
-import MessageApi from '../data/MessageApi';
+import ChatServiceApi from '../data/ChatServiceApi';
 import MessageEventContext from '../data/MessageEventContext';
 import RenderedMessage from '../data/RenderedMessage';
 import RenderedMessageContent from '../data/RenderedMessageContent';
+import useChatServiceContext from '../external/useChatServiceContext';
 
 async function syncRenderedMessage(
   renderedMessage: RenderedMessage | null,
@@ -14,10 +15,11 @@ async function syncRenderedMessage(
 
   // Avoid race conditions that create a second message which could have been an edit.
   await lock.acquire(context.eventId, async () => {
-    const { channelId, replyToUserId, messageIdToEdit, messageApi } = context;
+    const { channelId, replyToUserId, messageIdToEdit, chatService } = context;
+    const { api } = useChatServiceContext(chatService);
     if (!renderedMessage) {
       if (messageIdToEdit) {
-        await messageApi.deleteMessage(channelId, messageIdToEdit);
+        await api.deleteMessage(channelId, messageIdToEdit);
       }
       context.messageIdToEdit = null;
       return;
@@ -29,12 +31,12 @@ async function syncRenderedMessage(
       channelId,
       (replyTo && replyToUserId) ?? undefined,
       messageIdToEdit,
-      messageApi
+      api
     );
     context.messageIdToEdit = newlySentMessageId;
 
     if (newlySentMessageId) {
-      await syncReactions(reactionContents, channelId, newlySentMessageId, messageApi);
+      await syncReactions(reactionContents, channelId, newlySentMessageId, api);
     }
   });
   return true;
@@ -45,22 +47,22 @@ async function syncMessageContent(
   channelId: string,
   replyToUserId: string | undefined,
   sentMessageId: string | null,
-  messageApi: MessageApi
+  chatServiceApi: ChatServiceApi
 ): Promise<string | null> {
   if (sentMessageId) {
-    await messageApi.editMessage(channelId, sentMessageId, content, replyToUserId);
+    await chatServiceApi.editMessage(channelId, sentMessageId, content, replyToUserId);
     return sentMessageId;
   }
-  return messageApi.sendMessage(channelId, content, replyToUserId);
+  return chatServiceApi.sendMessage(channelId, content, replyToUserId);
 }
 
 async function syncReactions(
   reactionContents: readonly string[],
   channelId: string,
   messageId: string,
-  messageApi: MessageApi
+  chatServiceApi: ChatServiceApi
 ): Promise<void> {
-  const reactions = await messageApi.fetchReactions(channelId, messageId);
+  const reactions = await chatServiceApi.fetchReactions(channelId, messageId);
   await Promise.all([
     // TODO Remove reactions no longer rendered.
     // ...message.reactions.cache
@@ -74,12 +76,12 @@ async function syncReactions(
       .filter((reactionContent) =>
         reactions.every(
           (reaction) =>
-            reaction.userId !== messageApi.userId && reaction.content !== reactionContent
+            reaction.userId !== chatServiceApi.botUserId && reaction.content !== reactionContent
         )
       )
       .reduce<Promise<unknown>>(
         (promise, reactionContent) =>
-          promise.then(() => messageApi.reactMessage(channelId, messageId, reactionContent)),
+          promise.then(() => chatServiceApi.reactMessage(channelId, messageId, reactionContent)),
         Promise.resolve()
       ),
   ]);

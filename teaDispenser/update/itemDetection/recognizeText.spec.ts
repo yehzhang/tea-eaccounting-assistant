@@ -1,5 +1,5 @@
 import { Scheduler } from 'tesseract.js';
-import startTesseract from '../../externalDependency/startTesseract';
+import startTesseract from '../../external/startTesseract';
 import recognizeText from './recognizeText';
 import getTestImage from './testData/getTestImage';
 

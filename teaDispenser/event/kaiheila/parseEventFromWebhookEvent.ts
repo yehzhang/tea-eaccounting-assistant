@@ -1,11 +1,11 @@
+import ChatServiceApi from '../../data/ChatServiceApi';
 import KaiheilaMessageType from '../../data/KaiheilaMessageType';
-import MessageApi from '../../data/MessageApi';
-import parseFleetLootRecord from '../discord/parseFleetLootRecord';
-import Event, { MessageServiceEventCommon } from '../Event';
+import Event from '../Event';
+import parseEventFromMessageReaction from './parseEventFromMessageReaction';
 
-async function parseEventsFromWebhookEvent(
+async function parseEventFromWebhookEvent(
   data: { readonly [key: string]: any },
-  messageApi: MessageApi
+  chatServiceApi: ChatServiceApi,
 ): Promise<Event | null> {
   if (data.type === KaiheilaMessageType.TEXT) {
     const triggeringUserId = data.extra?.author?.id;
@@ -19,14 +19,14 @@ async function parseEventsFromWebhookEvent(
       return null;
     }
 
-    if (triggeringUserId === messageApi.userId) {
+    if (triggeringUserId === chatServiceApi.botUserId) {
       return null;
     }
 
     if (content === 'ping') {
       return {
-        type: '[Message] Pinged',
-        messageServiceProvider: 'kaiheila',
+        type: '[Chat] Pinged',
+        chatService: 'kaiheila',
         channelId,
         triggeringUserId,
       };
@@ -49,13 +49,13 @@ async function parseEventsFromWebhookEvent(
       return null;
     }
 
-    if (triggeringUserId === messageApi.userId) {
+    if (triggeringUserId === chatServiceApi.botUserId) {
       return null;
     }
 
     return {
-      type: '[Message] ImagePosted',
-      messageServiceProvider: 'kaiheila',
+      type: '[Chat] ImagePosted',
+      chatService: 'kaiheila',
       channelId,
       triggeringUserId,
       urls: [data.content],
@@ -89,45 +89,17 @@ async function parseEventsFromWebhookEvent(
     }
 
     // TODO Remove this once update logic is updated.
-    if (triggeringUserId === messageApi.userId) {
+    if (triggeringUserId === chatServiceApi.botUserId) {
       return null;
     }
 
-    const message = await messageApi.fetchMessage(channelId, messageId);
-    if (!message || message.externalUserId !== messageApi.userId) {
+    const message = await chatServiceApi.fetchMessage(channelId, messageId);
+    if (!message || message.externalUserId !== chatServiceApi.botUserId) {
       return null;
     }
-    const fleetLootRecord = parseFleetLootRecord(message);
-    if (!fleetLootRecord) {
-      return null;
-    }
-
-    const eventCommon: MessageServiceEventCommon = {
-      messageServiceProvider: 'kaiheila',
-      channelId,
-      triggeringUserId,
-    };
-    if (emoji.id === '[#128588;]') {
-      return {
-        type: '[Message] HandsUpButtonPressed',
-        ...eventCommon,
-        fleetLoot: fleetLootRecord.fleetLoot,
-        fleetLootRecordTitle: fleetLootRecord.title,
-        needs: fleetLootRecord.needs,
-      };
-    }
-    if (emoji.id === '[#129373;]') {
-      return {
-        type: '[Message] KiwiButtonPressed',
-        ...eventCommon,
-        fleetLootRecord,
-        userId: triggeringUserId,
-        buttonAssociatedMessageId: messageId,
-      };
-    }
-    return null;
+    return parseEventFromMessageReaction(emoji.id, message, messageId, channelId, triggeringUserId);
   }
   return null;
 }
 
-export default parseEventsFromWebhookEvent;
+export default parseEventFromWebhookEvent;

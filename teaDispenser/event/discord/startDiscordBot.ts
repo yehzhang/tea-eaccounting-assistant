@@ -1,5 +1,6 @@
 import { Client, MessageReaction, PartialUser, User } from 'discord.js';
 import DispatchEvent from '../../data/DispatchEvent';
+import getEnvironmentVariable from '../../external/getEnvironmentVariable';
 import Event from '../Event';
 import parseEventFromMessage from './parseEventFromMessage';
 import parseEventFromMessageReaction from './parseEventFromMessageReaction';
@@ -36,10 +37,8 @@ async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Cli
     );
   });
 
-  if (!process.env.DISCORD_BOT_TOKEN) {
-    throw new TypeError('Please set the `DISCORD_BOT_TOKEN` environment variable');
-  }
-  await client.login(process.env.DISCORD_BOT_TOKEN);
+  const discordBotToken = getEnvironmentVariable('DISCORD_BOT_TOKEN');
+  await client.login(discordBotToken);
 
   return client;
 }

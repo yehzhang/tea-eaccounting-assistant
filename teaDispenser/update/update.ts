@@ -1,11 +1,8 @@
 import { nanoid } from 'nanoid';
 import DispatchView from '../data/DispatchView';
-import MessageApi from '../data/MessageApi';
 import MessageEventContext from '../data/MessageEventContext';
-import MessageServiceProvider from '../data/MessageServiceProvider';
 import WebServerEventContext from '../data/WebServerEventContext';
 import Event, { MessageAssociatedEventCommon } from '../event/Event';
-import ExternalDependency from '../externalDependency/ExternalDependency';
 import MessageView from '../view/message/MessageView';
 import WebPageView from '../view/webPage/WebPageView';
 import updateOnCommandIssued from './updateOnCommandIssued';
@@ -25,30 +22,27 @@ async function update(
   dispatchViews: {
     readonly message: DispatchView<MessageView, [MessageEventContext]>;
     readonly webPage: DispatchView<WebPageView, [WebServerEventContext]>;
-  },
-  externalDependency: ExternalDependency
+  }
 ): Promise<boolean> {
-  const { schedulers } = externalDependency;
   switch (event.type) {
-    case '[Message] Pinged':
-    case '[Message] ImagePosted':
-    case '[Message] HandsUpButtonPressed':
-    case '[Message] KiwiButtonPressed':
-    case '[Message] CommandIssued': {
-      const messageApi = chooseMessageApi(event.messageServiceProvider, externalDependency);
-      const context = getMessageEventContext(event, messageApi);
+    case '[Chat] Pinged':
+    case '[Chat] ImagePosted':
+    case '[Chat] HandsUpButtonPressed':
+    case '[Chat] KiwiButtonPressed':
+    case '[Chat] CommandIssued': {
+      const context = buildMessageEventContext(event);
       const dispatchMessageView: DispatchView<MessageView> = (view) =>
         dispatchViews.message(view, context);
       switch (event.type) {
-        case '[Message] Pinged':
+        case '[Chat] Pinged':
           return updateOnPinged(dispatchMessageView);
-        case '[Message] ImagePosted':
-          return updateOnImagePosted(event, context, dispatchMessageView, schedulers);
-        case '[Message] HandsUpButtonPressed':
+        case '[Chat] ImagePosted':
+          return updateOnImagePosted(event, context, dispatchMessageView);
+        case '[Chat] HandsUpButtonPressed':
           return updateOnHandsUpButtonPressed(event, dispatchMessageView);
-        case '[Message] KiwiButtonPressed':
+        case '[Chat] KiwiButtonPressed':
           return updateOnKiwiButtonPressed(event, dispatchMessageView);
-        case '[Message] CommandIssued':
+        case '[Chat] CommandIssued':
           return updateOnCommandIssued(event, dispatchMessageView);
       }
     }
@@ -64,44 +58,31 @@ async function update(
         return updateOnWebIndexRequested(dispatchWebView);
       }
 
-      const messageApi = chooseMessageApi(event.messageServiceProvider, externalDependency);
       const dispatchMessageView: DispatchView<MessageView> = (view) =>
-        dispatchViews.message(view, getMessageEventContext(event, messageApi));
+        dispatchViews.message(view, buildMessageEventContext(event));
       switch (event.type) {
         case '[Web] FleetLootEditorRequested':
-          return updateOnWebFleetLootEditorRequested(event, dispatchWebView, messageApi);
+          return updateOnWebFleetLootEditorRequested(event, dispatchWebView);
         case '[Web] FleetLootEditorPosted':
-          return updateOnWebFleetLootEditorPosted(
-            event,
-            dispatchWebView,
-            dispatchMessageView,
-            messageApi
-          );
+          return updateOnWebFleetLootEditorPosted(event, dispatchWebView, dispatchMessageView);
         case '[Web] NeederChooserRequested':
-          return updateOnWebNeederChooserRequested(event, dispatchWebView, messageApi);
+          return updateOnWebNeederChooserRequested(event, dispatchWebView);
         case '[Web] NeedsEditorRequested':
-          return updateOnWebNeedsEditorRequested(event, dispatchWebView, messageApi);
+          return updateOnWebNeedsEditorRequested(event, dispatchWebView);
         case '[Web] NeedsEditorPosted':
-          return updateOnWebNeedsEditorPosted(
-            event,
-            dispatchWebView,
-            dispatchMessageView,
-            messageApi
-          );
+          return updateOnWebNeedsEditorPosted(event, dispatchWebView, dispatchMessageView);
       }
     }
   }
 }
 
-function getMessageEventContext(
-  event: MessageAssociatedEvent,
-  messageApi: MessageApi
-): MessageEventContext {
+function buildMessageEventContext(event: MessageAssociatedEvent): MessageEventContext {
+  const { channelId, chatService } = event;
   return {
     eventId: nanoid(),
-    channelId: event.channelId,
+    channelId,
     replyToUserId: getReplyToUserId(event),
-    messageApi,
+    chatService: chatService,
     messageIdToEdit: getMessageIdToEdit(event),
   };
 }
@@ -110,11 +91,11 @@ type MessageAssociatedEvent = Extract<Event, MessageAssociatedEventCommon>;
 
 function getReplyToUserId(event: MessageAssociatedEvent): string | null {
   switch (event.type) {
-    case '[Message] KiwiButtonPressed':
-    case '[Message] HandsUpButtonPressed':
-    case '[Message] Pinged':
-    case '[Message] ImagePosted':
-    case '[Message] CommandIssued':
+    case '[Chat] KiwiButtonPressed':
+    case '[Chat] HandsUpButtonPressed':
+    case '[Chat] Pinged':
+    case '[Chat] ImagePosted':
+    case '[Chat] CommandIssued':
       return event.triggeringUserId;
     case '[Web] FleetLootEditorRequested':
     case '[Web] FleetLootEditorPosted':
@@ -127,31 +108,19 @@ function getReplyToUserId(event: MessageAssociatedEvent): string | null {
 
 function getMessageIdToEdit(event: MessageAssociatedEvent): string | null {
   switch (event.type) {
-    case '[Message] KiwiButtonPressed':
+    case '[Chat] KiwiButtonPressed':
       return event.buttonAssociatedMessageId;
     case '[Web] FleetLootEditorPosted':
     case '[Web] NeedsEditorPosted':
       return event.messageId;
-    case '[Message] HandsUpButtonPressed':
-    case '[Message] Pinged':
-    case '[Message] ImagePosted':
-    case '[Message] CommandIssued':
+    case '[Chat] HandsUpButtonPressed':
+    case '[Chat] Pinged':
+    case '[Chat] ImagePosted':
+    case '[Chat] CommandIssued':
     case '[Web] FleetLootEditorRequested':
     case '[Web] NeederChooserRequested':
     case '[Web] NeedsEditorRequested':
       return null;
-  }
-}
-
-function chooseMessageApi(
-  messageServiceProvider: MessageServiceProvider,
-  { discordApi, kaiheilaApi }: { readonly discordApi: MessageApi; readonly kaiheilaApi: MessageApi }
-): MessageApi {
-  switch (messageServiceProvider) {
-    case 'discord':
-      return discordApi;
-    case 'kaiheila':
-      return kaiheilaApi;
   }
 }
 

@@ -1,18 +1,16 @@
 import DispatchView from '../data/DispatchView';
-import MessageApi from '../data/MessageApi';
-import webServerBaseUrl from '../data/webServerBaseUrl';
 import { WebNeederChooserRequestedEvent } from '../event/Event';
+import webServerBaseUrl from '../external/webServerBaseUrl';
 import WebPageView from '../view/webPage/WebPageView';
 import areNeedsEditable from './areNeedsEditable';
 import fetchFleetLootRecord from './fetchFleetLootRecord';
 
 async function updateOnWebNeederChooserRequested(
   event: WebNeederChooserRequestedEvent,
-  dispatchView: DispatchView<WebPageView>,
-  messageApi: MessageApi
+  dispatchView: DispatchView<WebPageView>
 ): Promise<boolean> {
-  const { channelId, messageId, messageServiceProvider } = event;
-  const fleetLootRecord = await fetchFleetLootRecord(messageApi, channelId, messageId);
+  const { channelId, messageId, chatService } = event;
+  const fleetLootRecord = await fetchFleetLootRecord(chatService, channelId, messageId);
   if (!fleetLootRecord) {
     return dispatchView({
       type: 'InvalidFleetLootRecordView',
@@ -28,7 +26,7 @@ async function updateOnWebNeederChooserRequested(
 
   const needsEditorLinks = fleetLoot.fleetMembers.map((fleetMember) => ({
     needer: fleetMember,
-    needsEditorUrl: `${webServerBaseUrl}/needs-editor/${messageServiceProvider}/${channelId}/${messageId}/${encodeURIComponent(
+    needsEditorUrl: `${webServerBaseUrl}/needs-editor/${chatService}/${channelId}/${messageId}/${encodeURIComponent(
       fleetMember
     )}`,
   }));

@@ -13,7 +13,7 @@ async function updateOnKiwiButtonPressed(
   const {
     fleetLootRecord,
     userId,
-    messageServiceProvider,
+    chatService,
     channelId,
     buttonAssociatedMessageId,
   } = event;
@@ -32,7 +32,7 @@ async function updateOnKiwiButtonPressed(
 
   return dispatchView(
     buildFleetLootRecordUpdatedView(
-      messageServiceProvider,
+      chatService,
       {
         ...fleetLootRecord,
         fleetLoot: {

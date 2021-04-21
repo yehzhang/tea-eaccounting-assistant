@@ -1,13 +1,13 @@
 import Router from 'koa-router';
+import ChatService from '../data/ChatService';
 import DispatchEvent from '../data/DispatchEvent';
-import MessageServiceProvider from '../data/MessageServiceProvider';
 import Event from './Event';
 import parseFleetLootEditorForm from './parseFleetLootEditorForm';
 import parseNeedsEditorForm from './parseNeedsEditorForm';
 import useTranscodingMiddlewares from './useTranscodingMiddlewares';
 
-function buildMessageBasedServicesRouter(
-  serviceProvider: MessageServiceProvider,
+function buildChatServiceRouter(
+  serviceProvider: ChatService,
   dispatchEvent: DispatchEvent<Event>
 ) {
   const router = new Router();
@@ -19,7 +19,7 @@ function buildMessageBasedServicesRouter(
     await dispatchEvent({
       type: `[Web] FleetLootEditorRequested`,
       ie10OrBelow: !!(context.headers['user-agent'] || '').match(/\bMSIE\b/),
-      messageServiceProvider: serviceProvider,
+      chatService: serviceProvider,
       channelId,
       messageId,
       context: {
@@ -31,7 +31,7 @@ function buildMessageBasedServicesRouter(
     const { channelId, messageId } = context.params;
     await dispatchEvent({
       type: `[Web] FleetLootEditorPosted`,
-      messageServiceProvider: serviceProvider,
+      chatService: serviceProvider,
       channelId,
       messageId,
       fleetLoot: parseFleetLootEditorForm(context.request.body),
@@ -45,7 +45,7 @@ function buildMessageBasedServicesRouter(
     const { channelId, messageId } = context.params;
     await dispatchEvent({
       type: `[Web] NeederChooserRequested`,
-      messageServiceProvider: serviceProvider,
+      chatService: serviceProvider,
       channelId,
       messageId,
       context: {
@@ -57,7 +57,7 @@ function buildMessageBasedServicesRouter(
     const { channelId, messageId, needer } = context.params;
     await dispatchEvent({
       type: `[Web] NeedsEditorRequested`,
-      messageServiceProvider: serviceProvider,
+      chatService: serviceProvider,
       channelId,
       messageId,
       needer,
@@ -70,7 +70,7 @@ function buildMessageBasedServicesRouter(
     const { channelId, messageId, needer } = context.params;
     await dispatchEvent({
       type: `[Web] NeedsEditorPosted`,
-      messageServiceProvider: serviceProvider,
+      chatService: serviceProvider,
       channelId,
       messageId,
       needer,
@@ -84,4 +84,4 @@ function buildMessageBasedServicesRouter(
   return router;
 }
 
-export default buildMessageBasedServicesRouter;
+export default buildChatServiceRouter;

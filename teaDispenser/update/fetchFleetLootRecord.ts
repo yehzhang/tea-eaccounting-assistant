@@ -1,18 +1,20 @@
+import ChatService from '../data/ChatService';
 import FleetLootRecord from '../data/FleetLootRecord';
-import MessageApi from '../data/MessageApi';
-import parseFleetLootRecord from '../event/discord/parseFleetLootRecord';
+import parseFleetLootRecord from '../event/parseFleetLootRecord';
+import useChatServiceContext from '../external/useChatServiceContext';
 
 async function fetchFleetLootRecord(
-  messageApi: MessageApi,
+  chatService: ChatService,
   channelId: string,
   messageId: string
 ): Promise<FleetLootRecord | null> {
-  const message = await messageApi.fetchMessage(channelId, messageId);
+  const { api } = useChatServiceContext(chatService);
+  const message = await api.fetchMessage(channelId, messageId);
   if (!message) {
     return null;
   }
 
-  if (message.externalUserId !== messageApi.userId) {
+  if (message.externalUserId !== api.botUserId) {
     console.warn('Unexpected access to an unauthorized message:', {
       channelId,
       messageId,

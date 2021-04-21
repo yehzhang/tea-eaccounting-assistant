@@ -1,10 +1,10 @@
 import _ from 'lodash';
-import FleetLootRecord from '../../data/FleetLootRecord';
-import Message from '../../data/Message';
-import Needs from '../../data/Needs';
-import tableColumnSeparator from '../../data/tableColumnSeparator';
-import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
-import fromDoubleByteCharacterText from '../../view/message/fromDoubleByteCharacterText';
+import FleetLootRecord from '../data/FleetLootRecord';
+import Message from '../data/Message';
+import Needs from '../data/Needs';
+import tableColumnSeparator from '../data/tableColumnSeparator';
+import UserInputPricedItemStack from '../data/UserInputPricedItemStack';
+import fromDoubleByteCharacterText from '../view/message/fromDoubleByteCharacterText';
 
 function parseFleetLootRecord(message: Message): FleetLootRecord | null {
   if (!message.embed) {

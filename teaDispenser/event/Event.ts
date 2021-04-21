@@ -1,9 +1,9 @@
+import ChatService from '../data/ChatService';
 import Command from '../data/Command';
 import FleetLoot from '../data/FleetLoot';
 import FleetLootRecord from '../data/FleetLootRecord';
 import InvalidCommand from '../data/InvalidCommand';
 import ItemStack from '../data/ItemStack';
-import MessageServiceProvider from '../data/MessageServiceProvider';
 import Needs from '../data/Needs';
 import WebServerEventContext from '../data/WebServerEventContext';
 
@@ -21,38 +21,38 @@ type Event =
   | WebIndexRequested;
 
 export interface MessageAssociatedEventCommon {
-  readonly messageServiceProvider: MessageServiceProvider;
+  readonly chatService: ChatService;
   readonly channelId: string;
 }
 
-export interface MessageServiceEventCommon extends MessageAssociatedEventCommon {
+export interface ChatServiceEventCommon extends MessageAssociatedEventCommon {
   readonly triggeringUserId: string;
 }
 
-export interface PingedEvent extends MessageServiceEventCommon {
-  readonly type: '[Message] Pinged';
+export interface PingedEvent extends ChatServiceEventCommon {
+  readonly type: '[Chat] Pinged';
 }
 
-export interface ImagePostedEvent extends MessageServiceEventCommon {
-  readonly type: '[Message] ImagePosted';
+export interface ImagePostedEvent extends ChatServiceEventCommon {
+  readonly type: '[Chat] ImagePosted';
   readonly urls: readonly string[];
   readonly username: string;
 }
 
-export interface HandsUpButtonPressedEvent extends MessageServiceEventCommon {
-  readonly type: '[Message] HandsUpButtonPressed';
+export interface HandsUpButtonPressedEvent extends ChatServiceEventCommon {
+  readonly type: '[Chat] HandsUpButtonPressed';
   readonly fleetLoot: FleetLoot;
   readonly fleetLootRecordTitle: string;
   readonly needs: Needs;
 }
 
-export interface CommandIssuedEvent extends MessageServiceEventCommon {
-  readonly type: '[Message] CommandIssued';
+export interface CommandIssuedEvent extends ChatServiceEventCommon {
+  readonly type: '[Chat] CommandIssued';
   readonly command: Command | InvalidCommand;
 }
 
-export interface KiwiButtonPressedEvent extends MessageServiceEventCommon {
-  readonly type: '[Message] KiwiButtonPressed';
+export interface KiwiButtonPressedEvent extends ChatServiceEventCommon {
+  readonly type: '[Chat] KiwiButtonPressed';
   readonly fleetLootRecord: FleetLootRecord;
   readonly userId: string;
   readonly buttonAssociatedMessageId: string;

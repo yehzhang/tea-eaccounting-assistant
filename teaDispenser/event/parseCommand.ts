@@ -1,6 +1,6 @@
-import Command from '../../data/Command';
-import InvalidCommand from '../../data/InvalidCommand';
-import { commandPrefix, queryPriceCommandView } from '../../view/message/commandViews';
+import Command from '../data/Command';
+import InvalidCommand from '../data/InvalidCommand';
+import { commandPrefix, queryPriceCommandView } from '../view/message/commandViews';
 
 function parseCommand(text: string): Command | InvalidCommand | null {
   const cleanText = text.trim();

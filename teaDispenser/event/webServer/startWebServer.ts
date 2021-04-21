@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import Router from 'koa-router';
 import { URL } from 'url';
-import webServerBaseUrl from '../../data/webServerBaseUrl';
+import webServerBaseUrl from '../../external/webServerBaseUrl';
 
 function startWebServer(routers: readonly Router[]) {
   const koa = new Koa();

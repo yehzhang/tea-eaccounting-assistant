@@ -1,18 +1,13 @@
 import logInfo from './logInfo';
 
-async function startApp<E, V, D>(
-  initialize: (dispatchEvent: (event: E) => Promise<void>) => Promise<D>,
-  update: (event: E, dispatchViews: V, externalDependency: D) => Promise<unknown>,
+function startApp<E, V>(
+  initialize: (dispatchEvent: (event: E) => Promise<void>) => Promise<void>,
+  update: (event: E, dispatchViews: V) => Promise<unknown>,
   dispatchViews: V
 ): Promise<void> {
-  const externalDependency = await initialize(async (event) => {
-    if (!externalDependency) {
-      throw new TypeError('Unexpected event dispatched during initialization');
-    }
-
+  return initialize(async (event) => {
     logInfo('[Core] event', event, /* depth= */ 4);
-
-    await update(event, dispatchViews, externalDependency);
+    await update(event, dispatchViews);
   });
 }
 

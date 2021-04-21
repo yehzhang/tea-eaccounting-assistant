@@ -1,8 +1,8 @@
-import MessageServiceProvider from '../data/MessageServiceProvider';
-import webServerBaseUrl from '../data/webServerBaseUrl';
+import ChatService from '../data/ChatService';
+import webServerBaseUrl from '../external/webServerBaseUrl';
 
 function getFleetLootEditorUrl(
-  serviceProvider: MessageServiceProvider,
+  serviceProvider: ChatService,
   channelId: string,
   messageId: string
 ): string {

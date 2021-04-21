@@ -1,7 +1,7 @@
 import { imreadAsync, Mat } from 'opencv4nodejs';
 import { Scheduler } from 'tesseract.js';
 import RecognizedItem from '../../data/RecognizedItem';
-import { TesseractSchedulers } from '../../externalDependency/ExternalDependency';
+import { TesseractContext } from '../../external/ExternalContext';
 import locateItemStacks, { LocatedItemStack } from './locateItemStacks';
 import recognizeDigit from './recognizeDigit';
 import recognizeItemIcon from './recognizeItemIcon';
@@ -10,7 +10,7 @@ import removeFactionSuperscript from './removeFactionSuperscript';
 
 async function recognizeItems(
   imagePath: string,
-  schedulers: TesseractSchedulers
+  schedulers: TesseractContext
 ): Promise<readonly Promise<RecognizedItem | null>[]> {
   console.debug('Recognizing image:', imagePath);
 

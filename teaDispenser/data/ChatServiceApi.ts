@@ -2,8 +2,8 @@ import Message from './Message';
 import Reaction from './Reaction';
 import RenderedMessageContent from './RenderedMessageContent';
 
-interface MessageApi {
-  readonly userId: string;
+interface ChatServiceApi {
+  readonly botUserId: string;
 
   fetchMessage(channelId: string, messageId: MessageId): Promise<Message | null>;
 
@@ -29,4 +29,4 @@ interface MessageApi {
 
 type MessageId = string;
 
-export default MessageApi;
+export default ChatServiceApi;

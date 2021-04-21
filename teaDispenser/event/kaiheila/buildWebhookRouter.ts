@@ -1,12 +1,13 @@
 import bodyParser from 'koa-bodyparser';
 import Router from 'koa-router';
+import ChatServiceApi from '../../data/ChatServiceApi';
 import DispatchEvent from '../../data/DispatchEvent';
 import KaiheilaMessageType from '../../data/KaiheilaMessageType';
-import MessageApi from '../../data/MessageApi';
+import getEnvironmentVariable from '../../external/getEnvironmentVariable';
 import Event from '../Event';
-import parseEventsFromWebhookEvent from './parseEventsFromWebhookEvent';
+import parseEventFromWebhookEvent from './parseEventFromWebhookEvent';
 
-function buildWebhookRouter(dispatchEvent: DispatchEvent<Event>, messageApi: MessageApi): Router {
+function buildWebhookRouter(dispatchEvent: DispatchEvent<Event>, chatServiceApi: ChatServiceApi): Router {
   const router = new Router();
 
   router.post(
@@ -49,7 +50,7 @@ function buildWebhookRouter(dispatchEvent: DispatchEvent<Event>, messageApi: Mes
       }
 
       // Do not await here in order to unblock the response.
-      parseEventsFromWebhookEvent(data, messageApi).then(
+      parseEventFromWebhookEvent(data, chatServiceApi).then(
         (event) => void (event && dispatchEvent(event))
       );
     }
@@ -59,9 +60,6 @@ function buildWebhookRouter(dispatchEvent: DispatchEvent<Event>, messageApi: Mes
   return router;
 }
 
-if (!process.env.KAIHEILA_VERIFY_TOKEN) {
-  throw new TypeError('Expected environment variable `KAIHEILA_VERIFY_TOKEN`');
-}
-const verifyToken: string = process.env.KAIHEILA_VERIFY_TOKEN;
+const verifyToken = getEnvironmentVariable('KAIHEILA_VERIFY_TOKEN');
 
 export default buildWebhookRouter;

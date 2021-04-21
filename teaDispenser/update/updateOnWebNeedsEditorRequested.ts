@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import DispatchView from '../data/DispatchView';
-import MessageApi from '../data/MessageApi';
 import { WebNeedsEditorRequestedEvent } from '../event/Event';
 import WebPageView from '../view/webPage/WebPageView';
 import areNeedsEditable from './areNeedsEditable';
@@ -8,11 +7,10 @@ import fetchFleetLootRecord from './fetchFleetLootRecord';
 
 async function updateOnWebNeedsEditorRequested(
   event: WebNeedsEditorRequestedEvent,
-  dispatchView: DispatchView<WebPageView>,
-  messageApi: MessageApi
+  dispatchView: DispatchView<WebPageView>
 ): Promise<boolean> {
-  const { channelId, messageId, needer } = event;
-  const fleetLootRecord = await fetchFleetLootRecord(messageApi, channelId, messageId);
+  const { channelId, messageId, needer, chatService } = event;
+  const fleetLootRecord = await fetchFleetLootRecord(chatService, channelId, messageId);
   if (!fleetLootRecord) {
     return dispatchView({
       type: 'InvalidFleetLootRecordView',

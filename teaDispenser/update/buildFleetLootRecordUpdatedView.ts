@@ -1,11 +1,11 @@
+import ChatService from '../data/ChatService';
 import FleetLootRecord from '../data/FleetLootRecord';
-import MessageServiceProvider from '../data/MessageServiceProvider';
 import MessageView from '../view/message/MessageView';
 import getFleetLootEditorUrl from './getFleetLootEditorUrl';
 import getNeederChooserUrl from './getNeederChooserUrl';
 
 function buildFleetLootRecordUpdatedView(
-  serviceProvider: MessageServiceProvider,
+  serviceProvider: ChatService,
   fleetLootRecord: FleetLootRecord,
   channelId: string,
   messageId: string

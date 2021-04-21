@@ -1,17 +1,13 @@
 import { Client, MessageOptions } from 'discord.js';
+import ChatServiceApi from '../data/ChatServiceApi';
 import fromDiscordMessage from '../data/fromDiscordMessage';
-import MessageApi from '../data/MessageApi';
 import RenderedMessageContent from '../data/RenderedMessageContent';
 import fetchDiscordChannel from './fetchDiscordChannel';
 import fetchDiscordMessage from './fetchDiscordMessage';
 
-function buildDiscordApi(discordBot: Client): MessageApi {
-  const { user } = discordBot;
-  if (!user) {
-    throw new TypeError('Expected signed in Discord bot');
-  }
+function buildDiscordApi(discordBot: Client): ChatServiceApi {
   return {
-    userId: user.id,
+    botUserId: discordBot.user!.id,
 
     async fetchMessage(channelId, messageId) {
       const channel = await fetchDiscordChannel(discordBot, channelId);

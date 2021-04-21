@@ -7,7 +7,7 @@ import MessageEventContext from '../data/MessageEventContext';
 import RecognizedItem from '../data/RecognizedItem';
 import UserInputPricedItemStack from '../data/UserInputPricedItemStack';
 import { ImagePostedEvent } from '../event/Event';
-import { TesseractSchedulers } from '../externalDependency/ExternalDependency';
+import useExternalContext from '../external/useExternalContext';
 import MessageView from '../view/message/MessageView';
 import normalizeItemName from './fuzzySearch/normalizeItemName';
 import getFleetLootEditorUrl from './getFleetLootEditorUrl';
@@ -21,9 +21,8 @@ async function updateOnImagePosted(
   event: ImagePostedEvent,
   context: MessageEventContext,
   dispatchView: DispatchView<MessageView>,
-  schedulers: TesseractSchedulers
 ): Promise<boolean> {
-  const { urls, username, channelId, messageServiceProvider } = event;
+  const { urls, username, channelId, chatService } = event;
   let detectingItems = true;
   const ignored = (async () => {
     let magnifierDirection = true;
@@ -42,6 +41,7 @@ async function updateOnImagePosted(
     }
   })();
 
+  const { schedulers } = useExternalContext();
   const itemStacksList = await Promise.all(
     urls.map(async (url) => {
       const path = await fetchTempFile(url);
@@ -76,8 +76,8 @@ async function updateOnImagePosted(
     type: 'ItemsRecognizedView',
     itemStacks,
     username,
-    fleetLootEditorUrl: getFleetLootEditorUrl(messageServiceProvider, channelId, messageIdToEdit),
-    neederChooserUrl: getNeederChooserUrl(messageServiceProvider, channelId, messageIdToEdit),
+    fleetLootEditorUrl: getFleetLootEditorUrl(chatService, channelId, messageIdToEdit),
+    neederChooserUrl: getNeederChooserUrl(chatService, channelId, messageIdToEdit),
   });
 }
 

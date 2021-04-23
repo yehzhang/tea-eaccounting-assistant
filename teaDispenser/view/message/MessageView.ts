@@ -53,6 +53,7 @@ type MessageView =
     }
   | {
       readonly type: 'BlueFuckeryTicketIntroductionView';
+      readonly mentionedRoles: readonly number[];
     }
   | {
       readonly type: 'DeletedView';

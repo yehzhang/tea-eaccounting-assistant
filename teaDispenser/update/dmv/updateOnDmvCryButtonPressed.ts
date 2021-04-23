@@ -68,7 +68,10 @@ async function updateOnDmvCryButtonPressed(
       api.createChannelPermission(
         newChannelId,
         mentionedRole,
-        /* allow= */ ChatServicePermission.VIEW,
+        /* allow= */ ChatServicePermission.INVITATION_LINK |
+          ChatServicePermission.CHANNEL_METADATA |
+          ChatServicePermission.PERMISSION |
+          ChatServicePermission.VIEW,
         /* deny= */ ChatServicePermission.NONE
       )
     ),
@@ -77,6 +80,7 @@ async function updateOnDmvCryButtonPressed(
   return dispatchMessageView(
     {
       type: 'BlueFuckeryTicketIntroductionView',
+      mentionedRoles
     },
     newChannelId
   );

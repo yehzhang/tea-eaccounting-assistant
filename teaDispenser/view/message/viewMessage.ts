@@ -150,11 +150,8 @@ function viewMessage(view: MessageView): RenderedMessage | null {
     }
     case 'BlueFuckeryQueueIntroductionView': {
       const { mentionedRoles } = view;
-      // Caveat: this is Kaiheila markdown which is not compatible with Discord.
-      const ccedRoles = mentionedRoles
-        .map((mentionedRole) => ` (rol)${mentionedRole}(rol)`)
-        .join('');
-      const ccedRolesView = ccedRoles ? `，会自动抄送给${ccedRoles}` : '';
+      const ccedRoles = renderMentionedRoles(mentionedRoles);
+      const ccedRolesView = ccedRoles ? `，会自动抄送给 ${ccedRoles}` : '';
       return {
         content:
           '如果你无法通过简单沟通自行解决问题，请使用本申诉系统。' +
@@ -164,16 +161,24 @@ function viewMessage(view: MessageView): RenderedMessage | null {
         reactionContents: [cryButton],
       };
     }
-    case 'BlueFuckeryTicketIntroductionView':
+    case 'BlueFuckeryTicketIntroductionView': {
+      const { mentionedRoles } = view;
+      const ccedRoles = renderMentionedRoles(mentionedRoles);
       return {
         content:
-          '如遇蓝加恶意行为，请提供尽可能多的截图证据。提供的信息越多越能加快我们的处理时间。' +
-          '同时请提供有关玩家游戏内名片以便我们联系相关军团/联盟。',
+          `${ccedRoles}${ccedRoles ? ' ' : ''}如遇蓝加恶意行为，请提供尽可能多的截图证据。` +
+          '提供的信息越多越能加快我们的处理时间。同时请提供有关玩家游戏内名片以便我们联系相关军团/联盟。',
         replyTo: 'user',
       };
+    }
     case 'DeletedView':
       return null;
   }
+}
+
+function renderMentionedRoles(mentionedRoles: readonly number[]): string {
+  // Caveat: this is Kaiheila markdown which is not compatible with Discord.
+  return mentionedRoles.map((mentionedRole) => `(rol)${mentionedRole}(rol)`).join(' ');
 }
 
 function renderPriceTimestamp(date: Date): string {

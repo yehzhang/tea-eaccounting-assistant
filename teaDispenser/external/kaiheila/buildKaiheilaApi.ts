@@ -95,6 +95,7 @@ async function buildKaiheilaApi(botToken: string): Promise<ChatServiceApi> {
             console.error('Expected user object, got', response);
             return null;
           }
+          // `nickname` is actually the same as `username` - no server nicknames available.
           const { id, nickname } = userData;
           if (typeof id !== 'string' || typeof nickname !== 'string') {
             console.error('Expected valid user object, got', response);

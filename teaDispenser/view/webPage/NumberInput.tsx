@@ -10,9 +10,28 @@ interface Props {
   readonly min: number;
 }
 
-function NumberInput(props: Props) {
+function NumberInput({
+  class: className = 'form-control',
+  name,
+  value,
+  placeholder,
+  disabled,
+  required,
+  min,
+}: Props) {
   return (
-    <input class="form-control" style="text-align: right;" type="number" step="0.1" {...props} />
+    <input
+      class={className}
+      style="text-align: right;"
+      type="number"
+      step="0.1"
+      name={name}
+      value={value}
+      placeholder={placeholder}
+      disabled={disabled}
+      required={required}
+      min={min}
+    />
   );
 }
 

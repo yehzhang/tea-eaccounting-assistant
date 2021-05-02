@@ -24,10 +24,10 @@ async function updateOnWebNeederChooserRequested(
     });
   }
 
-  const needsEditorLinks = fleetLoot.fleetMembers.map((fleetMember) => ({
-    needer: fleetMember,
+  const needsEditorLinks = fleetLoot.fleetMembers.map(({ name }) => ({
+    needer: name,
     needsEditorUrl: `${webServerBaseUrl}/needs-editor/${chatService}/${channelId}/${messageId}/${encodeURIComponent(
-      fleetMember
+      name
     )}`,
   }));
   return dispatchView({

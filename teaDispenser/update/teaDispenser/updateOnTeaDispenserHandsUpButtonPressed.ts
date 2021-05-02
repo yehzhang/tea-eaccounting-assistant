@@ -43,7 +43,7 @@ async function updateOnTeaDispenserHandsUpButtonPressed(
 
   return dispatchView({
     type: 'FleetMembersSettledUpView',
-    ...settleUpFleetLoot(fleetMembers, itemStacks, needs),
+    settledLoot: settleUpFleetLoot(fleetMembers, itemStacks, needs),
     fleetLootRecordTitle,
   });
 }

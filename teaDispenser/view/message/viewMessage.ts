@@ -11,6 +11,7 @@ import renderIsk from './renderIsk';
 import renderNumber from './renderNumber';
 import renderRelativeDate from './renderRelativeDate';
 import renderTable from './renderTable';
+import renderWeight from './renderWeight';
 
 function viewMessage(view: MessageView): RenderedMessage | null {
   switch (view.type) {
@@ -75,36 +76,52 @@ function viewMessage(view: MessageView): RenderedMessage | null {
       });
     case 'FleetMembersSettledUpView': {
       const {
-        fleetMembersLoot,
-        totalLootPrice,
-        averageLootPricePerMember,
-        balanceClear,
+        settledLoot: {
+          fleetMembersLoot,
+          totalLootPrice,
+          averageLootPricePerMember,
+          lootPricePerUnitWeight,
+          totalWeight,
+          balanceClear,
+          unequalSplit,
+        },
         fleetLootRecordTitle,
       } = view;
       return {
         content: [
           '**✨分赃完毕**',
           fleetLootRecordTitle,
-          `总价：${renderIsk(totalLootPrice)}`,
-          `${fleetMembersLoot.length}人均分价格：${renderIsk(averageLootPricePerMember)}`,
+          `总价 ${renderIsk(totalLootPrice)}`,
+          unequalSplit
+            ? `${fleetMembersLoot.length}人分${renderWeight(
+                totalWeight
+              )}份物品，每份价格 ${renderIsk(lootPricePerUnitWeight)}`
+            : `${fleetMembersLoot.length}人均分价格 ${renderIsk(averageLootPricePerMember)}`,
           !balanceClear &&
-            '补差价公式：(分得价格 - 均分价格) * 0.75，再四舍五入。分赃者不用补差价，不管写的差价是什么。',
-          ...fleetMembersLoot.flatMap(({ fleetMemberName, loot, payout }) => [
-            '',
-            `**${fleetMemberName}** ${renderIsk(
-              _.sumBy(loot, ({ amount, price }) => amount * price)
-            )}`,
-            !balanceClear &&
-              (payout === 0
-                ? '不用补差价'
-                : `${payout < 0 ? '收取' : '支付'}差价：${renderIsk(Math.abs(payout))}`),
-            renderTable(
-              ['名称', '数量'],
-              loot.map(({ name, amount }) => [name, renderNumber(amount)]),
-              /* visibleColumnSeparator= */ false,
-              /* visibleHeader= */ false
-            ),
-          ]),
+            '补差价公式：(理应获得价格 - 实际获得价格) * 0.75，再四舍五入。' +
+              '分赃者不用补差价，不管写的是什么。',
+          ...fleetMembersLoot.flatMap(
+            ({ fleetMemberName, loot, lootPrice, targetValue, weight, payout }) => [
+              '',
+              unequalSplit
+                ? `**${fleetMemberName}** 理应获得${renderWeight(weight)}份物品，总价 ${renderIsk(
+                    targetValue
+                  )}`
+                : `**${fleetMemberName}** ${renderIsk(lootPrice)}`,
+              unequalSplit && `实际获得物品价格 ${renderIsk(lootPrice)}`,
+              !balanceClear &&
+                (payout === 0
+                  ? '不用补差价'
+                  : `应${payout < 0 ? '收取' : '支付'}差价 ${renderIsk(Math.abs(payout))}`),
+              !!loot.length &&
+                renderTable(
+                  ['名称', '数量'],
+                  loot.map(({ name, amount }) => [name, renderNumber(amount)]),
+                  /* visibleColumnSeparator= */ false,
+                  /* visibleHeader= */ false
+                ),
+            ]
+          ),
         ]
           .filter((line) => !!line || line === '')
           .join('\n'),

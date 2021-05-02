@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import FleetMember from '../../data/FleetMember';
 import handsUpIcon from '../../data/handsUpIcon';
 import kiwiIcon from '../../data/kiwiIcon';
 import Needs from '../../data/Needs';
@@ -8,15 +9,17 @@ import fleetLootEditorLinkName from './fleetLootEditorLinkName';
 import renderEmbedMessage from './renderEmbedMessage';
 import renderNumber from './renderNumber';
 import renderTable from './renderTable';
+import renderWeight from './renderWeight';
 
 function renderFleetLootRecord(
   title: string,
   itemStacks: readonly UserInputPricedItemStack[],
   fleetLootEditorUrl: string,
   neederChooserUrl: string | null,
-  fleetMembers: readonly string[],
+  fleetMembers: readonly FleetMember[],
   needs: Needs
 ): RenderedMessage {
+  const weightSpecified = fleetMembers.some(({ weight }) => weight !== 1);
   return renderEmbedMessage(
     {
       title,
@@ -35,7 +38,7 @@ function renderFleetLootRecord(
           /* visibleHeader= */ false
         ),
         '',
-        ...renderFleetMembers(fleetMembers),
+        ...renderFleetMembers(fleetMembers, weightSpecified),
         ...renderNeeds(
           needs,
           itemStacks.map(({ name }) => name)
@@ -55,11 +58,20 @@ function renderFleetLootRecord(
 
 const neederChooserLinkName = '编辑需求';
 
-function renderFleetMembers(fleetMembers: readonly string[]): readonly string[] {
+function renderFleetMembers(
+  fleetMembers: readonly FleetMember[],
+  _renderWeight: boolean
+): readonly string[] {
   if (!fleetMembers.length) {
     return [];
   }
-  return ['**参与者**', ...fleetMembers.map((member) => `◦ ${member}`), ''];
+  return [
+    '**参与者**',
+    ...fleetMembers.map(
+      ({ name, weight }) => `◦ ${name}${_renderWeight ? ` ${renderWeight(weight)}份` : ''}`
+    ),
+    '',
+  ];
 }
 
 function renderNeeds(needs: Needs, itemNames: readonly string[]): readonly string[] {

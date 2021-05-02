@@ -1,42 +1,36 @@
 import _ from 'lodash';
 import Item from '../../data/Item';
+import LootAllocation from '../../data/LootAllocation';
 import Needs from '../../data/Needs';
 import findRandomMinValuedItem from './findRandomMinValuedItem';
 
+/** Returns spare items. */
 function splitItemsByNeeds<T extends Item>(
-  fleetMembers: readonly string[],
+  lootAllocations: readonly LootAllocation<T>[],
   items: readonly T[],
   needs: Needs
-): {
-  readonly fleetMembersLoot: readonly (readonly T[])[];
-  readonly spareItems: readonly T[];
-} {
-  const fleetMembersLoot: readonly T[][] = fleetMembers.map(() => []);
+): readonly T[] {
   const spareItems = [];
   for (const item of items) {
     const itemNeeds = needs.filter(({ item: { name } }) => name === item.name);
-    const unmetNeedersLoot = fleetMembersLoot.filter((loot, index) => {
+    const unmetAllocations = lootAllocations.filter(({ loot }, index) => {
       const suppliedAmount = countSuppliedAmountFromLoot(loot, item.name);
       const neededAmount = _.sumBy(
-        itemNeeds.filter(({ needer }) => needer === fleetMembers[index]),
+        itemNeeds.filter(({ needer }) => needer === lootAllocations[index].fleetMemberName),
         ({ item: { amount } }) => amount
       );
       return suppliedAmount < neededAmount;
     });
-    const neederLootToSupply = findRandomMinValuedItem(unmetNeedersLoot, (loot) =>
+    const unmetAllocation = findRandomMinValuedItem(unmetAllocations, ({ loot }) =>
       countSuppliedAmountFromLoot(loot, item.name)
     );
-    if (neederLootToSupply) {
-      neederLootToSupply.push(item);
+    if (unmetAllocation) {
+      unmetAllocation.loot.push(item);
     } else {
       spareItems.push(item);
     }
   }
-
-  return {
-    fleetMembersLoot,
-    spareItems,
-  };
+  return spareItems;
 }
 
 function countSuppliedAmountFromLoot<T extends Item>(

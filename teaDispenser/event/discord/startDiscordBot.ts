@@ -29,7 +29,11 @@ async function startDiscordBot(dispatchEvent: DispatchEvent<Event>): Promise<Cli
         if (messageReaction.message.partial) {
           await messageReaction.message.fetch();
         }
-        const event = parseTeaDispenserEventFromReaction(messageReaction, partialUser.id, clientUser.id);
+        const event = parseTeaDispenserEventFromReaction(
+          messageReaction,
+          partialUser.id,
+          clientUser.id
+        );
         if (event) {
           await dispatchEvent(event);
         }

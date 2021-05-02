@@ -1,13 +1,13 @@
 import _ from 'lodash';
-import splitItemsAmongFleetMembers from './splitItemsAmongFleetMembers';
+import splitItemsByTargetValue from './splitItemsByTargetValue';
 
-describe('splitItemsAmongFleetMembers', () => {
+describe('splitItemsByTargetValue', () => {
   beforeEach(() => {
     spyOn(_, 'sample').and.callFake((values: unknown[]) => values[0]);
   });
 
   it('works', () => {
-    const actual = splitItemsAmongFleetMembers(
+    const actual = splitItemsByTargetValue(
       [[], []],
       [
         { name: '激光炮范围扩大设备 II', price: 219000 },
@@ -89,7 +89,7 @@ describe('splitItemsAmongFleetMembers', () => {
   });
 
   it('works with outlier', () => {
-    const actual = splitItemsAmongFleetMembers(
+    const actual = splitItemsByTargetValue(
       [[], [], [], [], [], []],
       [
         { name: '激光炮范围扩大设备 II', price: 219000 },
@@ -177,7 +177,7 @@ describe('splitItemsAmongFleetMembers', () => {
   });
 
   it('works for K sets', () => {
-    const actual = splitItemsAmongFleetMembers(
+    const actual = splitItemsByTargetValue(
       [[], [], [], [], [], []],
       [
         { name: '锁定系统辅助控制器蓝图 I', price: 2000000 },
@@ -265,7 +265,7 @@ describe('splitItemsAmongFleetMembers', () => {
   });
 
   it('works for pre-split sets', () => {
-    const actual = splitItemsAmongFleetMembers(
+    const actual = splitItemsByTargetValue(
       [
         [
           { name: '锁定系统辅助控制器蓝图 I', price: 2000000 },
@@ -372,7 +372,7 @@ describe('splitItemsAmongFleetMembers', () => {
       { name: 'C', price: 3 },
       { name: 'C', price: 3 },
     ];
-    const actual = splitItemsAmongFleetMembers([[]], items, ({ price }) => price);
+    const actual = splitItemsByTargetValue([[]], items, ({ price }) => price);
 
     expect(actual).toEqual([jasmine.arrayWithExactContents(items)]);
   });

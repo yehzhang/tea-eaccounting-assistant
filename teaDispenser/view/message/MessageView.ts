@@ -1,8 +1,8 @@
 import FleetLoot from '../../data/FleetLoot';
-import FleetMemberLoot from '../../data/FleetMemberLoot';
 import InvalidCommand from '../../data/InvalidCommand';
 import ItemPrice from '../../data/ItemPrice';
 import Needs from '../../data/Needs';
+import SettledLoot from '../../data/SettledLoot';
 import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
 
 type MessageView =
@@ -36,10 +36,7 @@ type MessageView =
     }
   | {
       readonly type: 'FleetMembersSettledUpView';
-      readonly totalLootPrice: number;
-      readonly averageLootPricePerMember: number;
-      readonly fleetMembersLoot: readonly FleetMemberLoot[];
-      readonly balanceClear: boolean;
+      readonly settledLoot: SettledLoot;
       readonly fleetLootRecordTitle: string;
     }
   | InvalidCommand

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import ChatService from '../../data/ChatService';
 import FleetLootRecord from '../../data/FleetLootRecord';
+import FleetMember from '../../data/FleetMember';
 import Message from '../../data/Message';
 import Needs from '../../data/Needs';
 import tableColumnSeparator from '../../data/tableColumnSeparator';
@@ -70,17 +71,34 @@ function parseUserInputPricedItemStack(text: string): UserInputPricedItemStack |
   };
 }
 
-function parseFleetMember(text: string): string | null {
+function parseFleetMember(text: string): FleetMember | null {
   if (!text) {
     return null;
   }
 
   const parts = text.split(' ');
-  if (parts.length === 1) {
-    console.warn('Unexpected fleet member row', text);
-    return null;
+  if (parts.length === 2) {
+    return {
+      name: parts[1],
+      weight: 1,
+    };
   }
-  return parts.slice(1).join(' ');
+
+  if (parts.length === 3) {
+    const weightMatch = parts[2].match(/([\d.]+)份/) || [];
+    const weight = Number(weightMatch[1]);
+    if (isNaN(weight)) {
+      console.warn('Expected valid weight in fleet member text, got', text);
+      return null;
+    }
+    return {
+      name: parts[1],
+      weight,
+    };
+  }
+
+  console.warn('Unexpected fleet member row', text);
+  return null;
 }
 
 function parseRows<T>(

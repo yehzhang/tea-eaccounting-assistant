@@ -2,6 +2,7 @@ import _ from 'lodash';
 import ChatService from '../../data/ChatService';
 import FleetLootRecord from '../../data/FleetLootRecord';
 import FleetMember from '../../data/FleetMember';
+import fleetMemberHeader from '../../data/fleetMemberHeader';
 import Message from '../../data/Message';
 import Needs from '../../data/Needs';
 import tableColumnSeparator from '../../data/tableColumnSeparator';
@@ -76,29 +77,24 @@ function parseFleetMember(text: string): FleetMember | null {
     return null;
   }
 
-  const parts = text.split(' ');
-  if (parts.length === 2) {
+  const [bullet, ...parts] = text.split(' ');
+  if (bullet !== fleetMemberHeader) {
+    console.error('Expected valid fleet member header, got', text);
+    return null;
+  }
+
+  const weightMatch = parts[parts.length - 1].match(/([\d.]+)份/) || [];
+  const maybeWeight = Number(weightMatch[1]);
+  if (isNaN(maybeWeight)) {
     return {
-      name: parts[1],
+      name: parts.join(' '),
       weight: 1,
     };
   }
-
-  if (parts.length === 3) {
-    const weightMatch = parts[2].match(/([\d.]+)份/) || [];
-    const weight = Number(weightMatch[1]);
-    if (isNaN(weight)) {
-      console.warn('Expected valid weight in fleet member text, got', text);
-      return null;
-    }
-    return {
-      name: parts[1],
-      weight,
-    };
-  }
-
-  console.warn('Unexpected fleet member row', text);
-  return null;
+  return {
+    name: parts.slice(0, -1).join(' '),
+    weight: maybeWeight,
+  };
 }
 
 function parseRows<T>(

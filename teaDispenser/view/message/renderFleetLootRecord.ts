@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import FleetMember from '../../data/FleetMember';
+import fleetMemberHeader from '../../data/fleetMemberHeader';
 import handsUpIcon from '../../data/handsUpIcon';
 import kiwiIcon from '../../data/kiwiIcon';
 import Needs from '../../data/Needs';
@@ -68,7 +69,8 @@ function renderFleetMembers(
   return [
     '**参与者**',
     ...fleetMembers.map(
-      ({ name, weight }) => `◦ ${name}${_renderWeight ? ` ${renderWeight(weight)}份` : ''}`
+      ({ name, weight }) =>
+        `${fleetMemberHeader} ${name}${_renderWeight ? ` ${renderWeight(weight)}份` : ''}`
     ),
     '',
   ];

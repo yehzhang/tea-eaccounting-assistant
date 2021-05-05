@@ -1,12 +1,15 @@
-import ChatService from '../data/ChatService';
+import { TeaDispenserService } from '../data/ChatService';
+import toUrlFriendlyChatService from '../data/toUrlFriendlyChatService';
 import webServerBaseUrl from '../external/webServerBaseUrl';
 
 function getFleetLootEditorUrl(
-  serviceProvider: ChatService,
+  serviceProvider: TeaDispenserService,
   channelId: string,
   messageId: string
 ): string {
-  return `${webServerBaseUrl}/editor/${serviceProvider}/${channelId}/${messageId}`;
+  return `${webServerBaseUrl}/editor/${toUrlFriendlyChatService(
+    serviceProvider
+  )}/${channelId}/${messageId}`;
 }
 
 export default getFleetLootEditorUrl;

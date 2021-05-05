@@ -1,4 +1,5 @@
 import DispatchView from '../../data/DispatchView';
+import toUrlFriendlyChatService from '../../data/toUrlFriendlyChatService';
 import { WebNeederChooserRequestedEvent } from '../../event/Event';
 import webServerBaseUrl from '../../external/webServerBaseUrl';
 import WebPageView from '../../view/webPage/WebPageView';
@@ -26,9 +27,9 @@ async function updateOnWebNeederChooserRequested(
 
   const needsEditorLinks = fleetLoot.fleetMembers.map(({ name }) => ({
     needer: name,
-    needsEditorUrl: `${webServerBaseUrl}/needs-editor/${chatService}/${channelId}/${messageId}/${encodeURIComponent(
-      name
-    )}`,
+    needsEditorUrl: `${webServerBaseUrl}/needs-editor/${toUrlFriendlyChatService(
+      chatService
+    )}/${channelId}/${messageId}/${encodeURIComponent(name)}`,
   }));
   return dispatchView({
     type: 'NeederChooserView',

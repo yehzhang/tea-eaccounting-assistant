@@ -1,11 +1,11 @@
-import ChatService from '../data/ChatService';
+import { TeaDispenserService } from '../data/ChatService';
 import FleetLootRecord from '../data/FleetLootRecord';
 import MessageView from '../view/message/MessageView';
 import getFleetLootEditorUrl from './getFleetLootEditorUrl';
 import getNeederChooserUrl from './getNeederChooserUrl';
 
 function buildFleetLootRecordUpdatedView(
-  serviceProvider: ChatService,
+  serviceProvider: TeaDispenserService,
   fleetLootRecord: FleetLootRecord,
   channelId: string,
   messageId: string

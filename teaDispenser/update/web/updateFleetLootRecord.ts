@@ -1,5 +1,5 @@
 import AsyncLock from 'async-lock';
-import ChatService from '../../data/ChatService';
+import { TeaDispenserService } from '../../data/ChatService';
 import DispatchView from '../../data/DispatchView';
 import FleetLootRecord from '../../data/FleetLootRecord';
 import MessageView from '../../view/message/MessageView';
@@ -9,7 +9,7 @@ import fetchFleetLootRecord from './fetchFleetLootRecord';
 async function updateFleetLootRecord(
   channelId: string,
   messageId: string,
-  chatService: ChatService,
+  chatService: TeaDispenserService,
   dispatchView: DispatchView<MessageView>,
   update: (fleetLootRecord: FleetLootRecord) => FleetLootRecord
 ): Promise<boolean> {

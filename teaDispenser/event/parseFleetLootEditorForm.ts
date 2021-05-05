@@ -74,16 +74,14 @@ function parseIndexedRows<T extends string>(
   columnKeys: readonly T[],
   form: Form
 ): readonly { readonly [K in T]?: string }[] | null {
-  const indexedRows: {
-    [indexedColumnKey: string]: { [K in T]?: string };
-  } = {};
+  const indexedRows: { [K in T]?: string }[] = [];
   for (const [formKey, formValue] of Object.entries(form)) {
     const [columnKey, ...indexParts] = formKey.split('-');
     if (!arrayIncludes(columnKeys, columnKey)) {
       continue;
     }
-    const index = indexParts.join('-');
-    if (isNaN(Number(index)) || typeof formValue !== 'string') {
+    const index = Number(indexParts.join('-'));
+    if (isNaN(index) || typeof formValue !== 'string') {
       console.error('Expected value form entry, got', formKey, formValue, form);
       return null;
     }
@@ -91,7 +89,7 @@ function parseIndexedRows<T extends string>(
     indexedRows[index] = indexedRows[index] || {};
     indexedRows[index][columnKey] = formValue;
   }
-  return Object.values(indexedRows);
+  return _.compact(indexedRows);
 }
 
 interface Form {

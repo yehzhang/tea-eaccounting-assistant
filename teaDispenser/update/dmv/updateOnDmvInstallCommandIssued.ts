@@ -1,13 +1,13 @@
-import DispatchView from '../../data/DispatchView';
+import Reader from '../../core/Reader/Reader';
 import { DmvInstallCommandIssuedEvent } from '../../event/Event';
-import MessageView from '../../view/message/MessageView';
+import dispatchView from '../../render/message/dispatchView';
+import MessageRenderingContext from '../../render/message/MessageRenderingContext';
 
-async function updateOnDmvInstallCommandIssued(
-  event: DmvInstallCommandIssuedEvent,
-  dispatchMessageView: DispatchView<MessageView>
-): Promise<boolean> {
+function updateOnDmvInstallCommandIssued(
+  event: DmvInstallCommandIssuedEvent
+): Reader<MessageRenderingContext, boolean> {
   const { mentionedRoles } = event;
-  return dispatchMessageView({
+  return dispatchView({
     type: 'BlueFuckeryQueueIntroductionView',
     mentionedRoles,
   });

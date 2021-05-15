@@ -1,7 +1,8 @@
-import DispatchView from '../data/DispatchView';
-import MessageView from '../view/message/MessageView';
+import Reader from '../core/Reader/Reader';
+import dispatchView from '../render/message/dispatchView';
+import MessageRenderingContext from '../render/message/MessageRenderingContext';
 
-function updateOnPinged(dispatchView: DispatchView<MessageView>): Promise<boolean> {
+function updateOnPinged(): Reader<MessageRenderingContext, boolean> {
   return dispatchView({
     type: 'PongView',
   });

@@ -1,6 +1,6 @@
 import bodyParser from 'koa-bodyparser';
 import Router from 'koa-router';
-import DispatchEvent from '../../data/DispatchEvent';
+import DispatchEvent from '../../core/DispatchEvent';
 import Event from '../Event';
 import KaiheilaMessageType from './KaiheilaMessageType';
 import parseWebhookEvent from './parseWebhookEvent';

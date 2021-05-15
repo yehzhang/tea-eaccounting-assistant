@@ -1,7 +1,7 @@
 import { MessageReaction, NewsChannel } from 'discord.js';
 import handsUpIcon from '../../data/handsUpIcon';
 import kiwiIcon from '../../data/kiwiIcon';
-import Event, { TeaDispenserEventCommon } from '../Event';
+import Event, { TeaDispenserChatServiceEventCommon } from '../Event';
 
 function parseTeaDispenserEventFromReaction(
   messageReaction: MessageReaction,
@@ -22,7 +22,7 @@ function parseTeaDispenserEventFromReaction(
     return null;
   }
 
-  const eventCommon: TeaDispenserEventCommon = {
+  const eventCommon: TeaDispenserChatServiceEventCommon = {
     chatService: 'discordTeaDispenser',
     channelId: messageReaction.message.channel.id,
   };
@@ -30,15 +30,14 @@ function parseTeaDispenserEventFromReaction(
     return {
       type: '[TeaDispenser] HandsUpButtonPressed',
       ...eventCommon,
-      buttonAssociatedMessageId: messageReaction.message.id,
+      messageId: messageReaction.message.id,
     };
   }
   if (messageReaction.emoji.name === kiwiIcon) {
     return {
       type: '[TeaDispenser] KiwiButtonPressed',
       ...eventCommon,
-      userId,
-      buttonAssociatedMessageId: messageReaction.message.id,
+      messageId: messageReaction.message.id,
       triggeringUserId: userId,
     };
   }

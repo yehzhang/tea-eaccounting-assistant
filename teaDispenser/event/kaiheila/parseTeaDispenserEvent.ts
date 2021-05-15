@@ -1,10 +1,10 @@
-import Event, { TeaDispenserEventCommon } from '../Event';
+import Event, { TeaDispenserChatServiceEventCommon } from '../Event';
 import WebhookEvent from './WebhookEvent';
 
 function parseTeaDispenserEvent(
   event: WebhookEvent,
   botUserId: string
-): (Event & TeaDispenserEventCommon) | null {
+): (Event & TeaDispenserChatServiceEventCommon) | null {
   // Ignore events triggered by the bot itself.
   if (event.triggeringUserId === botUserId) {
     return null;
@@ -36,7 +36,7 @@ function parseTeaDispenserEvent(
     }
     case 'ReactionAdded': {
       const { channelId, messageId, emojiId, triggeringUserId } = event;
-      const eventCommon: TeaDispenserEventCommon = {
+      const eventCommon: TeaDispenserChatServiceEventCommon = {
         chatService: 'kaiheilaTeaDispenser',
         channelId,
       };
@@ -44,15 +44,14 @@ function parseTeaDispenserEvent(
         return {
           type: '[TeaDispenser] HandsUpButtonPressed',
           ...eventCommon,
-          buttonAssociatedMessageId: messageId,
+          messageId: messageId,
         };
       }
       if (emojiId === '[#129373;]') {
         return {
           type: '[TeaDispenser] KiwiButtonPressed',
           ...eventCommon,
-          userId: triggeringUserId,
-          buttonAssociatedMessageId: messageId,
+          messageId: messageId,
           triggeringUserId,
         };
       }

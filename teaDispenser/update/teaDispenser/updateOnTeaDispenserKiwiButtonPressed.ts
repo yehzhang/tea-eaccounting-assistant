@@ -1,43 +1,37 @@
 import _ from 'lodash';
-import DispatchView from '../../data/DispatchView';
+import Reader from '../../core/Reader/Reader';
 import FleetLootRecord from '../../data/FleetLootRecord';
+import MessageContext from '../../data/MessageContext';
 import { TeaDispenserKiwiButtonPressedEvent } from '../../event/Event';
-import MessageView from '../../view/message/MessageView';
-import buildFleetLootRecordUpdatedView from '../buildFleetLootRecordUpdatedView';
-import fetchFleetLootRecord from '../web/fetchFleetLootRecord';
+import EventContext from '../../external/EventContext';
+import dispatchView from '../../render/message/dispatchView';
 import OneShotDuplex from './OneShotDuplex';
+import fleetLootRecordReader from './web/fleetLootRecordReader';
+import overwriteFleetLootRecord from './web/overwriteFleetLootRecord';
 
-async function updateOnTeaDispenserKiwiButtonPressed(
-  event: TeaDispenserKiwiButtonPressedEvent,
-  dispatchView: DispatchView<MessageView>
-): Promise<boolean> {
-  const { userId, chatService, channelId, buttonAssociatedMessageId } = event;
-  const fleetLootRecord = await fetchFleetLootRecord(
-    chatService,
-    channelId,
-    buttonAssociatedMessageId
-  );
-  if (!fleetLootRecord) {
-    return false;
-  }
+function updateOnTeaDispenserKiwiButtonPressed(
+  event: TeaDispenserKiwiButtonPressedEvent
+): Reader<EventContext & MessageContext, boolean> {
+  const { triggeringUserId, messageId } = event;
+  return fleetLootRecordReader
+    .bind(async (fleetLootRecord) => {
+      if (!fleetLootRecord) {
+        return false;
+      }
+      const otherRecord = await fleetLootRecordDuplex.connect(
+        triggeringUserId,
+        fleetLootRecord,
+        /* timeoutMs= */ 30000
+      );
+      if (!otherRecord || fleetLootRecord.id === otherRecord.id) {
+        return true;
+      }
 
-  const otherRecord = await fleetLootRecordDuplex.connect(
-    userId,
-    fleetLootRecord,
-    /* timeoutMs= */ 30000
-  );
-  if (!otherRecord || fleetLootRecord.id === otherRecord.id) {
-    return true;
-  }
+      if (fleetLootRecord.createdAt < otherRecord.createdAt) {
+        return dispatchView({ type: 'DeletedView' });
+      }
 
-  if (fleetLootRecord.createdAt < otherRecord.createdAt) {
-    return dispatchView({ type: 'DeletedView' });
-  }
-
-  return dispatchView(
-    buildFleetLootRecordUpdatedView(
-      chatService,
-      {
+      return overwriteFleetLootRecord({
         ...fleetLootRecord,
         fleetLoot: {
           fleetMembers: _.uniq(
@@ -46,11 +40,9 @@ async function updateOnTeaDispenserKiwiButtonPressed(
           loot: otherRecord.fleetLoot.loot.concat(fleetLootRecord.fleetLoot.loot),
         },
         needs: otherRecord.needs.concat(fleetLootRecord.needs),
-      },
-      channelId,
-      buttonAssociatedMessageId
-    )
-  );
+      });
+    })
+    .mapContext((context) => ({ ...context, messageIdToEditRef: { current: messageId } }));
 }
 
 const fleetLootRecordDuplex = new OneShotDuplex<FleetLootRecord>();

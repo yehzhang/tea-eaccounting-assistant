@@ -2,82 +2,90 @@ import axios from 'axios';
 import { createWriteStream } from 'fs';
 import _ from 'lodash';
 import { basename } from 'path';
-import DispatchView from '../../data/DispatchView';
-import MessageEventContext from '../../data/MessageEventContext';
+import Reader from '../../core/Reader/Reader';
+import MessageContext from '../../data/MessageContext';
 import RecognizedItem from '../../data/RecognizedItem';
 import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
 import { TeaDispenserImagePostedEvent } from '../../event/Event';
-import useExternalContext from '../../external/useExternalContext';
-import MessageView from '../../view/message/MessageView';
-import normalizeItemName from '../fuzzySearch/normalizeItemName';
-import getFleetLootEditorUrl from '../getFleetLootEditorUrl';
-import getNeederChooserUrl from '../getNeederChooserUrl';
-import getTempPath from '../getTempPath';
-import recognizeItems from '../itemDetection/recognizeItems';
-import fetchPriceByItemTypeId from '../market/fetchPriceByItemTypeId';
+import dispatchView from '../../render/message/dispatchView';
+import MessageRenderingContext from '../../render/message/MessageRenderingContext';
+import normalizeItemName from './fuzzySearch/normalizeItemName';
+import getFleetLootEditorUrl from './getFleetLootEditorUrl';
 import getItemTypeIdByName from './getItemTypeIdByName';
+import getNeederChooserUrl from './getNeederChooserUrl';
+import getTempPath from './getTempPath';
+import recognizeItems from './itemDetection/recognizeItems';
+import fetchPriceByItemTypeId from './market/fetchPriceByItemTypeId';
 
-async function updateOnTeaDispenserImagePosted(
-  event: TeaDispenserImagePostedEvent,
-  context: MessageEventContext,
-  dispatchView: DispatchView<MessageView>,
-): Promise<boolean> {
-  const { urls, username, channelId, chatService } = event;
-  let detectingItems = true;
-  const ignored = (async () => {
-    let magnifierDirection = true;
-    while (detectingItems) {
-      const timeoutPromise = new Promise((resolve) => void setTimeout(resolve, 1260));
+function updateOnTeaDispenserImagePosted(
+  event: TeaDispenserImagePostedEvent
+): Reader<MessageRenderingContext, boolean> {
+  return new Reader(async (context) => {
+    let detectingItems = true;
+    void (async () => {
+      let magnifierDirection = true;
+      while (detectingItems) {
+        const timeoutPromise = new Promise((resolve) => void setTimeout(resolve, 1260));
 
-      const success = await dispatchView({
-        type: 'DetectingItemsView',
-        magnifierDirection,
-      });
-      if (success) {
-        magnifierDirection = !magnifierDirection;
+        const success = await dispatchView({
+          type: 'DetectingItemsView',
+          magnifierDirection,
+        }).run(context);
+        if (success) {
+          magnifierDirection = !magnifierDirection;
+        }
+
+        await timeoutPromise;
       }
+    })();
 
-      await timeoutPromise;
-    }
-  })();
-
-  const { schedulers } = useExternalContext();
-  const itemStacksList = await Promise.all(
-    urls.map(async (url) => {
-      const path = await fetchTempFile(url);
-      const recognizedItemPromises = await recognizeItems(path, schedulers);
-      return Promise.all(
-        recognizedItemPromises.map((recognizedItemPromise) =>
-          recognizedItemPromise.then(
-            (recognizedItem) => recognizedItem && populateItemStack(recognizedItem)
+    const { urls, username } = event;
+    const {
+      externalContext: { schedulers },
+    } = context;
+    const itemStacksList = await Promise.all(
+      urls.map(async (url) => {
+        const path = await fetchTempFile(url);
+        const recognizedItemPromises = await recognizeItems(path, schedulers);
+        return Promise.all(
+          recognizedItemPromises.map((recognizedItemPromise) =>
+            recognizedItemPromise.then(
+              (recognizedItem) => recognizedItem && populateItemStack(recognizedItem)
+            )
           )
-        )
-      );
-    })
-  );
-  const itemStacks = _.compact(itemStacksList.flat());
+        );
+      })
+    );
+    const itemStacks = _.compact(itemStacksList.flat());
 
-  detectingItems = false;
-  if (!itemStacks.length) {
+    detectingItems = false;
+    if (!itemStacks.length) {
+      return dispatchView({
+        type: 'NoItemsDetectedView',
+      });
+    }
+
+    const {
+      messageIdToEditRef: { current: messageIdToEdit },
+    } = context;
+    if (!messageIdToEdit) {
+      console.error('Expected a sent message from reference');
+      return dispatchView({
+        type: 'InternalErrorView',
+      });
+    }
+
+    const messageContext: MessageContext = {
+      ...context,
+      messageId: messageIdToEdit,
+    };
     return dispatchView({
-      type: 'NoItemsDetectedView',
+      type: 'ItemsRecognizedView',
+      itemStacks,
+      username,
+      fleetLootEditorUrl: getFleetLootEditorUrl(messageContext),
+      neederChooserUrl: getNeederChooserUrl(messageContext),
     });
-  }
-
-  const { messageIdToEdit } = context;
-  if (!messageIdToEdit) {
-    console.error('Expected a sent message from context:', context);
-    return dispatchView({
-      type: 'InternalErrorView',
-    });
-  }
-
-  return dispatchView({
-    type: 'ItemsRecognizedView',
-    itemStacks,
-    username,
-    fleetLootEditorUrl: getFleetLootEditorUrl(chatService, channelId, messageIdToEdit),
-    neederChooserUrl: getNeederChooserUrl(chatService, channelId, messageIdToEdit),
   });
 }
 

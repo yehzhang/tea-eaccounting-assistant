@@ -1,7 +1,7 @@
 import Router from 'koa-router';
-import DispatchEvent from '../../data/DispatchEvent';
+import DispatchEvent from '../../core/DispatchEvent';
 import Event from '../Event';
-import useTranscodingMiddlewares from '../useTranscodingMiddlewares';
+import useTranscodingMiddlewares from './useTranscodingMiddlewares';
 
 function buildWebsiteRouter(dispatchEvent: DispatchEvent<Event>): Router {
   const router = new Router();
@@ -11,9 +11,7 @@ function buildWebsiteRouter(dispatchEvent: DispatchEvent<Event>): Router {
   router.get('/', async (context) => {
     await dispatchEvent({
       type: '[Web] IndexRequested',
-      context: {
-        context,
-      },
+      koaContext: context,
     });
   });
 

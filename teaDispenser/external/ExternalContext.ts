@@ -1,11 +1,14 @@
+import { Client } from 'discord.js';
 import { Scheduler } from 'tesseract.js';
-import ChatServiceContext from './ChatServiceContext';
+import DiscordApiContext from './chatService/discord/ApiContext';
+import KaiheilaApiContext from './chatService/kaiheila/ApiContext';
 
 interface ExternalContext {
   readonly schedulers: TesseractContext;
-  readonly discordTeaDispenser: ChatServiceContext;
-  readonly kaiheilaTeaDispenser: ChatServiceContext;
-  readonly kaiheilaDmv: ChatServiceContext;
+  readonly discordBot: Client;
+  readonly discordTeaDispenser: DiscordApiContext;
+  readonly kaiheilaTeaDispenser: KaiheilaApiContext;
+  readonly kaiheilaDmv: KaiheilaApiContext;
 }
 
 export interface TesseractContext {

@@ -1,7 +1,7 @@
 import { Message, Snowflake } from 'discord.js';
 import _ from 'lodash';
-import Event, { TeaDispenserEventCommon } from '../Event';
-import parseCommand from '../parseCommand';
+import Event, { TeaDispenserChatServiceEventCommon } from '../Event';
+import parseCommand from './parseCommand';
 
 function parseTeaDispenserEventFromMessage(
   message: Message,
@@ -12,7 +12,7 @@ function parseTeaDispenserEventFromMessage(
     return null;
   }
 
-  const eventCommon: TeaDispenserEventCommon = {
+  const eventCommon: TeaDispenserChatServiceEventCommon = {
     chatService: 'discordTeaDispenser',
     channelId: message.channel.id,
   };

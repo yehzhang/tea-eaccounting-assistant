@@ -1,11 +1,6 @@
-import ChatService from './ChatService';
+import EventContext from '../external/EventContext';
+import MessageContext from './MessageContext';
 
-interface MessageEventContext {
-  readonly eventId: string;
-  readonly channelId: string;
-  readonly replyToUserId: string | null;
-  readonly chatService: ChatService;
-  messageIdToEdit: string | null;
-}
+interface MessageEventContext extends EventContext, MessageContext {}
 
 export default MessageEventContext;

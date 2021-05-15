@@ -1,89 +1,98 @@
 import { nanoid } from 'nanoid';
+import allReaders from '../../core/Reader/allReaders';
+import Reader from '../../core/Reader/Reader';
 import ChatServicePermission from '../../data/ChatServicePermission';
-import DispatchView from '../../data/DispatchView';
 import { DmvCryButtonPressedEvent } from '../../event/Event';
-import useExternalContext from '../../external/useExternalContext';
-import MessageView from '../../view/message/MessageView';
+import createChannel from '../../external/chatService/createChannel';
+import createChannelPermission from '../../external/chatService/createChannelPermission';
+import fetchChannel from '../../external/chatService/fetchChannel';
+import fetchMessage from '../../external/chatService/fetchMessage';
+import fetchReactionUsers from '../../external/chatService/fetchReactionUsers';
+import dispatchView from '../../render/message/dispatchView';
+import MessageRenderingContext from '../../render/message/MessageRenderingContext';
 
-async function updateOnDmvCryButtonPressed(
-  event: DmvCryButtonPressedEvent,
-  dispatchMessageView: DispatchView<MessageView, [channelId: string]>
-): Promise<boolean> {
-  const {
-    kaiheilaDmv: { api },
-  } = useExternalContext();
+function updateOnDmvCryButtonPressed(
+  event: DmvCryButtonPressedEvent
+): Reader<MessageRenderingContext, boolean> {
   const { triggeringUserId, messageId, emojiId, channelId } = event;
-  const [message, reactionUsers, channel] = await Promise.all([
-    api.fetchMessage(channelId, messageId),
-    api.fetchReactionUsers(messageId, emojiId),
-    api.fetchChannel(channelId),
-  ]);
+  return allReaders([
+    fetchMessage(channelId, messageId),
+    fetchReactionUsers(messageId, emojiId),
+    fetchChannel(channelId),
+  ]).bind(([message, reactionUsers, channel]) => {
+    if (!message) {
+      // Unexpected error, but no need to inform the user.
+      return false;
+    }
+    const { externalUserId, mentionedRoles } = message;
+    return new Reader((context) => {
+      // TODO Generify this.
+      if (externalUserId !== context.externalContext.kaiheilaDmv.botUserId) {
+        // Intended exit.
+        return false;
+      }
+      const triggeringUser = reactionUsers.find((user) => user.id === triggeringUserId);
+      if (!triggeringUser) {
+        console.error(
+          'Expected triggering user. Using random channel name',
+          reactionUsers,
+          triggeringUserId
+        );
+      }
+      if (!channel) {
+        // TODO Somehow inform user of the failure.
+        console.error('Expected channel. Using random category', channelId);
+        return false;
+      }
 
-  if (!message) {
-    // Unexpected error, but no need to inform the user.
-    return false;
-  }
-  const { externalUserId, mentionedRoles } = message;
-  if (externalUserId !== api.botUserId) {
-    // Intended exit.
-    return false;
-  }
-  const triggeringUser = reactionUsers.find((user) => user.id === triggeringUserId);
-  if (!triggeringUser) {
-    console.error(
-      'Expected triggering user. Using random channel name',
-      reactionUsers,
-      triggeringUserId
-    );
-  }
-  if (!channel) {
-    // TODO Somehow inform user of the failure.
-    console.error('Expected channel. Using random category', channelId);
-    return false;
-  }
+      const { guildId, categoryId } = channel;
+      const { name: username = nanoid() } = triggeringUser || {};
+      const channelName = `蓝加申诉 - ${username}`;
+      return createChannel(guildId, channelName, categoryId).bind((newChannelId) => {
+        if (!newChannelId) {
+          // TODO Somehow inform user of the failure.
+          return false;
+        }
 
-  const { guildId, categoryId } = channel;
-  const { name: username = nanoid() } = triggeringUser || {};
-  const channelName = `蓝加申诉 - ${username}`;
-  const newChannelId = await api.createChannel(guildId, channelName, categoryId);
-  if (!newChannelId) {
-    // TODO Somehow inform user of the failure.
-    return false;
-  }
-
-  await Promise.all([
-    api.createChannelPermission(
-      newChannelId,
-      /* userId= */ 0,
-      /* allow= */ ChatServicePermission.NONE,
-      /* deny= */ ChatServicePermission.VIEW
-    ),
-    api.createChannelPermission(
-      newChannelId,
-      triggeringUserId,
-      /* allow= */ ChatServicePermission.VIEW,
-      /* deny= */ ChatServicePermission.NONE
-    ),
-    ...mentionedRoles.map((mentionedRole) =>
-      api.createChannelPermission(
-        newChannelId,
-        mentionedRole,
-        /* allow= */ ChatServicePermission.INVITATION_LINK |
-          ChatServicePermission.CHANNEL_METADATA |
-          ChatServicePermission.PERMISSION |
-          ChatServicePermission.VIEW,
-        /* deny= */ ChatServicePermission.NONE
-      )
-    ),
-  ]);
-
-  return dispatchMessageView(
-    {
-      type: 'BlueFuckeryTicketIntroductionView',
-      mentionedRoles
-    },
-    newChannelId
-  );
+        return allReaders([
+          createChannelPermission(
+            newChannelId,
+            /* userId= */ 0,
+            /* allow= */ ChatServicePermission.NONE,
+            /* deny= */ ChatServicePermission.VIEW
+          ),
+          createChannelPermission(
+            newChannelId,
+            triggeringUserId,
+            /* allow= */ ChatServicePermission.VIEW,
+            /* deny= */ ChatServicePermission.NONE
+          ),
+          ...mentionedRoles.map((mentionedRole) =>
+            createChannelPermission(
+              newChannelId,
+              mentionedRole,
+              /* allow= */ ChatServicePermission.INVITATION_LINK |
+                ChatServicePermission.CHANNEL_METADATA |
+                ChatServicePermission.PERMISSION |
+                ChatServicePermission.VIEW,
+              /* deny= */ ChatServicePermission.NONE
+            )
+          ),
+        ])
+          .sequence(
+            dispatchView({
+              type: 'BlueFuckeryTicketIntroductionView',
+              mentionedRoles,
+            })
+          )
+          .mapContext((context) => ({
+            ...context,
+            channelId: newChannelId,
+            replyToUserId: event.triggeringUserId,
+          }));
+      });
+    });
+  });
 }
 
 export default updateOnDmvCryButtonPressed;

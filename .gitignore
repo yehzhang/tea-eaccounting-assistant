@@ -109,10 +109,5 @@ build/
 .DS_Store
 googleApisCredentials.json
 
-priceFetcher/mitm_module.py
-priceFetcher/fetcher.py
-priceFetcher/transport.py
-priceFetcher/eve_echoes.db
-
 scratch.ts
 /tea-eaccounting-assistant.iml

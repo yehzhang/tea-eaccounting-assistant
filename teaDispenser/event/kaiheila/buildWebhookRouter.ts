@@ -46,8 +46,8 @@ function buildWebhookRouter(
         return;
       }
       cachedSns.push(sn);
-      if (1000 < cachedSns.length) {
-        cachedSns.splice(0, 200);
+      if (50 < cachedSns.length) {
+        cachedSns.splice(0, 25);
       }
 
       if (type === KaiheilaMessageType.SYSTEM && typeof challenge === 'string') {

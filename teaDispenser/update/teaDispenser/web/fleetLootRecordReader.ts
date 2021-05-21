@@ -73,13 +73,16 @@ function parseUserInputPricedItemStack(text: string): UserInputPricedItemStack |
 }
 
 function parseFleetMember(text: string): FleetMember | null {
-  if (!text) {
+  const trimmedText = text.trim();
+  // It is unknown why Discord adds such a character before the asterisks of the next section.
+  // Probably bug.
+  if (!trimmedText || trimmedText.charCodeAt(0) === 65039) {
     return null;
   }
 
-  const [bullet, ...parts] = text.split(' ');
+  const [bullet, ...parts] = trimmedText.split(' ');
   if (bullet !== fleetMemberHeader) {
-    logError('Expected valid fleet member header', text);
+    logError('Expected valid fleet member header', trimmedText);
     return null;
   }
 

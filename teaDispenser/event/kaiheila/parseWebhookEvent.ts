@@ -6,13 +6,13 @@ import WebhookEvent from './WebhookEvent';
 function parseWebhookEvent(data: { readonly [key: string]: any }): WebhookEvent | null {
   if (data.type === KaiheilaMessageType.TEXT || data.type === KaiheilaMessageType.IMAGE) {
     const { mention_roles: mentionedRoles, author = {} } = data.extra;
-    const { nickname: triggeringUserNickname, id: triggeringUserId } = author;
+    const { username: triggeringUsername, id: triggeringUserId } = author;
     const { target_id: channelId, content } = data;
     if (
       typeof triggeringUserId !== 'string' ||
       typeof channelId !== 'string' ||
       typeof content !== 'string' ||
-      typeof triggeringUserNickname !== 'string'
+      typeof triggeringUsername !== 'string'
     ) {
       logErrorWithoutContext('Expected valid content', data);
       return null;
@@ -26,7 +26,7 @@ function parseWebhookEvent(data: { readonly [key: string]: any }): WebhookEvent 
         type: 'TextMessage',
         channelId,
         triggeringUserId,
-        triggeringUserNickname,
+        triggeringUsername,
         content,
         mentionedRoles,
       };
@@ -35,7 +35,7 @@ function parseWebhookEvent(data: { readonly [key: string]: any }): WebhookEvent 
       type: 'ImageMessage',
       channelId,
       triggeringUserId,
-      triggeringUserNickname,
+      triggeringUsername,
       content,
     };
   }

@@ -25,13 +25,13 @@ function parseTeaDispenserEvent(
       return null;
     }
     case 'ImageMessage': {
-      const { triggeringUserNickname, content, channelId } = event;
+      const { triggeringUsername, content, channelId } = event;
       return {
         type: '[TeaDispenser] ImagePosted',
         chatService: 'kaiheilaTeaDispenser',
         channelId,
         urls: [content],
-        username: triggeringUserNickname,
+        username: triggeringUsername,
       };
     }
     case 'ReactionAdded': {

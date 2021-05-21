@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@types/async-lock": "^1.1.2",
+    "@types/chokidar": "^2.1.3",
     "@types/jasmine": "^3.6.1",
     "@types/koa": "^2.13.1",
     "@types/koa-bodyparser": "^4.3.0",
@@ -32,6 +33,7 @@
     "@types/node": "^14.14.7",
     "@types/vhtml": "^2.2.1",
     "@types/winston": "^2.4.4",
+    "chokidar": "^3.5.1",
     "jasmine": "^3.6.3",
     "prettier": "^2.2.1",
     "ts-node": "^9.1.1",
@@ -45,6 +47,7 @@
     "train:chinese": "cd ./training && tesstrain.sh --fontlist 'Source Han Sans CN Semi-Light' --fonts_dir ./font --output_dir ./outputTessdata --tessdata_dir ./inputTessdata --langdata_dir ./langdata --overwrite --lang chi_sim",
     "train:english": "cd ./training && tesstrain.sh --fontlist 'Source Han Sans CN Semi-Light' --fonts_dir ./font --output_dir ./outputTessdata --tessdata_dir ./inputTessdata --langdata_dir ./langdata --overwrite --lang eng",
     "test": "run(){ ts-node node_modules/jasmine/bin/jasmine ${@:-./**/*.spec.ts}; }; run",
+    "start:dev": "node --loader ts-node/esm --experimental-specifier-resolution=node devIndex.ts",
     "start": "node --loader ts-node/esm --experimental-specifier-resolution=node teaDispenser/index.ts"
   }
 }

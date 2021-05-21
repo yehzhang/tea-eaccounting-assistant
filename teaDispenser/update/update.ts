@@ -1,6 +1,5 @@
 import EventContext from '../core/EventContext';
 import Reader from '../core/Reader/Reader';
-import useContext from '../core/Reader/useContext';
 import runUpdateWithEventContext from '../core/runUpdateWithEventContext';
 import Event from '../event/Event';
 import updateOnDmvCryButtonPressed from './dmv/updateOnDmvCryButtonPressed';
@@ -22,29 +21,27 @@ import updateOnWebNeedsEditorRequested from './teaDispenser/web/updateOnWebNeeds
 import updateOnPinged from './updateOnPinged';
 
 function update(event: Event): Reader<EventContext, boolean> {
-  return useContext(
+  return runUpdateWithEventContext(
     {
-      messageIdToEditRef: { current: null },
+      '[Chat] Pinged': updateOnPinged,
+      '[TeaDispenser] ImagePosted': updateOnTeaDispenserImagePosted,
+      '[TeaDispenser] HandsUpButtonPressed': updateOnTeaDispenserHandsUpButtonPressed,
+      '[TeaDispenser] KiwiButtonPressed': updateOnTeaDispenserKiwiButtonPressed,
+      '[TeaDispenser] CommandIssued': updateOnTeaDispenserCommandIssued,
+      '[Dmv] InstallCommandIssued': updateOnDmvInstallCommandIssued,
+      '[Dmv] CryButtonPressed': updateOnDmvCryButtonPressed,
+      '[Web] IndexRequested': updateOnWebIndexRequested,
+      '[Web] FleetLootEditorRequested': updateOnWebFleetLootEditorRequested,
+      '[Web] FleetLootEditorPosted': updateOnWebFleetLootEditorPosted,
+      '[Web] NeederChooserRequested': updateOnWebNeederChooserRequested,
+      '[Web] NeedsEditorRequested': updateOnWebNeedsEditorRequested,
+      '[Web] NeedsEditorPosted': updateOnWebNeedsEditorPosted,
     },
-    runUpdateWithEventContext(
-      {
-        '[Chat] Pinged': updateOnPinged,
-        '[TeaDispenser] ImagePosted': updateOnTeaDispenserImagePosted,
-        '[TeaDispenser] HandsUpButtonPressed': updateOnTeaDispenserHandsUpButtonPressed,
-        '[TeaDispenser] KiwiButtonPressed': updateOnTeaDispenserKiwiButtonPressed,
-        '[TeaDispenser] CommandIssued': updateOnTeaDispenserCommandIssued,
-        '[Dmv] InstallCommandIssued': updateOnDmvInstallCommandIssued,
-        '[Dmv] CryButtonPressed': updateOnDmvCryButtonPressed,
-        '[Web] IndexRequested': updateOnWebIndexRequested,
-        '[Web] FleetLootEditorRequested': updateOnWebFleetLootEditorRequested,
-        '[Web] FleetLootEditorPosted': updateOnWebFleetLootEditorPosted,
-        '[Web] NeederChooserRequested': updateOnWebNeederChooserRequested,
-        '[Web] NeedsEditorRequested': updateOnWebNeedsEditorRequested,
-        '[Web] NeedsEditorPosted': updateOnWebNeedsEditorPosted,
-      },
-      event
-    )
-  );
+    event
+  ).mapContext((context) => ({
+    ...context,
+    messageIdToEditRef: { current: null },
+  }));
 }
 
 export default update;

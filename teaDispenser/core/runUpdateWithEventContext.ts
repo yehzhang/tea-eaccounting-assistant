@@ -1,12 +1,14 @@
 import Reader from './Reader/Reader';
-import useContext from './Reader/useContext';
 import Update from './Update';
 
 function runUpdateWithEventContext<E extends { type: string }, UC extends UpdateConfig<E>>(
   updateConfig: UC,
   event: E
 ): CombinedUpdateContextWithEvent<E, UC> {
-  return useContext(event, (updateConfig as any)[event.type](event));
+  return (updateConfig as any)[event.type](event).mapContext((context: any) => ({
+    ...context,
+    ...event,
+  }));
 }
 
 type UpdateConfig<E extends { type: string }> = {

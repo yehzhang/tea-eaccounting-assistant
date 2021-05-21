@@ -62,7 +62,7 @@ function syncMessageContent(
   sentMessageId: string | null
 ): Reader<MessageRenderingContext, string | null> {
   return sentMessageId
-    ? editMessage(channelId, sentMessageId, content, replyToUserId).replace(sentMessageId)
+    ? editMessage(channelId, sentMessageId, content, replyToUserId).replaceBy(sentMessageId)
     : sendMessage(channelId, content, replyToUserId);
 }
 

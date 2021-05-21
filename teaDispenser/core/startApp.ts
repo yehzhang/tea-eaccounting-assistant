@@ -1,10 +1,11 @@
 import { nanoid } from 'nanoid';
+import DispatchEvent from './DispatchEvent';
 import EventContext from './EventContext';
 import Reader from './Reader/Reader';
 import Update from './Update';
 
 function startApp<E>(
-  setupEvents: (dispatchEvent: (event: E) => Promise<void>) => void,
+  setupEvents: (dispatchEvent: DispatchEvent<E>) => void,
   update: Update<E, EventContext>,
   logEvent: (event: E) => Reader<EventContext, void>
 ): void {

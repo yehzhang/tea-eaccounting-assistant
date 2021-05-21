@@ -32,20 +32,20 @@ async function recognizeText(languageRecognizer: Scheduler, image: Mat): Promise
       .replace(/[丨|]/g, 'I')
       .replace(/‖/g, 'II') + (ellipsis ? '...' : '');
 
-  console.dir(
-    {
-      rawText: data.text,
-      confidentText,
-      cleanText,
-      confidence: data.confidence,
-      normalizedImagePath: imagePath,
-      wordsChoices: data.words.map((word) => word.choices),
-      // symbolsChoices: data.symbols.map(symbol => symbol.choices),
-    },
-    {
-      depth: null,
-    }
-  );
+  // console.dir(
+  //   {
+  //     rawText: data.text,
+  //     confidentText,
+  //     cleanText,
+  //     confidence: data.confidence,
+  //     normalizedImagePath: imagePath,
+  //     wordsChoices: data.words.map((word) => word.choices),
+  //     // symbolsChoices: data.symbols.map(symbol => symbol.choices),
+  //   },
+  //   {
+  //     depth: null,
+  //   }
+  // );
 
   return cleanText
     .replace('激光炮苜Z调节装置', '激光炮发散调节装置')

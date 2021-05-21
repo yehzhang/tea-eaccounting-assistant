@@ -1,6 +1,7 @@
 import bodyParser from 'koa-bodyparser';
 import Router from 'koa-router';
 import DispatchEvent from '../../core/DispatchEvent';
+import logErrorWithoutContext from '../../external/logError';
 import Event from '../Event';
 import KaiheilaMessageType from './KaiheilaMessageType';
 import parseWebhookEvent from './parseWebhookEvent';
@@ -25,7 +26,7 @@ function buildWebhookRouter(
     bodyParser(),
     (context) => {
       if (context.request.body?.s !== 0) {
-        console.warn('Expected Kaiheila webhook event, got', context.request.body);
+        logErrorWithoutContext('Expected Kaiheila webhook event', context.request.body);
         context.status = 400;
         return;
       }
@@ -34,7 +35,7 @@ function buildWebhookRouter(
       const { type, challenge, verify_token: verifyToken } = data;
       const parseEvent = eventParsers[verifyToken];
       if (!parseEvent) {
-        console.warn('Unexpected verify token in webhook call', data);
+        logErrorWithoutContext('Unexpected verify token in webhook call', data);
         context.status = 400;
         return;
       }
@@ -42,7 +43,7 @@ function buildWebhookRouter(
       context.status = 200;
 
       if (cachedSns.includes(sn)) {
-        console.warn('Unexpected repeated webhook call', context.request.body);
+        logErrorWithoutContext('Unexpected repeated webhook call', context.request.body);
         return;
       }
       cachedSns.push(sn);

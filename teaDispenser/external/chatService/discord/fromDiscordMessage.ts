@@ -1,10 +1,11 @@
 import { Message as DiscordMessage } from 'discord.js';
 import Message from '../../../data/Message';
+import logErrorWithoutContext from '../../logError';
 
 function fromDiscordMessage(message: DiscordMessage): Message {
   const { id, author, content, embeds, createdAt } = message;
   if (2 <= embeds.length) {
-    console.warn('Expected at most one embed, got', embeds);
+    logErrorWithoutContext('Expected at most one embed', embeds);
   }
   return {
     internalId: `discord/${id}`,

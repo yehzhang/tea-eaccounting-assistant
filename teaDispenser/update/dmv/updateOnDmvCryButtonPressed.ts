@@ -9,6 +9,8 @@ import createChannelPermission from '../../external/chatService/createChannelPer
 import fetchChannel from '../../external/chatService/fetchChannel';
 import fetchMessage from '../../external/chatService/fetchMessage';
 import fetchReactionUsers from '../../external/chatService/fetchReactionUsers';
+import logError from '../../external/logError';
+import logErrorWithContext from '../../external/logErrorWithContext';
 import dispatchView from '../../render/message/dispatchView';
 import MessageRenderingContext from '../../render/message/MessageRenderingContext';
 
@@ -33,16 +35,16 @@ function updateOnDmvCryButtonPressed(
     }
     const triggeringUser = reactionUsers.find((user) => user.id === triggeringUserId);
     if (!triggeringUser) {
-      console.error(
-        'Expected triggering user. Using random channel name',
+      logError('Expected triggering user. Using random channel name', {
         reactionUsers,
-        triggeringUserId
-      );
+        triggeringUserId,
+      });
     }
     if (!channel) {
       // TODO Somehow inform user of the failure.
-      console.error('Expected channel. Using random category', channelId);
-      return false;
+      return logErrorWithContext('Expected channel. Using random category', channelId).replaceBy(
+        false
+      );
     }
 
     const { guildId, categoryId } = channel;

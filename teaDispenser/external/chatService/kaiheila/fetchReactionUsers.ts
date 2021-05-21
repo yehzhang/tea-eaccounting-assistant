@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import Reader from '../../../core/Reader/Reader';
 import User from '../../../data/User';
+import logError from '../../logError';
+import logErrorWithContext from '../../logErrorWithContext';
 import fetchKaiheilaReader from './fetchKaiheilaReader';
 import KaiheilaEventContext from './KaiheilaEventContext';
 
@@ -17,24 +19,22 @@ function fetchReactionUsers(
     }
 
     if (!_.isArray(response)) {
-      console.error('Expected user array, got', response);
-      return [];
+      return logErrorWithContext('Expected user array', response).replaceBy([]);
     }
     return _.compact(
       response.map((userData) => {
         if (typeof userData !== 'object' || !userData) {
-          console.error('Expected user object, got', response);
+          logError('Expected user object', response);
           return null;
         }
-        // `nickname` is actually the same as `username` - no server nicknames available.
-        const { id, nickname } = userData;
-        if (typeof id !== 'string' || typeof nickname !== 'string') {
-          console.error('Expected valid user object, got', response);
+        const { id, username } = userData;
+        if (typeof id !== 'string' || typeof username !== 'string') {
+          logError('Expected valid user object', response);
           return null;
         }
         return {
           id,
-          name: nickname,
+          name: username,
         };
       })
     );

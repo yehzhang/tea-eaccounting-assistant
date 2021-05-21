@@ -7,8 +7,10 @@ import MessageContext from '../../data/MessageContext';
 import RecognizedItem from '../../data/RecognizedItem';
 import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
 import { TeaDispenserImagePostedEvent } from '../../event/Event';
+import logErrorWithContext from '../../external/logErrorWithContext';
 import dispatchView from '../../render/message/dispatchView';
 import MessageRenderingContext from '../../render/message/MessageRenderingContext';
+import MessageView from '../../render/message/view/MessageView';
 import normalizeItemName from './fuzzySearch/normalizeItemName';
 import getFleetLootEditorUrl from './getFleetLootEditorUrl';
 import getItemTypeIdByName from './getItemTypeIdByName';
@@ -20,7 +22,7 @@ import fetchPriceByItemTypeId from './market/fetchPriceByItemTypeId';
 function updateOnTeaDispenserImagePosted(
   event: TeaDispenserImagePostedEvent
 ): Reader<MessageRenderingContext, boolean> {
-  return new Reader(async (context) => {
+  return new Reader<MessageRenderingContext, MessageView>(async (context) => {
     let detectingItems = true;
     void (async () => {
       let magnifierDirection = true;
@@ -57,17 +59,16 @@ function updateOnTeaDispenserImagePosted(
 
     detectingItems = false;
     if (!itemStacks.length) {
-      return dispatchView({
+      return {
         type: 'NoItemsDetectedView',
-      });
+      };
     }
 
     const {
       messageIdToEditRef: { current: messageIdToEdit },
     } = context;
     if (!messageIdToEdit) {
-      console.error('Expected a sent message from reference');
-      return dispatchView({
+      return logErrorWithContext('Expected a sent message from reference').replaceBy({
         type: 'InternalErrorView',
       });
     }
@@ -76,14 +77,14 @@ function updateOnTeaDispenserImagePosted(
       ...context,
       messageId: messageIdToEdit,
     };
-    return dispatchView({
+    return {
       type: 'ItemsRecognizedView',
       itemStacks,
       username,
       fleetLootEditorUrl: getFleetLootEditorUrl(messageContext),
       neederChooserUrl: getNeederChooserUrl(messageContext),
-    });
-  });
+    };
+  }).bind(dispatchView);
 }
 
 async function fetchTempFile(url: string): Promise<string> {

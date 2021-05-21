@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import Reader from '../../../core/Reader/Reader';
 import Message from '../../../data/Message';
+import logErrorWithContext from '../../logErrorWithContext';
 import fetchKaiheilaReader from './fetchKaiheilaReader';
 import fromKaiheilaMessage from './fromKaiheilaMessage';
 import KaiheilaEventContext from './KaiheilaEventContext';
@@ -46,16 +47,14 @@ function fetchMessages(
       return [];
     }
     if (!_.isArray(response.items)) {
-      console.error('Expected items in response, got', response);
-      return [];
+      return logErrorWithContext('Expected items in response', response).replaceBy([]);
     }
 
     const items = _.compact(
       response.items.map((item) => (typeof item === 'object' && item ? item : null))
     );
     if (items.length !== response.items.length) {
-      console.error('Expected message items in response, got', response);
-      return [];
+      return logErrorWithContext('Expected message items in response', response).replaceBy([]);
     }
 
     return items;

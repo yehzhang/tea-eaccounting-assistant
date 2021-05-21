@@ -1,6 +1,7 @@
 import Reader from '../../../core/Reader/Reader';
 import RenderedMessageContent from '../../../data/RenderedMessageContent';
 import KaiheilaMessageType from '../../../event/kaiheila/KaiheilaMessageType';
+import logErrorWithContext from '../../logErrorWithContext';
 import buildMessageContent from './buildMessageContent';
 import fetchKaiheilaReader from './fetchKaiheilaReader';
 import KaiheilaEventContext from './KaiheilaEventContext';
@@ -20,8 +21,9 @@ function sendMessage(
     }
     const { msg_id: messageId } = response;
     if (typeof messageId !== 'string') {
-      console.error('Expected string msg_id from Kaiheila, got', response);
-      return null;
+      return logErrorWithContext('Expected string msg_id from Kaiheila', response).replaceBy(
+        null
+      );
     }
     return messageId;
   });

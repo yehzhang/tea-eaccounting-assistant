@@ -1,5 +1,6 @@
 import axios from 'axios';
 import _ from 'lodash';
+import logError from '../../../external/logError';
 import MarketSnapshot from './MarketSnapshot';
 
 async function fetchMarketSnapshot(): Promise<MarketSnapshot> {
@@ -7,7 +8,7 @@ async function fetchMarketSnapshot(): Promise<MarketSnapshot> {
     url: `https://api.eve-echoes-market.com/market-stats/stats.csv`,
   });
   if (typeof data !== 'string') {
-    console.error('Expected valid response in database fetch, got', data);
+    logError('Expected valid response in database fetch', data);
     return {};
   }
 
@@ -17,7 +18,7 @@ async function fetchMarketSnapshot(): Promise<MarketSnapshot> {
 function parseMarketSnapshotRow(row: string): MarketSnapshot {
   const columns = row.split(',');
   if (columns.length !== 7) {
-    console.error('Received invalid number of columns in a market snapshot row', row);
+    logError('Received invalid number of columns in a market snapshot row', row);
     return {};
   }
 
@@ -36,7 +37,7 @@ function parseMarketSnapshotRow(row: string): MarketSnapshot {
   const highestBuy = parseOptionalNumericColumn(highestBuyColumn);
   const date = parseOptionalDateColumn(dateColumn);
   if ((estimatedSell ?? estimatedBuy ?? lowestSell ?? highestBuy ?? date) === null) {
-    console.error('Received invalid market snapshot row', row);
+    logError('Received invalid market snapshot row', row);
     return {};
   }
   return {
@@ -57,7 +58,7 @@ function parseOptionalNumericColumn(column: string): number | null {
 
   const value = Number(column);
   if (isNaN(value)) {
-    console.error('Received invalid numeric column in market snapshot', column);
+    logError('Received invalid numeric column in market snapshot', column);
     return null;
   }
 
@@ -71,7 +72,7 @@ function parseOptionalDateColumn(column: string): Date | null {
 
   const value = new Date(column);
   if (isNaN(value.getTime())) {
-    console.error('Received invalid date column in market snapshot', column);
+    logError('Received invalid date column in market snapshot', column);
     return null;
   }
 

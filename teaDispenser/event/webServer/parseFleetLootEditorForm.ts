@@ -2,6 +2,7 @@ import _ from 'lodash';
 import FleetLoot from '../../data/FleetLoot';
 import FleetMember from '../../data/FleetMember';
 import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
+import logError from '../../external/logError';
 
 function parseFleetLootEditorForm(form: unknown): FleetLoot | null {
   if (!_.isObject(form)) {
@@ -30,7 +31,7 @@ function parseFleetMembers(form: Form): readonly FleetMember[] | null {
       }
       const parsedWeight = weight ? parseNumber(weight) : 1;
       if (parsedWeight === null) {
-        console.warn('Expected valid weight number, got', member, weight, form);
+        logError('Expected valid weight number', { member, weight, form });
         return null;
       }
       return {
@@ -82,7 +83,7 @@ function parseIndexedRows<T extends string>(
     }
     const index = Number(indexParts.join('-'));
     if (isNaN(index) || typeof formValue !== 'string') {
-      console.error('Expected value form entry, got', formKey, formValue, form);
+      logError('Expected value form entry', { formKey, formValue, form });
       return null;
     }
 

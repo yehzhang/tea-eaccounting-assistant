@@ -2,6 +2,7 @@ import { stat, unlink } from 'fs/promises';
 import { createScheduler, createWorker, PSM, Scheduler } from 'tesseract.js';
 import getPathRelativeToFileDirname
   from '../update/teaDispenser/itemDetection/getPathRelativeToFileDirname';
+import logError from './logError';
 
 async function createMonolingualScheduler(
   language: string,
@@ -11,7 +12,7 @@ async function createMonolingualScheduler(
   const worker = createWorker({
     langPath: getPathRelativeToFileDirname(import.meta.url, '../../../training/outputTessdata'),
     gzip: false,
-    errorHandler: (error) => void console.warn('Tesseract worker error:', error),
+    errorHandler: (error) => void logError('Tesseract worker error:', error),
   });
   await worker.load();
   await worker.loadLanguage(language);

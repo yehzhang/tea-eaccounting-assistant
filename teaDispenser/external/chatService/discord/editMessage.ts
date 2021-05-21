@@ -1,6 +1,7 @@
 import EventContext from '../../../core/EventContext';
 import Reader from '../../../core/Reader/Reader';
 import RenderedMessageContent from '../../../data/RenderedMessageContent';
+import logErrorWithContext from '../../logErrorWithContext';
 import buildMessageOptions from './buildMessageOptions';
 import fetchDiscordMessage from './fetchDiscordMessage';
 
@@ -23,8 +24,9 @@ function editMessage(
       });
       return true;
     } catch (e) {
-      console.error('Unexpected error when editing a Discord message', e);
-      return false;
+      return logErrorWithContext('Unexpected error when editing a Discord message', e).replaceBy(
+        false
+      );
     }
   });
 }

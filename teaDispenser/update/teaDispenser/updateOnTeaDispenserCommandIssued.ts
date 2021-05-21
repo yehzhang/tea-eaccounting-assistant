@@ -1,5 +1,6 @@
 import Reader from '../../core/Reader/Reader';
 import { TeaDispenserCommandIssuedEvent } from '../../event/Event';
+import logErrorWithoutContext from '../../external/logError';
 import dispatchView from '../../render/message/dispatchView';
 import MessageRenderingContext from '../../render/message/MessageRenderingContext';
 import MessageView, { MarketQueryResult } from '../../render/message/view/MessageView';
@@ -32,7 +33,7 @@ function updateOnTeaDispenserCommandIssued(
                 }
                 const itemTypeId = getItemTypeIdByName(normalizationResult.text);
                 if (itemTypeId === null) {
-                  console.error('Expected item type id found by normalized item name');
+                  logErrorWithoutContext('Expected item type id found by normalized item name');
                   return {
                     type: 'UnknownItemName',
                     itemName,

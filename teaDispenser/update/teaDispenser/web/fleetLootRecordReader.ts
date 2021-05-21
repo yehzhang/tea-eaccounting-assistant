@@ -11,6 +11,7 @@ import tableColumnSeparator from '../../../data/tableColumnSeparator';
 import UserInputPricedItemStack from '../../../data/UserInputPricedItemStack';
 import botUserIdReader from '../../../external/chatService/botUserIdReader';
 import fetchMessage from '../../../external/chatService/fetchMessage';
+import logError from '../../../external/logError';
 import fromDoubleByteCharacterText from '../../../render/message/view/fromDoubleByteCharacterText';
 
 const fleetLootRecordReader: Reader<
@@ -24,7 +25,7 @@ const fleetLootRecordReader: Reader<
 
 function parseFleetLootRecord(message: Message): FleetLootRecord | null {
   if (!message.embed) {
-    console.error('Expected a valid message embed, got', message);
+    logError('Expected a valid message embed', message);
     return null;
   }
 
@@ -34,7 +35,7 @@ function parseFleetLootRecord(message: Message): FleetLootRecord | null {
       /^.*\n```(?<loot>[^`]*)```\s*(\*\*参与者\*\*\n(?<fleetMembers>[^*]*))?(\*\*需求\*\*\n```(?<needs>(.|\n)*)```\n)?/m
     ) || {};
   if (!groups) {
-    console.error('Expected valid description in the message embed, got', message);
+    logError('Expected valid description in the message embed', message);
     return null;
   }
 
@@ -53,7 +54,7 @@ function parseFleetLootRecord(message: Message): FleetLootRecord | null {
 function parseUserInputPricedItemStack(text: string): UserInputPricedItemStack | null {
   const parts = text.split(tableColumnSeparator);
   if (parts.length !== 3) {
-    console.error('Expected valid loot, got', text);
+    logError('Expected valid loot', text);
     return null;
   }
 
@@ -78,7 +79,7 @@ function parseFleetMember(text: string): FleetMember | null {
 
   const [bullet, ...parts] = text.split(' ');
   if (bullet !== fleetMemberHeader) {
-    console.error('Expected valid fleet member header, got', text);
+    logError('Expected valid fleet member header', text);
     return null;
   }
 
@@ -108,7 +109,7 @@ function parseRows<T>(
 function parseNeed(text: string): Needs {
   const parts = text.split(tableColumnSeparator);
   if (parts.length !== 3) {
-    console.warn('Unexpected need row', text);
+    logError('Unexpected need row', text);
     return [];
   }
 
@@ -117,7 +118,7 @@ function parseNeed(text: string): Needs {
   const itemName = parseString(rawItemName);
   const itemAmount = parseNumber(rawItemAmount);
   if (!needer || !itemName || itemAmount === null) {
-    console.warn('Unexpected need attributes', text);
+    logError('Unexpected need attributes', text);
     return [];
   }
 

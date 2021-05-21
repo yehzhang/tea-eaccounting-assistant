@@ -7,7 +7,7 @@ function parseTeaDispenserEventFromMessage(
   message: Message,
   clientUserId: Snowflake
 ): Event | null {
-  const { id, author, content, attachments, channel } = message;
+  const { author, content, attachments, channel } = message;
   if (author.id === clientUserId || !(channel.type === 'text' || channel.type === 'dm')) {
     return null;
   }
@@ -19,10 +19,7 @@ function parseTeaDispenserEventFromMessage(
   const imageUrls = _.compact(
     [...attachments.values()].map((attachment) => {
       if (attachment.width === null) {
-        console.warn('Received an attachment that is not an image', {
-          messageId: id,
-          attachment,
-        });
+        // The attachment is not an image, probably a file.
         return null;
       }
       return attachment.url;

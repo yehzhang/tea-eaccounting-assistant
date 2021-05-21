@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import Message from '../../../data/Message';
 import KaiheilaMessageType from '../../../event/kaiheila/KaiheilaMessageType';
+import logErrorWithoutContext from '../../logError';
 
 function fromKaiheilaMessage(message: { readonly [key: string]: any }): Message | null {
   const { id, type, author, content, create_at, mention_roles: mentionedRoles } = message;
@@ -18,7 +19,7 @@ function fromKaiheilaMessage(message: { readonly [key: string]: any }): Message 
     !_.isArray(mentionedRoles) ||
     !mentionedRoles.every(_.isNumber)
   ) {
-    console.error('Expected valid Kaiheila message, got', message);
+    logErrorWithoutContext('Expected valid Kaiheila message', message);
     return null;
   }
 

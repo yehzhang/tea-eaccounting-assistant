@@ -23,7 +23,7 @@ class Reader<C, R> {
     });
   }
 
-  replace<S>(s: S): Reader<C, S> {
+  replaceBy<S>(s: S): Reader<C, S> {
     return new Reader(async (context) => {
       await this.run(context);
       return s;
@@ -31,7 +31,7 @@ class Reader<C, R> {
   }
 
   discard(): Reader<C, void> {
-    return this.replace(undefined);
+    return this.replaceBy(undefined);
   }
 }
 

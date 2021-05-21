@@ -2,6 +2,7 @@ import { readdirSync } from 'fs';
 import _ from 'lodash';
 import cv, { Mat } from 'opencv4nodejs';
 import { join } from 'path';
+import logError from '../../../external/logError';
 import getPathRelativeToFileDirname from './getPathRelativeToFileDirname';
 import matchBestTemplate from './matchBestTemplate';
 import resizeHeightTo from './resizeHeightTo';
@@ -47,7 +48,7 @@ const characterTemplates: TemplateSet = (() => {
   }
 
   if (!Object.keys(templates).length) {
-    console.warn('Expected amount templates');
+    logError('Expected amount templates');
   }
 
   return templates;

@@ -1,6 +1,7 @@
 import EventContext from '../../../core/EventContext';
 import Reader from '../../../core/Reader/Reader';
 import Reaction from '../../../data/Reaction';
+import logErrorWithContext from '../../logErrorWithContext';
 import fetchDiscordMessage from './fetchDiscordMessage';
 
 function fetchReactions(
@@ -21,8 +22,9 @@ function fetchReactions(
         )
         .flat();
     } catch (e) {
-      console.error('Unexpected error when fetching Discord reactions', e);
-      return [];
+      return logErrorWithContext('Unexpected error when fetching Discord reactions', e).replaceBy(
+        []
+      );
     }
   });
 }

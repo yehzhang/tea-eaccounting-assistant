@@ -1,5 +1,6 @@
 import EventContext from '../../../core/EventContext';
 import Reader from '../../../core/Reader/Reader';
+import logErrorWithContext from '../../logErrorWithContext';
 import fetchDiscordMessage from './fetchDiscordMessage';
 
 function deleteMessage(channelId: string, messageId: string): Reader<EventContext, boolean> {
@@ -12,8 +13,7 @@ function deleteMessage(channelId: string, messageId: string): Reader<EventContex
       await message.delete();
       return true;
     } catch (e) {
-      console.error('Unexpected error when deleting a Discord message', e);
-      return false;
+      return logErrorWithContext('Unexpected error when deleting a Discord message', e).replaceBy(false);
     }
   });
 }

@@ -1,5 +1,6 @@
 import EventContext from '../../../core/EventContext';
 import Reader from '../../../core/Reader/Reader';
+import logErrorWithContext from '../../logErrorWithContext';
 import fetchDiscordMessage from './fetchDiscordMessage';
 
 function reactMessage(
@@ -16,8 +17,10 @@ function reactMessage(
       await message.react(content);
       return true;
     } catch (e) {
-      console.error('Unexpected error when reacting to a Discord message', e);
-      return false;
+      return logErrorWithContext(
+        'Unexpected error when reacting to a Discord message',
+        e
+      ).replaceBy(false);
     }
   });
 }

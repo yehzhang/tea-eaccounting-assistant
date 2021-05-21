@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import logErrorWithoutContext from '../../external/logError';
 import KaiheilaMessageType from './KaiheilaMessageType';
 import WebhookEvent from './WebhookEvent';
 
@@ -13,12 +14,12 @@ function parseWebhookEvent(data: { readonly [key: string]: any }): WebhookEvent 
       typeof content !== 'string' ||
       typeof triggeringUserNickname !== 'string'
     ) {
-      console.error('Expected valid content, got', data);
+      logErrorWithoutContext('Expected valid content', data);
       return null;
     }
     if (data.type === KaiheilaMessageType.TEXT) {
       if (!_.isArray(mentionedRoles) || !mentionedRoles.every(_.isNumber)) {
-        console.error('Expected valid content, got', data);
+        logErrorWithoutContext('Expected valid content', data);
         return null;
       }
       return {
@@ -41,7 +42,7 @@ function parseWebhookEvent(data: { readonly [key: string]: any }): WebhookEvent 
   if (data.type === KaiheilaMessageType.SYSTEM) {
     const { extra } = data;
     if (typeof extra !== 'object' || !extra) {
-      console.error('Expected valid content, got', data);
+      logErrorWithoutContext('Expected valid content', data);
       return null;
     }
     const { type, body } = extra;
@@ -49,7 +50,7 @@ function parseWebhookEvent(data: { readonly [key: string]: any }): WebhookEvent 
       return null;
     }
     if (typeof body !== 'object' || !body) {
-      console.error('Expected valid reaction body, got', data);
+      logErrorWithoutContext('Expected valid reaction body', data);
       return null;
     }
     const { channel_id: channelId, user_id: triggeringUserId, msg_id: messageId, emoji } = body;
@@ -61,7 +62,7 @@ function parseWebhookEvent(data: { readonly [key: string]: any }): WebhookEvent 
       !emoji ||
       typeof emoji.id !== 'string'
     ) {
-      console.error('Expected valid reaction body data, got', data);
+      logErrorWithoutContext('Expected valid reaction body data', data);
       return null;
     }
     return {

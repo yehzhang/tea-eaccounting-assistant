@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Rect } from 'opencv4nodejs';
 import { areRectsOverlapping, getMaxX } from '../../../data/rectUtils';
 

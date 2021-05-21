@@ -1,7 +1,7 @@
-import { join } from 'path';
+import getPathRelativeToFileDirname from '../getPathRelativeToFileDirname';
 
 function getTestDataPath(filename: string): string {
-  return join(__dirname, filename);
+  return getPathRelativeToFileDirname(import.meta.url, filename);
 }
 
 export default getTestDataPath;

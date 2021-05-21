@@ -1,7 +1,7 @@
+import EventContext from '../../core/EventContext';
 import Reader from '../../core/Reader/Reader';
 import ChatServiceContext from '../../data/ChatServiceContext';
 import ChatServicePermission from '../../data/ChatServicePermission';
-import EventContext from '../EventContext';
 import chooseExternalApi from './chooseExternalApi';
 import kaiheilaCreateChannelPermission from './kaiheila/createChannelPermission';
 

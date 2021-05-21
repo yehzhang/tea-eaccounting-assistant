@@ -1,5 +1,5 @@
+import EventContext from '../../../core/EventContext';
 import Reader from '../../../core/Reader/Reader';
-import EventContext from '../../EventContext';
 import fetchDiscordMessage from './fetchDiscordMessage';
 
 function deleteMessage(channelId: string, messageId: string): Reader<EventContext, boolean> {

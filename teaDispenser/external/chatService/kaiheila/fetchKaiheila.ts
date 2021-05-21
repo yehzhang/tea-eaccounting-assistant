@@ -2,7 +2,7 @@ import axios from 'axios';
 
 /** Returns the `data` object of the API response. */
 async function fetchKaiheila(
-    botToken: string,
+  botToken: string,
   method: 'GET' | 'POST',
   path: string,
   payload?: object

@@ -40,13 +40,10 @@ function updateOnTeaDispenserImagePosted(
     })();
 
     const { urls, username } = event;
-    const {
-      externalContext: { schedulers },
-    } = context;
     const itemStacksList = await Promise.all(
       urls.map(async (url) => {
         const path = await fetchTempFile(url);
-        const recognizedItemPromises = await recognizeItems(path, schedulers);
+        const recognizedItemPromises = await recognizeItems(path);
         return Promise.all(
           recognizedItemPromises.map((recognizedItemPromise) =>
             recognizedItemPromise.then(

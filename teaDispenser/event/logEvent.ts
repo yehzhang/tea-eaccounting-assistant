@@ -1,5 +1,5 @@
+import EventContext from '../core/EventContext';
 import Reader from '../core/Reader/Reader';
-import EventContext from '../external/EventContext';
 import log from '../external/log';
 import Event from './Event';
 

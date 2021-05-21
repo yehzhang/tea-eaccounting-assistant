@@ -1,9 +1,9 @@
-import { Mat, TM_CCOEFF_NORMED } from 'opencv4nodejs';
+import cv, { Mat } from 'opencv4nodejs';
 
 async function matchTemplate(image: Mat, template: Mat): Promise<Confidence> {
   let confidenceMatrix;
   try {
-    confidenceMatrix = await image.matchTemplateAsync(template, TM_CCOEFF_NORMED);
+    confidenceMatrix = await image.matchTemplateAsync(template, cv.TM_CCOEFF_NORMED);
   } catch (e) {
     console.dir(
       {

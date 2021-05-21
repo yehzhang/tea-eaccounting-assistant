@@ -1,6 +1,6 @@
+import EventContext from '../../core/EventContext';
 import Reader from '../../core/Reader/Reader';
 import ChatServiceContext from '../../data/ChatServiceContext';
-import EventContext from '../EventContext';
 
 function chooseExternalApi<C extends EventContext & ChatServiceContext, R>(
   config: ExternalApiConfig<C, R>

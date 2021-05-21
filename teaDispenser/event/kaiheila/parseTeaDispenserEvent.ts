@@ -1,12 +1,12 @@
+import { teaDispenserBotUserId } from '../../external/chatService/kaiheila/botUserIds';
 import Event, { TeaDispenserChatServiceEventCommon } from '../Event';
 import WebhookEvent from './WebhookEvent';
 
 function parseTeaDispenserEvent(
-  event: WebhookEvent,
-  botUserId: string
+  event: WebhookEvent
 ): (Event & TeaDispenserChatServiceEventCommon) | null {
   // Ignore events triggered by the bot itself.
-  if (event.triggeringUserId === botUserId) {
+  if (event.triggeringUserId === teaDispenserBotUserId) {
     return null;
   }
 

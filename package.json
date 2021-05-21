@@ -1,6 +1,7 @@
 {
   "name": "tea-eaccounting-assistant",
   "version": "1.0.0",
+  "type": "module",
   "repository": "https://github.com/yehzhang/tea-eaccounting-assistant.git",
   "author": "yehzhang <simonzhangintp@gmail.com>",
   "license": "MIT",
@@ -33,8 +34,7 @@
     "@types/winston": "^2.4.4",
     "jasmine": "^3.6.3",
     "prettier": "^2.2.1",
-    "ts-node": "^9.0.0",
-    "ts-node-dev": "^1.0.0",
+    "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   },
   "scripts": {
@@ -45,7 +45,6 @@
     "train:chinese": "cd ./training && tesstrain.sh --fontlist 'Source Han Sans CN Semi-Light' --fonts_dir ./font --output_dir ./outputTessdata --tessdata_dir ./inputTessdata --langdata_dir ./langdata --overwrite --lang chi_sim",
     "train:english": "cd ./training && tesstrain.sh --fontlist 'Source Han Sans CN Semi-Light' --fonts_dir ./font --output_dir ./outputTessdata --tessdata_dir ./inputTessdata --langdata_dir ./langdata --overwrite --lang eng",
     "test": "run(){ ts-node node_modules/jasmine/bin/jasmine ${@:-./**/*.spec.ts}; }; run",
-    "start:dev": "ts-node-dev teaDispenser/index.ts",
-    "start": "ts-node teaDispenser/index.ts"
+    "start": "node --loader ts-node/esm --experimental-specifier-resolution=node teaDispenser/index.ts"
   }
 }

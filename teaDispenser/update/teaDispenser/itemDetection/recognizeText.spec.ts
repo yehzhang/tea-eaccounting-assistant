@@ -1,25 +1,17 @@
 import { Scheduler } from 'tesseract.js';
-import startTesseract from '../../../external/startTesseract';
+import { chineseRecognizer } from '../../../external/tesseractSchedulers';
 import recognizeText from './recognizeText';
 import getTestImage from './testData/getTestImage';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
 
 describe('recognizeText', () => {
-  let chineseRecognizer: Scheduler;
-  let englishRecognizer: Scheduler;
-
-  beforeAll(async () => {
-    ({ chineseRecognizer } = await startTesseract());
-    englishRecognizer = chineseRecognizer;
-  });
-
   async function run(imageFilename: string): Promise<string> {
     let recognizer: Scheduler;
     if (imageFilename.startsWith('chn_')) {
       recognizer = chineseRecognizer;
     } else if (imageFilename.startsWith('eng_')) {
-      recognizer = englishRecognizer;
+      recognizer = chineseRecognizer;
     } else {
       throw new TypeError(`Expected filename '${imageFilename}' to annotate language`);
     }

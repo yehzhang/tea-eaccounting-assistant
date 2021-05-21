@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import texts from '../../../../generated/textPacks.json';
 import ItemIcon from '../../../data/ItemIcon';
 import ItemType from '../../../data/ItemType';

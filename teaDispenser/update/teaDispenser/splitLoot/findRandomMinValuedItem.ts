@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 function findRandomMinValuedItem<T>(
   items: readonly T[],

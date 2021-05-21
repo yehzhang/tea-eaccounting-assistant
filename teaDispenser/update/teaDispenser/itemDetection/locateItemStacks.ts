@@ -1,14 +1,5 @@
 import _ from 'lodash';
-import {
-  CHAIN_APPROX_SIMPLE,
-  CHAIN_APPROX_TC89_KCOS,
-  Contour,
-  Mat,
-  Rect,
-  RETR_LIST,
-  RETR_TREE,
-  Vec3,
-} from 'opencv4nodejs';
+import cv, { Contour, Mat, Rect } from 'opencv4nodejs';
 import { containRect, getArea, getCenterY } from '../../../data/rectUtils';
 import deduplicateSiblingBoundingRects from './deduplicateSiblingBoundingRects';
 
@@ -17,13 +8,16 @@ async function locateItemStacks(image: Mat): Promise<readonly LocatedItemStack[]
   // The low threshold should not be higher than ~270, or the same contour may split.
   // The high threshold should not be too high, or lossy image may not be recognized.
   const digitEdges = await image.cannyAsync(260, 300, 3, true);
-  const digitContours = await digitEdges.findContoursAsync(RETR_LIST, CHAIN_APPROX_TC89_KCOS);
+  const digitContours = await digitEdges.findContoursAsync(cv.RETR_LIST, cv.CHAIN_APPROX_TC89_KCOS);
   const digitBoundingRects = digitContours.map((contour) => contour.boundingRect());
 
   // The low threshold should not be lower than ~1450, or there may be false positives.
   // The low threshold should not be higher than ~1500, or borders in lossy images may not be recognized.
   const itemStackEdges = await image.cannyAsync(1450, 3200, 5);
-  const itemStackContours = await itemStackEdges.findContoursAsync(RETR_TREE, CHAIN_APPROX_SIMPLE);
+  const itemStackContours = await itemStackEdges.findContoursAsync(
+    cv.RETR_TREE,
+    cv.CHAIN_APPROX_SIMPLE
+  );
   const itemLookedBoundingRects = _.compact(
     await Promise.all(itemStackContours.map((contour) => getItemLookedBoundingRect(contour, image)))
   );
@@ -81,8 +75,8 @@ async function getItemLookedBoundingRect(contour: Contour, image: Mat): Promise<
   return boundingRect;
 }
 
-const itemBackgroundColorLowerBound = new Vec3(82, 75, 64);
-const itemBackgroundColorHigherBound = new Vec3(103, 100, 91);
+const itemBackgroundColorLowerBound = new cv.Vec3(82, 75, 64);
+const itemBackgroundColorHigherBound = new cv.Vec3(103, 100, 91);
 
 export interface LocatedItemStack {
   readonly itemStackBoundingBox: Rect;
@@ -93,7 +87,7 @@ export interface LocatedItemStack {
 function getItemNameBoundingRect(itemStackBoundingBox: Rect): Rect {
   const padding = 2;
   const height = Math.round(itemStackBoundingBox.height * 0.211);
-  return new Rect(
+  return new cv.Rect(
     itemStackBoundingBox.x + padding,
     itemStackBoundingBox.y + padding,
     itemStackBoundingBox.width - padding * 2,
@@ -122,7 +116,7 @@ function getItemAmountBoundingRect(itemStackBoundingBox: Rect): Rect {
   const padding = 2;
   const width = Math.round(itemStackBoundingBox.width * 0.21);
   const height = Math.round(itemStackBoundingBox.height * 0.186);
-  return new Rect(
+  return new cv.Rect(
     itemStackBoundingBox.x + padding,
     itemStackBoundingBox.y + itemStackBoundingBox.height - height - padding,
     width - padding,

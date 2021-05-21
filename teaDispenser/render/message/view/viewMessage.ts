@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import Command from '../../../data/Command';
 import { InvalidUsageReason } from '../../../data/InvalidCommand';
 import RenderedMessage from '../../../data/RenderedMessage';

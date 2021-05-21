@@ -1,6 +1,6 @@
+import EventContext from '../../../core/EventContext';
 import Reader from '../../../core/Reader/Reader';
 import Reaction from '../../../data/Reaction';
-import EventContext from '../../EventContext';
 import fetchDiscordMessage from './fetchDiscordMessage';
 
 function fetchReactions(

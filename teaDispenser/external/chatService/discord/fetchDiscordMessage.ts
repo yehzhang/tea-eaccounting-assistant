@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
+import EventContext from '../../../core/EventContext';
 import Reader from '../../../core/Reader/Reader';
-import EventContext from '../../EventContext';
 import fetchDiscordChannel from './fetchDiscordChannel';
 
 function fetchDiscordMessage(

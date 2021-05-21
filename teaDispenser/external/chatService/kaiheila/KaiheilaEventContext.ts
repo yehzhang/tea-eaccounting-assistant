@@ -1,4 +1,4 @@
-import EventContext from '../../EventContext';
+import EventContext from '../../../core/EventContext';
 
 type KaiheilaEventContext = EventContext & { chatService: 'kaiheilaTeaDispense' | 'kaiheilaDmv' };
 

@@ -1,6 +1,6 @@
+import EventContext from '../../core/EventContext';
 import Reader from '../../core/Reader/Reader';
 import RenderedMessage from '../../data/RenderedMessage';
-import EventContext from '../../external/EventContext';
 import log from '../../external/log';
 import MessageView from './view/MessageView';
 

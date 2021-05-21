@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import LootAllocation from '../../../data/LootAllocation';
 import findRandomMinValuedItem from './findRandomMinValuedItem';
 

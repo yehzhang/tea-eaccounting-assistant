@@ -1,6 +1,6 @@
+import EventContext from '../../../core/EventContext';
 import Reader from '../../../core/Reader/Reader';
 import Message from '../../../data/Message';
-import EventContext from '../../EventContext';
 import fetchDiscordMessage from './fetchDiscordMessage';
 import fromDiscordMessage from './fromDiscordMessage';
 

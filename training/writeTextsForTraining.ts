@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { join } from 'path';
 import readNeoxJson from '../data/readNeoxJson';
 import { writeText } from '../data/writeText';

@@ -1,3 +1,4 @@
+import { dmvBotToken, teaDispenserBotToken } from './botTokens';
 import fetchKaiheila from './fetchKaiheila';
 
 async function fetchBotUserId(botToken: string): Promise<string> {
@@ -9,4 +10,7 @@ async function fetchBotUserId(botToken: string): Promise<string> {
   return id;
 }
 
-export default fetchBotUserId;
+export const [teaDispenserBotUserId, dmvBotUserId] = await Promise.all([
+  fetchBotUserId(teaDispenserBotToken),
+  fetchBotUserId(dmvBotToken),
+]);

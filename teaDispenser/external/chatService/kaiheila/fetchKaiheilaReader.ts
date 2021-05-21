@@ -1,5 +1,5 @@
 import Reader from '../../../core/Reader/Reader';
-import ExternalContext from '../../ExternalContext';
+import { dmvBotToken, teaDispenserBotToken } from './botTokens';
 import fetchKaiheila from './fetchKaiheila';
 import KaiheilaEventContext from './KaiheilaEventContext';
 
@@ -9,20 +9,17 @@ function fetchKaiheilaReader(
   path: string,
   payload?: object
 ): Reader<KaiheilaEventContext, { readonly [key: string]: any } | null> {
-  return new Reader(async ({ externalContext, chatService }) =>
-    fetchKaiheila(getBotToken(externalContext, chatService), method, path, payload)
+  return new Reader(({ chatService }) =>
+    fetchKaiheila(getBotToken(chatService), method, path, payload)
   );
 }
 
-function getBotToken(
-  externalContext: ExternalContext,
-  chatService: 'kaiheilaTeaDispense' | 'kaiheilaDmv'
-): string {
+function getBotToken(chatService: 'kaiheilaTeaDispense' | 'kaiheilaDmv'): string {
   switch (chatService) {
     case 'kaiheilaTeaDispense':
-      return externalContext.kaiheilaTeaDispenser.botToken;
+      return teaDispenserBotToken;
     case 'kaiheilaDmv':
-      return externalContext.kaiheilaDmv.botToken;
+      return dmvBotToken;
   }
 }
 

@@ -1,9 +1,9 @@
 import _ from 'lodash';
+import EventContext from '../../core/EventContext';
 import Reader from '../../core/Reader/Reader';
 import FleetLootRecord from '../../data/FleetLootRecord';
 import MessageContext from '../../data/MessageContext';
 import { TeaDispenserKiwiButtonPressedEvent } from '../../event/Event';
-import EventContext from '../../external/EventContext';
 import dispatchView from '../../render/message/dispatchView';
 import OneShotDuplex from './OneShotDuplex';
 import fleetLootRecordReader from './web/fleetLootRecordReader';

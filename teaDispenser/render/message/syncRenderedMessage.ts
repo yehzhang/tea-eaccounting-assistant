@@ -2,6 +2,7 @@ import AsyncLock from 'async-lock';
 import Reader from '../../core/Reader/Reader';
 import RenderedMessage from '../../data/RenderedMessage';
 import RenderedMessageContent from '../../data/RenderedMessageContent';
+import botUserIdReader from '../../external/chatService/botUserIdReader';
 import deleteMessage from '../../external/chatService/deleteMessage';
 import editMessage from '../../external/chatService/editMessage';
 import fetchReactions from '../../external/chatService/fetchReactions';
@@ -76,26 +77,24 @@ function syncReactions(
   //         reaction.users.cache.has(clientUserId) && !reactionContents.find(
   //         reactionContent => reactionContent === reaction.emoji.name))
   //     .map(reaction => reaction.users.remove(clientUserId)),
-  return new Reader(({ chatService, externalContext }) =>
-    // Add reactions newly rendered.
-    fetchReactions(channelId, messageId)
-      .bind((reactions) =>
+  return botUserIdReader
+    .bind((botUserId) =>
+      // Add reactions newly rendered.
+      fetchReactions(channelId, messageId).bind((reactions) =>
         reactionContents
           .filter((reactionContent) =>
             reactions.every(
-              (reaction) =>
-                reaction.userId !== externalContext[chatService].botUserId &&
-                reaction.content !== reactionContent
+              (reaction) => reaction.userId !== botUserId && reaction.content !== reactionContent
             )
           )
-          .reduce<Reader<MessageRenderingContext, unknown>>(
+          .reduce(
             (reader, reactionContent) =>
               reader.sequence(reactMessage(channelId, messageId, reactionContent)),
-            new Reader(() => {})
+            new Reader<MessageRenderingContext, unknown>(() => {})
           )
       )
-      .discard()
-  );
+    )
+    .discard();
 }
 
 const lock = new AsyncLock();

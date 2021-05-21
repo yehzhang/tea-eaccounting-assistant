@@ -1,7 +1,7 @@
-import { imreadAsync, Mat } from 'opencv4nodejs';
-import { join } from 'path';
+import cv, { Mat } from 'opencv4nodejs';
 import ItemIcon from '../../../data/ItemIcon';
 import ItemType from '../../../data/ItemType';
+import getPathRelativeToFileDirname from './getPathRelativeToFileDirname';
 import matchBestTemplate from './matchBestTemplate';
 import resizeHeightTo from './resizeHeightTo';
 
@@ -114,8 +114,8 @@ const blueprintsIconTemplatesPromise: Promise<BlueprintsIconTemplates> = (async 
 })();
 
 async function getTemplate(filename: string): Promise<Mat> {
-  const templatePath = join(__dirname, 'template/itemIcon', filename);
-  return imreadAsync(templatePath);
+  const templatePath = getPathRelativeToFileDirname(import.meta.url, 'template/itemIcon', filename);
+  return cv.imreadAsync(templatePath);
 }
 
 type BlueprintsIconTemplates = { readonly [itemType in ItemType]: readonly [Mat, Mat, Mat, Mat] };

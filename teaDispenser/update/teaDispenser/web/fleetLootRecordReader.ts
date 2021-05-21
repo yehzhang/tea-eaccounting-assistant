@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import allReaders from '../../../core/Reader/allReaders';
 import Reader from '../../../core/Reader/Reader';
 import FleetLootRecord from '../../../data/FleetLootRecord';
 import FleetMember from '../../../data/FleetMember';
@@ -8,17 +9,16 @@ import MessageEventContext from '../../../data/MessageEventContext';
 import Needs from '../../../data/Needs';
 import tableColumnSeparator from '../../../data/tableColumnSeparator';
 import UserInputPricedItemStack from '../../../data/UserInputPricedItemStack';
+import botUserIdReader from '../../../external/chatService/botUserIdReader';
 import fetchMessage from '../../../external/chatService/fetchMessage';
 import fromDoubleByteCharacterText from '../../../render/message/view/fromDoubleByteCharacterText';
 
 const fleetLootRecordReader: Reader<
   MessageEventContext,
   FleetLootRecord | null
-> = new Reader(({ channelId, messageId, chatService, externalContext }) =>
-  fetchMessage(channelId, messageId).bind((message) =>
-    message && message.externalUserId === externalContext[chatService].botUserId
-      ? parseFleetLootRecord(message)
-      : null
+> = new Reader(({ channelId, messageId }) =>
+  allReaders([fetchMessage(channelId, messageId), botUserIdReader]).bind(([message, botUserId]) =>
+    message && message.externalUserId === botUserId ? parseFleetLootRecord(message) : null
   )
 );
 

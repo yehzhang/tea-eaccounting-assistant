@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import FleetMember from '../../../data/FleetMember';
 import FleetMemberLoot from '../../../data/FleetMemberLoot';
 import Needs from '../../../data/Needs';

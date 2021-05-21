@@ -1,5 +1,5 @@
 import { Context } from 'koa';
-import EventContext from '../../external/EventContext';
+import EventContext from '../../core/EventContext';
 
 interface WebServerRenderingContext extends EventContext {
   readonly koaContext: Context;

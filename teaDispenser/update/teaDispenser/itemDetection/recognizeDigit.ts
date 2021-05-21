@@ -1,7 +1,8 @@
 import { readdirSync } from 'fs';
-import * as _ from 'lodash';
-import { COLOR_RGB2GRAY, imread, IMREAD_GRAYSCALE, Mat } from 'opencv4nodejs';
+import _ from 'lodash';
+import cv, { Mat } from 'opencv4nodejs';
 import { join } from 'path';
+import getPathRelativeToFileDirname from './getPathRelativeToFileDirname';
 import matchBestTemplate from './matchBestTemplate';
 import resizeHeightTo from './resizeHeightTo';
 
@@ -18,7 +19,7 @@ async function recognizeDigit(image: Mat): Promise<string> {
 }
 
 async function normalizeImage(image: Mat, templates: readonly Mat[]): Promise<Mat> {
-  const greyscaleImage = await image.cvtColorAsync(COLOR_RGB2GRAY);
+  const greyscaleImage = await image.cvtColorAsync(cv.COLOR_RGB2GRAY);
 
   const maxTemplateHeight = Math.max(...templates.map((template) => template.rows));
   return resizeHeightTo(maxTemplateHeight, greyscaleImage);
@@ -27,7 +28,7 @@ async function normalizeImage(image: Mat, templates: readonly Mat[]): Promise<Ma
 const minTemplateMatchingConfidence = 0.3;
 
 const characterTemplates: TemplateSet = (() => {
-  const templateDirectory = join(__dirname, 'template/digit');
+  const templateDirectory = getPathRelativeToFileDirname(import.meta.url, 'template/digit');
   const templateFilenames = readdirSync(templateDirectory);
 
   const templates: { [character: string]: Mat } = {};
@@ -42,7 +43,7 @@ const characterTemplates: TemplateSet = (() => {
     }
 
     const templatePath = join(templateDirectory, templateFilename);
-    templates[character] = imread(templatePath, IMREAD_GRAYSCALE);
+    templates[character] = cv.imread(templatePath, cv.IMREAD_GRAYSCALE);
   }
 
   if (!Object.keys(templates).length) {

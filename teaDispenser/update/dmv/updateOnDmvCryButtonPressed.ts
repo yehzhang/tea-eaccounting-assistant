@@ -3,6 +3,7 @@ import allReaders from '../../core/Reader/allReaders';
 import Reader from '../../core/Reader/Reader';
 import ChatServicePermission from '../../data/ChatServicePermission';
 import { DmvCryButtonPressedEvent } from '../../event/Event';
+import botUserIdReader from '../../external/chatService/botUserIdReader';
 import createChannel from '../../external/chatService/createChannel';
 import createChannelPermission from '../../external/chatService/createChannelPermission';
 import fetchChannel from '../../external/chatService/fetchChannel';
@@ -19,78 +20,76 @@ function updateOnDmvCryButtonPressed(
     fetchMessage(channelId, messageId),
     fetchReactionUsers(messageId, emojiId),
     fetchChannel(channelId),
-  ]).bind(([message, reactionUsers, channel]) => {
+    botUserIdReader,
+  ]).bind(([message, reactionUsers, channel, botUserId]) => {
     if (!message) {
       // Unexpected error, but no need to inform the user.
       return false;
     }
     const { externalUserId, mentionedRoles } = message;
-    return new Reader((context) => {
-      // TODO Generify this.
-      if (externalUserId !== context.externalContext.kaiheilaDmv.botUserId) {
-        // Intended exit.
-        return false;
-      }
-      const triggeringUser = reactionUsers.find((user) => user.id === triggeringUserId);
-      if (!triggeringUser) {
-        console.error(
-          'Expected triggering user. Using random channel name',
-          reactionUsers,
-          triggeringUserId
-        );
-      }
-      if (!channel) {
+    if (externalUserId !== botUserId) {
+      // Intended exit.
+      return false;
+    }
+    const triggeringUser = reactionUsers.find((user) => user.id === triggeringUserId);
+    if (!triggeringUser) {
+      console.error(
+        'Expected triggering user. Using random channel name',
+        reactionUsers,
+        triggeringUserId
+      );
+    }
+    if (!channel) {
+      // TODO Somehow inform user of the failure.
+      console.error('Expected channel. Using random category', channelId);
+      return false;
+    }
+
+    const { guildId, categoryId } = channel;
+    const { name: username = nanoid() } = triggeringUser || {};
+    const channelName = `蓝加申诉 - ${username}`;
+    return createChannel(guildId, channelName, categoryId).bind((newChannelId) => {
+      if (!newChannelId) {
         // TODO Somehow inform user of the failure.
-        console.error('Expected channel. Using random category', channelId);
         return false;
       }
 
-      const { guildId, categoryId } = channel;
-      const { name: username = nanoid() } = triggeringUser || {};
-      const channelName = `蓝加申诉 - ${username}`;
-      return createChannel(guildId, channelName, categoryId).bind((newChannelId) => {
-        if (!newChannelId) {
-          // TODO Somehow inform user of the failure.
-          return false;
-        }
-
-        return allReaders([
+      return allReaders([
+        createChannelPermission(
+          newChannelId,
+          /* userId= */ 0,
+          /* allow= */ ChatServicePermission.NONE,
+          /* deny= */ ChatServicePermission.VIEW
+        ),
+        createChannelPermission(
+          newChannelId,
+          triggeringUserId,
+          /* allow= */ ChatServicePermission.VIEW,
+          /* deny= */ ChatServicePermission.NONE
+        ),
+        ...mentionedRoles.map((mentionedRole) =>
           createChannelPermission(
             newChannelId,
-            /* userId= */ 0,
-            /* allow= */ ChatServicePermission.NONE,
-            /* deny= */ ChatServicePermission.VIEW
-          ),
-          createChannelPermission(
-            newChannelId,
-            triggeringUserId,
-            /* allow= */ ChatServicePermission.VIEW,
+            mentionedRole,
+            /* allow= */ ChatServicePermission.INVITATION_LINK |
+              ChatServicePermission.CHANNEL_METADATA |
+              ChatServicePermission.PERMISSION |
+              ChatServicePermission.VIEW,
             /* deny= */ ChatServicePermission.NONE
-          ),
-          ...mentionedRoles.map((mentionedRole) =>
-            createChannelPermission(
-              newChannelId,
-              mentionedRole,
-              /* allow= */ ChatServicePermission.INVITATION_LINK |
-                ChatServicePermission.CHANNEL_METADATA |
-                ChatServicePermission.PERMISSION |
-                ChatServicePermission.VIEW,
-              /* deny= */ ChatServicePermission.NONE
-            )
-          ),
-        ])
-          .sequence(
-            dispatchView({
-              type: 'BlueFuckeryTicketIntroductionView',
-              mentionedRoles,
-            })
           )
-          .mapContext((context) => ({
-            ...context,
-            channelId: newChannelId,
-            replyToUserId: event.triggeringUserId,
-          }));
-      });
+        ),
+      ])
+        .sequence(
+          dispatchView({
+            type: 'BlueFuckeryTicketIntroductionView',
+            mentionedRoles,
+          })
+        )
+        .mapContext((context: MessageRenderingContext) => ({
+          ...context,
+          channelId: newChannelId,
+          replyToUserId: event.triggeringUserId,
+        }));
     });
   });
 }

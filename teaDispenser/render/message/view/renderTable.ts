@@ -26,6 +26,8 @@ function renderTable(
         numericColumn || columnIndex === header.length - 1 ? cell : toDoubleByteCharacterText(cell);
       const justifiedCell = numericColumn
         ? monospacedCell.padStart(columnPaddingLength, ' ')
+        : columnIndex === header.length - 1
+        ? monospacedCell
         : monospacedCell.padEnd(columnPaddingLength, '　');
       outputTable[rowIndex].push(justifiedCell);
     }

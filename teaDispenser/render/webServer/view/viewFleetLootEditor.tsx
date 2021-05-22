@@ -54,7 +54,7 @@ function viewFleetLootEditor({ fleetMembers, loot }: FleetLoot, title: string): 
         </Section>
         <Section id="loot">
           <h2>📦 赃物</h2>
-          <p>请校对数量与价格，并填写空缺的格子。</p>
+          <p>请填写空缺的格子。</p>
           {[
             ...loot,
             ...Array(Math.max(50 - loot.length, 10)).fill({
@@ -103,7 +103,8 @@ function viewFleetLootEditor({ fleetMembers, loot }: FleetLoot, title: string): 
           </Button>
         </Section>
         <Section id="controls">
-          <SubmitButton>💾 保存并覆盖</SubmitButton>
+          <p>点击下方按钮以保存并覆盖分赃记录。之后可返回聊天软件核对赃物，填写的名称及数量是否和截图一致。</p>
+          <SubmitButton>💾 保存</SubmitButton>
         </Section>
       </form>
       <Function>

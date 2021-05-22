@@ -1,5 +1,6 @@
 import AsyncLock from 'async-lock';
 import Reader from '../../core/Reader/Reader';
+import sequenceReaders from '../../core/Reader/sequenceReaders';
 import RenderedMessage from '../../data/RenderedMessage';
 import RenderedMessageContent from '../../data/RenderedMessageContent';
 import botUserIdReader from '../../external/chatService/botUserIdReader';
@@ -8,6 +9,7 @@ import editMessage from '../../external/chatService/editMessage';
 import fetchReactions from '../../external/chatService/fetchReactions';
 import reactMessage from '../../external/chatService/reactMessage';
 import sendMessage from '../../external/chatService/sendMessage';
+import logErrorWithContext from '../../external/logErrorWithContext';
 import MessageRenderingContext from './MessageRenderingContext';
 
 function syncRenderedMessage(
@@ -63,7 +65,47 @@ function syncMessageContent(
 ): Reader<MessageRenderingContext, string | null> {
   return sentMessageId
     ? editMessage(channelId, sentMessageId, content, replyToUserId).replaceBy(sentMessageId)
-    : sendMessage(channelId, content, replyToUserId);
+    : sequenceReaders(
+        splitMessageContentIfLong(content).map((_content, index) =>
+          sendMessage(channelId, _content, index === 0 ? replyToUserId : undefined)
+        )
+      ).bind((messageIds) =>
+        messageIds.length === 0
+          ? logErrorWithContext('Expected at least one message sent').replaceBy(null)
+          : messageIds[0]
+      );
+}
+
+/**
+ * Splits content by double newlines, if any and if too long. The split content may still be too long.
+ */
+function splitMessageContentIfLong(
+  content: RenderedMessageContent
+): readonly RenderedMessageContent[] {
+  if (typeof content === 'object') {
+    // Does not support splitting message embeds.
+    return [content];
+  }
+
+  const splitContents: string[] = [];
+  const delimiter = '\n\n';
+  for (const chunk of content.split(delimiter)) {
+    const lastSplitContent = splitContents.pop();
+    if (lastSplitContent === undefined) {
+      splitContents.push(chunk);
+      continue;
+    }
+
+    const nextSplitContent = `${lastSplitContent}${delimiter}${chunk}`;
+    // Discord has a character limit of 2000. Kaiheila does not have a limit that matters.
+    if (nextSplitContent.length <= 1998) {
+      splitContents.push(nextSplitContent);
+      continue;
+    }
+    splitContents.push(lastSplitContent);
+    splitContents.push(chunk);
+  }
+  return splitContents;
 }
 
 function syncReactions(
@@ -77,24 +119,20 @@ function syncReactions(
   //         reaction.users.cache.has(clientUserId) && !reactionContents.find(
   //         reactionContent => reactionContent === reaction.emoji.name))
   //     .map(reaction => reaction.users.remove(clientUserId)),
-  return botUserIdReader
-    .bind((botUserId) =>
-      // Add reactions newly rendered.
-      fetchReactions(channelId, messageId).bind((reactions) =>
+  return botUserIdReader.bind((botUserId) =>
+    // Add reactions newly rendered.
+    fetchReactions(channelId, messageId).bind((reactions) =>
+      sequenceReaders(
         reactionContents
           .filter((reactionContent) =>
             reactions.every(
               (reaction) => reaction.userId !== botUserId && reaction.content !== reactionContent
             )
           )
-          .reduce(
-            (reader, reactionContent) =>
-              reader.sequence(reactMessage(channelId, messageId, reactionContent)),
-            new Reader<MessageRenderingContext, unknown>(() => {})
-          )
-      )
+          .map((reactionContent) => reactMessage(channelId, messageId, reactionContent))
+      ).discard()
     )
-    .discard();
+  );
 }
 
 const lock = new AsyncLock();

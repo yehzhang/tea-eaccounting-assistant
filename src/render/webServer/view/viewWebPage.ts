@@ -25,7 +25,7 @@ function viewWebPage(view: WebPageView): RenderedWebPage {
     case 'UnsupportedIeBrowserView':
       return {
         html: viewUnsupportedIeBrowserView(indexTitle),
-      }
+      };
     case 'InvalidFleetLootEditorInputView':
       return {
         html: viewInvalidFleetLootEditorInput(fleetLootEditorTitle),

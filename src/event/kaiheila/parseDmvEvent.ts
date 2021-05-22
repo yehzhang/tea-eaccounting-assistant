@@ -2,9 +2,7 @@ import { dmvBotUserId } from '../../external/chatService/kaiheila/botUserIds';
 import Event, { DmvChatServiceEventCommon } from '../Event';
 import WebhookEvent from './WebhookEvent';
 
-function parseDmvEvent(
-  event: WebhookEvent,
-): (Event & DmvChatServiceEventCommon) | null {
+function parseDmvEvent(event: WebhookEvent): (Event & DmvChatServiceEventCommon) | null {
   // Ignore events triggered by the bot itself.
   if (event.triggeringUserId === dmvBotUserId) {
     return null;

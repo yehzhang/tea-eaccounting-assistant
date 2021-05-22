@@ -103,7 +103,9 @@ function viewFleetLootEditor({ fleetMembers, loot }: FleetLoot, title: string): 
           </Button>
         </Section>
         <Section id="controls">
-          <p>点击下方按钮以保存并覆盖分赃记录。之后可返回聊天软件核对赃物，填写的名称及数量是否和截图一致。</p>
+          <p>
+            点击下方按钮以保存并覆盖分赃记录。之后可返回聊天软件核对赃物，填写的名称及数量是否和截图一致。
+          </p>
           <SubmitButton>💾 保存</SubmitButton>
         </Section>
       </form>

@@ -85,10 +85,7 @@ async function normalizeItemName(
     };
   }
   if (matchedSimilarLookingTexts.length) {
-    logError(
-      'Unexpected to match more than one similar looking texts',
-      matchedSimilarLookingTexts
-    );
+    logError('Unexpected to match more than one similar looking texts', matchedSimilarLookingTexts);
   }
 
   return {

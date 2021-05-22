@@ -13,7 +13,9 @@ function deleteMessage(channelId: string, messageId: string): Reader<EventContex
       await message.delete();
       return true;
     } catch (e) {
-      return logErrorWithContext('Unexpected error when deleting a Discord message', e).replaceBy(false);
+      return logErrorWithContext('Unexpected error when deleting a Discord message', e).replaceBy(
+        false
+      );
     }
   });
 }

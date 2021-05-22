@@ -21,9 +21,7 @@ function sendMessage(
     }
     const { msg_id: messageId } = response;
     if (typeof messageId !== 'string') {
-      return logErrorWithContext('Expected string msg_id from Kaiheila', response).replaceBy(
-        null
-      );
+      return logErrorWithContext('Expected string msg_id from Kaiheila', response).replaceBy(null);
     }
     return messageId;
   });

@@ -8,15 +8,20 @@ function logViewAndRendering(
   view: MessageView,
   rendering: RenderedMessage | null
 ): Reader<EventContext, void> {
-  return log({
-    type: 'view',
-    data: view,
-  }).sequence(
-    log({
-      type: 'rendering',
-      data: rendering,
-    })
-  );
+  return new Reader(() => {
+    if (view.type === 'DetectingItemsView') {
+      return;
+    }
+    return log({
+      type: 'view',
+      data: view,
+    }).sequence(
+      log({
+        type: 'rendering',
+        data: rendering,
+      })
+    );
+  });
 }
 
 export default logViewAndRendering;

@@ -25,6 +25,8 @@ const fleetLootRecordReader: Reader<
 
 function parseFleetLootRecord(message: Message): FleetLootRecord | null {
   if (!message.embed) {
+    // This is not necessarily an error as users may add reactions to non record messages, but added
+    // just in case.
     logError('Expected a valid message embed', message);
     return null;
   }

@@ -52,6 +52,11 @@ function viewMessage(view: MessageView): RenderedMessage | null {
         /* needs= */ []
       );
     }
+    case 'IncompatibleFleetMembersView':
+      return renderEmbedMessage({
+        title: '无法合并两份分赃记录，因为人员不一致',
+        description: '请确认是否漏人，或者两份记录是不是同一拨人。不是一拨人的话应分别分赃。',
+      });
     case 'FleetLootRecordUpdatedView': {
       const {
         title,

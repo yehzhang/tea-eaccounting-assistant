@@ -23,6 +23,10 @@ type MessageView =
       readonly fleetLootEditorUrl: string;
       readonly neederChooserUrl: string;
     }
+
+  | {
+      readonly type: 'IncompatibleFleetMembersView';
+    }
   | {
       readonly type: 'FleetLootRecordUpdatedView';
       readonly fleetLoot: FleetLoot;

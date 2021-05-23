@@ -42,13 +42,15 @@ function buildWebhookRouter(
 
       context.status = 200;
 
-      if (cachedSns.includes(sn)) {
-        logErrorWithoutContext('Unexpected repeated webhook call', context.request.body);
-        return;
-      }
-      cachedSns.push(sn);
-      if (50 < cachedSns.length) {
-        cachedSns.splice(0, 25);
+      if (typeof sn === 'string' && sn) {
+        if (cachedSns.includes(sn)) {
+          logErrorWithoutContext('Unexpected repeated webhook call', context.request.body);
+          return;
+        }
+        cachedSns.push(sn);
+        if (50 < cachedSns.length) {
+          cachedSns.splice(0, 25);
+        }
       }
 
       if (type === KaiheilaMessageType.SYSTEM && typeof challenge === 'string') {
@@ -64,7 +66,7 @@ function buildWebhookRouter(
       }
     }
   );
-  const cachedSns: unknown[] = [];
+  const cachedSns: string[] = [];
 
   return router;
 }

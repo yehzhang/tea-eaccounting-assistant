@@ -23,8 +23,8 @@ async function fetchKaiheila(
     });
   } catch (error) {
     logErrorWithoutContext('Unexpected error when fetching Kaiheila', {
-      error,
-      response,
+      errorMessage: error.message,
+      data: error.response?.data,
     });
     return null;
   }

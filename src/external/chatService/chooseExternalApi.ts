@@ -18,7 +18,7 @@ function chooseExternalApi<C extends EventContext & ChatServiceContext, R>(
 
 interface ExternalApiConfig<C, R> {
   readonly discord: Reader<C, R>;
-  readonly kaiheila: Reader<C & { chatService: 'kaiheilaTeaDispense' | 'kaiheilaDmv' }, R>;
+  readonly kaiheila: Reader<C & { chatService: 'kaiheilaTeaDispenser' | 'kaiheilaDmv' }, R>;
 }
 
 export default chooseExternalApi;

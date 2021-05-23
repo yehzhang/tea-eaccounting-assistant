@@ -14,9 +14,9 @@ function fetchKaiheilaReader(
   );
 }
 
-function getBotToken(chatService: 'kaiheilaTeaDispense' | 'kaiheilaDmv'): string {
+function getBotToken(chatService: 'kaiheilaTeaDispenser' | 'kaiheilaDmv'): string {
   switch (chatService) {
-    case 'kaiheilaTeaDispense':
+    case 'kaiheilaTeaDispenser':
       return teaDispenserBotToken;
     case 'kaiheilaDmv':
       return dmvBotToken;

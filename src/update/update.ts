@@ -20,7 +20,7 @@ import updateOnWebNeedsEditorPosted from './teaDispenser/web/updateOnWebNeedsEdi
 import updateOnWebNeedsEditorRequested from './teaDispenser/web/updateOnWebNeedsEditorRequested';
 import updateOnPinged from './updateOnPinged';
 
-function update(event: Event): Reader<EventContext, boolean> {
+function update(event: Event): Reader<EventContext, void> {
   return runUpdateWithEventContext(
     {
       '[Chat] Pinged': updateOnPinged,
@@ -38,10 +38,12 @@ function update(event: Event): Reader<EventContext, boolean> {
       '[Web] NeedsEditorPosted': updateOnWebNeedsEditorPosted,
     },
     event
-  ).mapContext((context) => ({
-    ...context,
-    messageIdToEditRef: { current: null },
-  }));
+  )
+    .discard()
+    .mapContext((context) => ({
+      ...context,
+      messageIdToEditRef: { current: null },
+    }));
 }
 
 export default update;

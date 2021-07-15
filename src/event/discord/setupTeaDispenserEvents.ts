@@ -7,7 +7,6 @@ import parseTeaDispenserEventFromReaction from './parseTeaDispenserEventFromReac
 
 function setupTeaDispenserEvents(dispatchEvent: DispatchEvent<Event>) {
   const clientUser = teaDispenserClient.user!;
-  console.info(`Logged in as ${clientUser.tag}!`);
 
   teaDispenserClient.on('message', async (message) => {
     const event = parseTeaDispenserEventFromMessage(message, clientUser.id);

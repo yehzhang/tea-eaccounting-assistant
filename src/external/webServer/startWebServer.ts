@@ -1,6 +1,5 @@
 import Koa from 'koa';
 import Router from 'koa-router';
-import { URL } from 'url';
 import webServerBaseUrl from './webServerBaseUrl';
 
 function startWebServer(routers: readonly Router[]) {
@@ -11,9 +10,8 @@ function startWebServer(routers: readonly Router[]) {
     koa.use(router.allowedMethods());
   }
 
-  const url = new URL(webServerBaseUrl);
-  const port = url.port ? Number(url.port) : 80;
-  koa.listen(port, () => {
+  // Listen to 0.0.0.0 to work inside of Docker.
+  koa.listen(80, '0.0.0.0', () => {
     console.info(`Web server listening at ${webServerBaseUrl}`);
   });
 }

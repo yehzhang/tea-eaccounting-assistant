@@ -25,13 +25,14 @@ function buildWebhookRouter(
     },
     bodyParser(),
     (context) => {
-      if (context.request.body?.s !== 0) {
-        logErrorWithoutContext('Expected Kaiheila webhook event', context.request.body);
+      const requestBody = context.request.body as any;
+      if (requestBody?.s !== 0) {
+        logErrorWithoutContext('Expected Kaiheila webhook event', requestBody);
         context.status = 400;
         return;
       }
 
-      const { d: data = {}, sn } = context.request.body;
+      const { d: data = {}, sn } = requestBody;
       const { type, challenge, verify_token: verifyToken } = data;
       const parseEvent = eventParsers[verifyToken];
       if (!parseEvent) {
@@ -44,7 +45,7 @@ function buildWebhookRouter(
 
       if (typeof sn === 'string' && sn) {
         if (cachedSns.includes(sn)) {
-          logErrorWithoutContext('Unexpected repeated webhook call', context.request.body);
+          logErrorWithoutContext('Unexpected repeated webhook call', requestBody);
           return;
         }
         cachedSns.push(sn);

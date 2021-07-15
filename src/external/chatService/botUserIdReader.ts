@@ -3,7 +3,7 @@ import ChatServiceContext from '../../data/ChatServiceContext';
 import teaDispenserClient from './discord/teaDispenserClient';
 import { dmvBotUserId, teaDispenserBotUserId } from './kaiheila/botUserIds';
 
-const botUserIdReader = new Reader<ChatServiceContext, string>(({ chatService }) => {
+const botUserIdReader = new Reader<ChatServiceContext, string | null>(({ chatService }) => {
   switch (chatService) {
     case 'discordTeaDispenser':
       return teaDispenserClient.user!.id;

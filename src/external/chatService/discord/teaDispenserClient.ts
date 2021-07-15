@@ -1,11 +1,10 @@
 import { Client } from 'discord.js';
-import getEnvironmentVariable from '../../getEnvironmentVariable';
 
 const teaDispenserClient = new Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION', 'USER'] });
 
-await Promise.all([
-  teaDispenserClient.login(getEnvironmentVariable('DISCORD_BOT_TOKEN')),
-  new Promise((resolve) => void teaDispenserClient.on('ready', () => resolve(null))),
-]);
+if (process.env.DISCORD_BOT_TOKEN) {
+  await teaDispenserClient.login(process.env.DISCORD_BOT_TOKEN);
+  console.log('Using Discord Tea Dispenser,', teaDispenserClient.user?.tag);
+}
 
 export default teaDispenserClient;

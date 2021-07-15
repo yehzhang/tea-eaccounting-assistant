@@ -11,6 +11,6 @@ async function fetchBotUserId(botToken: string): Promise<string> {
 }
 
 export const [teaDispenserBotUserId, dmvBotUserId] = await Promise.all([
-  fetchBotUserId(teaDispenserBotToken),
-  fetchBotUserId(dmvBotToken),
+  teaDispenserBotToken && fetchBotUserId(teaDispenserBotToken),
+  dmvBotToken && fetchBotUserId(dmvBotToken),
 ]);

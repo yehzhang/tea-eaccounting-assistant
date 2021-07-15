@@ -7,11 +7,11 @@ function getEnvironmentVariable<T>(
 ): T;
 function getEnvironmentVariable<T>(
   key: string,
-  validator: (text: string) => T | null = _.identity
+  validator: (text: string) => T | null | undefined = _.identity
 ): T {
   const text = process.env[key];
   if (!text) {
-    throw new TypeError(`Expected the \`${key}\` environment variable`);
+    throw new TypeError(`Expected \`${key}\` environment variable`);
   }
 
   const validatedValue = validator(text);

@@ -10,7 +10,7 @@ async function createMonolingualScheduler(
   tessedit_char_whitelist?: string
 ): Promise<Scheduler> {
   const worker = createWorker({
-    langPath: getPathRelativeToFileDirname(import.meta.url, '../../../training/outputTessdata'),
+    langPath: getPathRelativeToFileDirname(import.meta.url, '../../training/outputTessdata'),
     gzip: false,
     errorHandler: (error) => void logError('Tesseract worker error:', error),
   });
@@ -32,7 +32,7 @@ async function createMonolingualScheduler(
 const trainedDataFilenames = ['chi_sim.traineddata', 'eng.traineddata'];
 await Promise.all(
   trainedDataFilenames.map(async (filename) => {
-    const path = getPathRelativeToFileDirname(import.meta.url, '../../../', filename);
+    const path = getPathRelativeToFileDirname(import.meta.url, '../../', filename);
     try {
       await stat(path);
     } catch {

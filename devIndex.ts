@@ -1,11 +1,13 @@
 import { ChildProcess, spawn } from 'child_process';
 import chokidar from 'chokidar';
 
+console.log('Starting dev service');
+
 const watcher = chokidar.watch('./src');
 await new Promise((resolve) => void watcher.on('ready', resolve));
 
 function run(): ChildProcess {
-  return spawn('yarn', ['start'], {
+  return spawn('yarn', ['start:app'], {
     stdio: 'inherit',
   });
 }

@@ -48,7 +48,11 @@
     "train:chinese": "cd ./training && tesstrain.sh --fontlist 'Source Han Sans CN Semi-Light' --fonts_dir ./font --output_dir ./outputTessdata --tessdata_dir ./inputTessdata --langdata_dir ./langdata --overwrite --lang chi_sim",
     "train:english": "cd ./training && tesstrain.sh --fontlist 'Source Han Sans CN Semi-Light' --fonts_dir ./font --output_dir ./outputTessdata --tessdata_dir ./inputTessdata --langdata_dir ./langdata --overwrite --lang eng",
     "test": "run(){ ts-node node_modules/jasmine/bin/jasmine ${@:-./**/*.spec.ts}; }; run",
+    "docker:build": "./build_docker.sh",
+    "docker:push": "docker push yehzhang/tea-eaccounting-assistant:latest",
+    "start:prod": "node --loader ts-node/esm/transpile-only --experimental-specifier-resolution=node prodIndex.ts",
     "start:dev": "node --loader ts-node/esm --experimental-specifier-resolution=node devIndex.ts",
-    "start": "node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts"
+    "start:app:transpileOnly": "node --loader ts-node/esm/transpile-only --experimental-specifier-resolution=node src/index.ts",
+    "start:app": "node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts"
   }
 }

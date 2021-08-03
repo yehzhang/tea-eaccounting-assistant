@@ -1,4 +1,3 @@
-import winston from 'winston';
 import EventContext from '../core/EventContext';
 import Reader from '../core/Reader/Reader';
 import WebServerContext from '../data/WebServerContext';
@@ -10,8 +9,7 @@ function log(entry: LogEntry): Reader<Partial<EventContext & WebServerContext>, 
       ...entry,
       context: trimmedContext,
     };
-    console.dir(newEntry, { depth: null });
-    logger.info(newEntry);
+    console.log(JSON.stringify(newEntry));
   });
 }
 
@@ -25,9 +23,5 @@ type LogEntry =
       readonly message: string;
       readonly data: unknown;
     };
-
-const logger = winston.createLogger({
-  transports: [new winston.transports.File({ filename: 'tea_dispenser.log' })],
-});
 
 export default log;

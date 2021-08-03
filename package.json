@@ -17,8 +17,7 @@
     "nanoid": "^3.1.22",
     "opencv4nodejs": "^5.6.0",
     "tesseract.js": "^2.1.4",
-    "vhtml": "^2.2.0",
-    "winston": "^3.3.3"
+    "vhtml": "^2.2.0"
   },
   "devDependencies": {
     "@types/async-lock": "^1.1.2",
@@ -32,7 +31,6 @@
     "@types/nanoid": "^2.1.0",
     "@types/node": "^14.14.7",
     "@types/vhtml": "^2.2.1",
-    "@types/winston": "^2.4.4",
     "chokidar": "^3.5.1",
     "jasmine": "^3.6.3",
     "jq.node": "^2.4.0",

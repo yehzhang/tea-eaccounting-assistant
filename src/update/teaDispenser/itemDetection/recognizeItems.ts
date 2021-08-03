@@ -1,6 +1,7 @@
 import cv, { Mat } from 'opencv4nodejs';
 import { Scheduler } from 'tesseract.js';
 import RecognizedItem from '../../../data/RecognizedItem';
+import logError from '../../../external/logError';
 import { chineseRecognizer } from '../../../external/tesseractSchedulers';
 import locateItemStacks, { LocatedItemStack } from './locateItemStacks';
 import recognizeDigit from './recognizeDigit';
@@ -12,12 +13,16 @@ async function recognizeItems(
   imagePath: string
 ): Promise<readonly Promise<RecognizedItem | null>[]> {
   console.debug('Recognizing image:', imagePath);
-
-  const image = await cv.imreadAsync(imagePath);
-  const locatedItemStacks = await locateItemStacks(image);
-  return locatedItemStacks.map((locatedItemStack) =>
-    recognizeItemStack(image, locatedItemStack, chineseRecognizer)
-  );
+  try {
+    const image = await cv.imreadAsync(imagePath);
+    const locatedItemStacks = await locateItemStacks(image);
+    return locatedItemStacks.map((locatedItemStack) =>
+      recognizeItemStack(image, locatedItemStack, chineseRecognizer)
+    );
+  } catch (e) {
+    logError('Unexpected opencv error', e);
+    return [];
+  }
 }
 
 async function recognizeItemStack(

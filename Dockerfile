@@ -14,7 +14,7 @@ RUN \
     npm install
 
 # Install the app.
-COPY . .
+COPY package.json .
 RUN \
     # Cleanup build dependencies.
     rm -rf /var/lib/apt/lists/* && \
@@ -22,6 +22,7 @@ RUN \
     apt-get autoremove -y --purge && \
     # Install the app.
     npm install
+COPY . .
 
 EXPOSE 80
 ENTRYPOINT ["npm", "run"]

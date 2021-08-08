@@ -16,5 +16,4 @@ training/
 !training/outputTessdata/chi_sim.traineddata
 *.log
 *.traineddata
-devIndex.ts
 build_docker.sh

@@ -17,6 +17,7 @@
     "nanoid": "^3.1.22",
     "opencv4nodejs": "^5.6.0",
     "tesseract.js": "^2.1.4",
+    "tree-kill": "^1.2.2",
     "vhtml": "^2.2.0"
   },
   "devDependencies": {
@@ -48,8 +49,8 @@
     "test": "run(){ ts-node node_modules/jasmine/bin/jasmine ${@:-./**/*.spec.ts}; }; run",
     "docker:build": "./build_docker.sh",
     "docker:push": "docker push yehzhang/tea-eaccounting-assistant:latest",
-    "start:prod": "node --loader ts-node/esm/transpile-only --experimental-specifier-resolution=node prodIndex.ts",
-    "start:dev": "node --loader ts-node/esm --experimental-specifier-resolution=node devIndex.ts",
+    "start:restarter:prod": "node --loader ts-node/esm/transpile-only --experimental-specifier-resolution=node prodRestarter.ts",
+    "start:restarter:dev": "node --loader ts-node/esm --experimental-specifier-resolution=node devRestarter.ts",
     "start:app:transpileOnly": "node --loader ts-node/esm/transpile-only --experimental-specifier-resolution=node src/index.ts",
     "start:app": "node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts"
   }

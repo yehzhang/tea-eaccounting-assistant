@@ -5,6 +5,7 @@ import { basename } from 'path';
 import Reader from '../../core/Reader/Reader';
 import MessageContext from '../../data/MessageContext';
 import RecognizedItem from '../../data/RecognizedItem';
+import Ref from '../../data/Ref';
 import UserInputPricedItemStack from '../../data/UserInputPricedItemStack';
 import { TeaDispenserImagePostedEvent } from '../../event/Event';
 import logErrorWithContext from '../../external/logErrorWithContext';
@@ -27,7 +28,7 @@ function updateOnTeaDispenserImagePosted(
     void (async () => {
       let magnifierDirection = true;
       while (detectingItems) {
-        const timeoutPromise = new Promise((resolve) => void setTimeout(resolve, 1260));
+        const timeoutPromise = waitForTimeoutMs(1260);
 
         const success = await dispatchView({
           type: 'DetectingItemsView',
@@ -64,9 +65,7 @@ function updateOnTeaDispenserImagePosted(
       };
     }
 
-    const {
-      messageIdToEditRef: { current: messageIdToEdit },
-    } = context;
+    const messageIdToEdit = await waitForMessageIdRef(context.messageIdToEditRef);
     if (!messageIdToEdit) {
       return logErrorWithContext('Expected a sent message from reference').replaceBy({
         type: 'InternalErrorView',
@@ -127,6 +126,20 @@ async function populateItemStack({
     amount,
     price: itemPrice ? itemPrice.lowestSell : null,
   };
+}
+
+function waitForTimeoutMs(timeoutMs: number): Promise<void> {
+  return new Promise((resolve) => void setTimeout(resolve, timeoutMs));
+}
+
+async function waitForMessageIdRef(messageIdRef: Readonly<Ref<string>>): Promise<string | null> {
+  // Wait for 10 seconds.
+  let retryCount = 0;
+  while (messageIdRef.current === null && retryCount < 20) {
+    await waitForTimeoutMs(500);
+    retryCount++;
+  }
+  return messageIdRef.current;
 }
 
 export default updateOnTeaDispenserImagePosted;
